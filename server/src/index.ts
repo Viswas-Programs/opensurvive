@@ -6,7 +6,7 @@ import { DIRECTION_VEC, MAP_SIZE, TICKS_PER_SECOND } from "./constants";
 import { CommonAngles, Vec2 } from "./types/math";
 import { Player } from "./store/entities";
 import { World } from "./types/world";
-import { Plain, Pond, River, Sea } from "./store/terrains";
+import { Floor, Plain, Pond, River, Sea } from "./store/terrains";
 import { Tree, Bush, Crate, Stone, Barrel } from "./store/obstacles";
 import { BUILDING_SUPPLIERS } from "./store/buildings";
 
@@ -70,134 +70,134 @@ export function reset() {
 reset();
 
 server.on("connection", async socket => {
-  console.log("Received a connection request");
-  // Set the type for msgpack later.
-  socket.binaryType = "arraybuffer";
+	console.log("Received a connection request");
+	// Set the type for msgpack later.
+	socket.binaryType = "arraybuffer";
 
-  // Add socket to map with a generated ID.
-  const id = ID();
-  sockets.set(id, socket);
+	// Add socket to map with a generated ID.
+	const id = ID();
+	sockets.set(id, socket);
 
-  // Setup the close connection listener. Socket will be deleted from map.
-  var connected = false;
-  socket.on("close", () => {
-    console.log("Connection closed");
-    sockets.delete(id);
-    connected = false;
-  });
+	// Setup the close connection listener. Socket will be deleted from map.
+	var connected = false;
+	socket.on("close", () => {
+		console.log("Connection closed");
+		sockets.delete(id);
+		connected = false;
+	});
 
-  var username = "";
-  var accessToken: string | undefined = undefined;
-  var skin = "default";
-  var deathImg = "default";
-  // Communicate with the client by sending the ID and map size. The client should respond with ID and username, or else close the connection.
-  await Promise.race([wait(10000), new Promise<void>(resolve => {
-    send(socket, new AckPacket(id, TICKS_PER_SECOND, world.size, world.defaultTerrain));
-    socket.once("message", (msg: ArrayBuffer) => {
-      const decoded = <ResponsePacket>receive(msg);
-      console.log(decoded.accessToken);
-      if (decoded.id == id && decoded.username && decoded.skin && decoded.deathImg && decoded.accessToken) {
-        connected = true;
-        username = decoded.username;
-        accessToken = decoded.accessToken;
-        skin = decoded.skin;
-        deathImg = decoded.deathImg;
-        console.log(skin)
-      } else try { socket.close(); } catch (err) { }
-      resolve();
-    })
-  })]);
-  if (!connected) return;
-  console.log(`A new player with ID ${id} connected!`);
+	var username = "";
+	var accessToken: string | undefined = undefined;
+	var skin = "default";
+	var deathImg = "default";
+	// Communicate with the client by sending the ID and map size. The client should respond with ID and username, or else close the connection.
+	await Promise.race([wait(10000), new Promise<void>(resolve => {
+		send(socket, new AckPacket(id, TICKS_PER_SECOND, world.size, world.defaultTerrain));
+		socket.once("message", (msg: ArrayBuffer) => {
+			const decoded = <ResponsePacket>receive(msg);
+			if (decoded.id == id && decoded.username && decoded.skin && decoded.deathImg) {
+				connected = true;
+				username = decoded.username;
+				accessToken = decoded.accessToken;
+				
+				skin = decoded.skin;
+				deathImg = decoded.deathImg;
+				console.log(skin)
+			} else try { socket.close(); } catch (err) { }
+			resolve();
+		})
+	})]);
+	if (!connected) return;
+	console.log(`A new player with ID ${id} connected!`);
 
-  // Create the new player and add it to the entity list.
-  const player = new Player(id, username, skin, deathImg, accessToken);
-  world.addPlayer(player);
-  player.boost *= 1.5;
+	// Create the new player and add it to the entity list.
+	const player = new Player(id, username, skin, deathImg, accessToken);
+	world.addPlayer(player);
+	player.boost *= 1.5;
 
-  // Send the player the entire map
-  send(socket, new MapPacket(world.obstacles, world.buildings, world.terrains));
-  // Send the player initial objects
-  send(socket, new GamePacket(world.entities, world.obstacles.concat(...world.buildings.map(b => b.obstacles.map(o => o.obstacle))), player, world.playerCount, true));
-  // Send the player music
-  for (const sound of world.joinSounds) send(socket, new SoundPacket(sound.path, sound.position));
+	// Send the player the entire map
+	send(socket, new MapPacket(world.obstacles, world.buildings, world.terrains.concat(...world.buildings.map(b => b.floors.map(fl => fl.terrain)))));
+	// Send the player initial objects
+	send(socket, new GamePacket(world.entities, world.obstacles.concat(...world.buildings.map(b => b.obstacles.map(o => o.obstacle))), player, world.playerCount, true));
+	// Send the player music
+	for (const sound of world.joinSounds) send(socket, new SoundPacket(sound.path, sound.position));
 
-  // If the client doesn't ping for 30 seconds, we assume it is a disconnection.
-  const timeout = setTimeout(() => {
-    try { socket.close(); } catch (err) { }
-  }, 30000);
+	// If the client doesn't ping for 30 seconds, we assume it is a disconnection.
+	const timeout = setTimeout(() => {
+		try { socket.close(); } catch (err) { }
+	}, 30000);
 
-  // The 4 directions of movement
-  const movements = [false, false, false, false];
-  const buttons = new Map<number, boolean>();
+	// The 4 directions of movement
+	const movements = [false, false, false, false];
+	const buttons = new Map<number, boolean>();
 
-  socket.on("message", (msg: ArrayBuffer) => {
-    const decoded = receive(msg);
-    switch (decoded.type) {
-      case "ping":
-        timeout.refresh();
-        break;
-      case "movementpress":
-        // Make the direction true
-        const mvPPacket = <MovementPressPacket>decoded;
-        movements[mvPPacket.direction] = true;
-        // Add corresponding direction vector to a zero vector to determine the velocity and direction.
-        var angleVec = Vec2.ZERO;
-        for (let ii = 0; ii < movements.length; ii++) if (movements[ii]) angleVec = angleVec.addVec(DIRECTION_VEC[ii]);
-        player.setVelocity(angleVec.unit());
-        break;
-      case "movementrelease":
-        // Make the direction false
-        const mvRPacket = <MovementReleasePacket>decoded;
-        movements[mvRPacket.direction] = false;
-        // Same as movementpress
-        var angleVec = Vec2.ZERO;
-        for (let ii = 0; ii < movements.length; ii++) if (movements[ii]) angleVec = angleVec.addVec(DIRECTION_VEC[ii]);
-        player.setVelocity(angleVec.unit());
-        break;
-      // Very not-done. Will probably change to "attack" and "use" tracking.
-      case "mousepress":
-        buttons.set((<MousePressPacket>decoded).button, true);
-        if (buttons.get(0)) player.tryAttacking = true;
-        break;
-      case "mouserelease":
-        buttons.set((<MouseReleasePacket>decoded).button, false);
-        if (!buttons.get(0)) player.tryAttacking = false;
-        break;
-      case "mousemove":
-        const mMvPacket = <MouseMovePacket>decoded;
-        // { x, y } will be x and y offset of the client from the centre of the screen.
-        player.setDirection(new Vec2(mMvPacket.x, mMvPacket.y));
-        break;
-      case "interact":
-        player.tryInteracting = true;
-        break;
-      case "switchweapon":
-        const swPacket = <SwitchWeaponPacket>decoded;
-        if (swPacket.setMode) {
-          if (player.inventory.getWeapon(swPacket.delta))
-            player.inventory.holding = swPacket.delta;
-        } else {
-          const unitDelta = swPacket.delta < 0 ? -1 : 1;
-          var holding = player.inventory.holding + swPacket.delta;
-          if (holding < 0) holding += player.inventory.weapons.length;
-          else holding %= player.inventory.weapons.length;
-          while (!player.inventory.getWeapon(holding)) {
-            holding += unitDelta;
-            if (holding < 0) holding += player.inventory.weapons.length;
-            else holding %= player.inventory.weapons.length;
-          }
-          player.inventory.holding = holding;
-        }
-        break;
-      case "reloadweapon":
-        player.reload();
-        break;
-      case "usehealing":
-        player.heal((<UseHealingPacket>decoded).item);
-        break;
-    }
-  });
+	socket.on("message", (msg: ArrayBuffer) => {
+		const decoded = receive(msg);
+		switch (decoded.type) {
+			case "ping":
+				timeout.refresh();
+				break;
+			case "movementpress":
+				// Make the direction true
+				const mvPPacket = <MovementPressPacket>decoded;
+				movements[mvPPacket.direction] = true;
+				// Add corresponding direction vector to a zero vector to determine the velocity and direction.
+				var angleVec = Vec2.ZERO;
+				for (let ii = 0; ii < movements.length; ii++) if (movements[ii]) angleVec = angleVec.addVec(DIRECTION_VEC[ii]);
+				player.setVelocity(angleVec.unit());
+				break;
+			case "movementrelease":
+				// Make the direction false
+				const mvRPacket = <MovementReleasePacket>decoded;
+				movements[mvRPacket.direction] = false;
+				// Same as movementpress
+				var angleVec = Vec2.ZERO;
+				for (let ii = 0; ii < movements.length; ii++) if (movements[ii]) angleVec = angleVec.addVec(DIRECTION_VEC[ii]);
+				player.setVelocity(angleVec.unit());
+				break;
+			// Very not-done. Will probably change to "attack" and "use" tracking.
+			case "mousepress":
+				buttons.set((<MousePressPacket>decoded).button, true);
+				if (buttons.get(0)) player.tryAttacking = true;
+				break;
+			case "mouserelease":
+				buttons.set((<MouseReleasePacket>decoded).button, false);
+				if (!buttons.get(0)) player.tryAttacking = false;
+				break;
+			case "mousemove":
+				const mMvPacket = <MouseMovePacket>decoded;
+				// { x, y } will be x and y offset of the client from the centre of the screen.
+				player.setDirection(new Vec2(mMvPacket.x, mMvPacket.y));
+				break;
+			case "interact":
+				player.tryInteracting = true;
+				break;
+			case "switchweapon":
+				const swPacket = <SwitchWeaponPacket>decoded;
+				if (swPacket.setMode) {
+					if (player.inventory.getWeapon(swPacket.delta))
+						player.inventory.holding = swPacket.delta;
+				} else {
+					const unitDelta = swPacket.delta < 0 ? -1 : 1;
+					var holding = player.inventory.holding + swPacket.delta;
+					if (holding < 0) holding += player.inventory.weapons.length;
+					else holding %= player.inventory.weapons.length;
+					while (!player.inventory.getWeapon(holding)) {
+						holding += unitDelta;
+						if (holding < 0) holding += player.inventory.weapons.length;
+						else holding %= player.inventory.weapons.length;
+					}
+					player.inventory.holding = holding;
+				}
+				break;
+			case "reloadweapon":
+				player.reload();
+				break;
+			case "usehealing":
+				player.heal((<UseHealingPacket>decoded).item);
+				break;
+		}
+	});
 });
 
 setInterval(() => {
