@@ -1,4 +1,4 @@
-run = "npm run webserv"
+run = "npm run gameserv"
 hidden = [".config", "package-lock.json", "tsconfig.json"]
 
 [packager]
@@ -26,4 +26,4 @@ requiredFiles = [".replit", "replit.nix", ".config"]
     start = "typescript-language-server --stdio"
 
 [deployment]
-run = ["sh", "-c", "npm run webserv"]
+run = ["sh", "-c", "npm run gameserv"]
