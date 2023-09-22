@@ -20,52 +20,52 @@ export const sockets = new Map<string, ws.WebSocket>();
 // Initialize the map
 export var world: World;
 export function reset() {
-  for (const socket of sockets.values()) socket.close();
-  sockets.clear();
+	for (const socket of sockets.values()) socket.close();
+	sockets.clear();
 
-  world = new World(new Vec2(MAP_SIZE[0], MAP_SIZE[1]), new Plain());
-  // Let's add some ponds
-  let ii: number;
-  for (ii = 0; ii < 5; ii++) world.terrains.push(new Pond());
-  // And a river
-  world.terrains.push(new River());
-  // And the sea ring
-  for (ii = 0; ii < 4; ii++) world.terrains.push(new Sea(ii));
-
-  // Add buildings
-  for (ii = 0; ii < 2; ii++) {
-    const cross = BUILDING_SUPPLIERS.get("cross")!.create();
-    cross.setPosition(world.size.scale(Math.random(), Math.random()));
-    world.buildings.push(cross);
-  }
-  for (ii = 0; ii < 5; ii++) {
-    const outhouse = BUILDING_SUPPLIERS.get("outhouse")!.create();
-    do {
-      var position = world.size.scale(Math.random(), Math.random());
-    } while (world.terrainAtPos(position).id != "plain");
-    outhouse.setPosition(position);
-    outhouse.setDirection(Vec2.UNIT_X.addAngle(Math.floor(Math.random() * 4) * CommonAngles.PI_TWO));
-    world.buildings.push(outhouse);
-  }
-  for (ii = 0; ii < 2; ii++) {
-    const outhouseMore = BUILDING_SUPPLIERS.get("outhouse_more")!.create();
-    do {
-      var position = world.size.scale(Math.random(), Math.random());
-    } while (world.terrainAtPos(position).id != "plain");
-    outhouseMore.setPosition(position);
-    outhouseMore.setDirection(Vec2.UNIT_X.addAngle(Math.floor(Math.random() * 4) * CommonAngles.PI_TWO));
-    world.buildings.push(outhouseMore);
-  }
-  // Add random obstacles
-  for (ii = 0; ii < 25; ii++) world.obstacles.push(new Tree());
-  world.obstacles.push(new Tree("mosin"));
-  for (ii = 0; ii < 25; ii++) world.obstacles.push(new Stone());
-  world.obstacles.push(new Stone("ak47"));
-  for (ii = 0; ii < 25; ii++) world.obstacles.push(new Crate());
-  for (ii = 0; ii < 10; ii++) world.obstacles.push(new Crate("soviet"));
-  for (ii = 0; ii < 15; ii++) world.obstacles.push(new Crate("grenade"));
-  for (ii = 0; ii < 25; ii++) world.obstacles.push(new Bush());
-  for (ii = 0; ii < 25; ii++) world.obstacles.push(new Barrel());
+	world = new World(new Vec2(MAP_SIZE[0], MAP_SIZE[1]), new Plain());
+	// Let's add some ponds
+	let ii: number;
+	for (ii = 0; ii < 5; ii++) world.terrains.push(new Pond());
+	// And a river
+	world.terrains.push(new River());
+	// And the sea ring
+	for (ii = 0; ii < 4; ii++) world.terrains.push(new Sea(ii));
+	
+	// Add buildings
+	for (ii = 0; ii < 2; ii++) {
+		const cross = BUILDING_SUPPLIERS.get("cross")!.create();
+		cross.setPosition(world.size.scale(Math.random(), Math.random()));
+		world.buildings.push(cross);
+	}
+	for (ii = 0; ii < 5; ii++) {
+		const outhouse = BUILDING_SUPPLIERS.get("outhouse")!.create();
+		do {
+			var position = world.size.scale(Math.random(), Math.random());
+		} while (world.terrainAtPos(position).id != "plain");
+		outhouse.setPosition(position);
+		outhouse.setDirection(Vec2.UNIT_X.addAngle(Math.floor(Math.random() * 4) * CommonAngles.PI_TWO));
+		world.buildings.push(outhouse);
+	}
+	for (ii = 0; ii < 2; ii++) {
+		const outhouseMore = BUILDING_SUPPLIERS.get("outhouse_more")!.create();
+		do {
+			var position = world.size.scale(Math.random(), Math.random());
+		} while (world.terrainAtPos(position).id != "plain");
+		outhouseMore.setPosition(position);
+		outhouseMore.setDirection(Vec2.UNIT_X.addAngle(Math.floor(Math.random() * 4) * CommonAngles.PI_TWO));
+		world.buildings.push(outhouseMore);
+	}
+	// Add random obstacles
+	for (ii = 0; ii < 25; ii++) world.obstacles.push(new Tree());
+	world.obstacles.push(new Tree("mosin"));
+	for (ii = 0; ii < 25; ii++) world.obstacles.push(new Stone());
+	world.obstacles.push(new Stone("ak47"));
+	for (ii = 0; ii < 25; ii++) world.obstacles.push(new Crate());
+	for (ii = 0; ii < 10; ii++) world.obstacles.push(new Crate("soviet"));
+	for (ii = 0; ii < 15; ii++) world.obstacles.push(new Crate("grenade"));
+	for (ii = 0; ii < 25; ii++) world.obstacles.push(new Bush());
+	for (ii = 0; ii < 25; ii++) world.obstacles.push(new Barrel());
 }
 reset();
 
@@ -95,11 +95,11 @@ server.on("connection", async socket => {
 		send(socket, new AckPacket(id, TICKS_PER_SECOND, world.size, world.defaultTerrain));
 		socket.once("message", (msg: ArrayBuffer) => {
 			const decoded = <ResponsePacket>receive(msg);
-			if (decoded.id == id && decoded.username && decoded.skin && decoded.deathImg) {
+			console.log(decoded.accessToken);
+			if (decoded.id == id && decoded.username && decoded.skin && decoded.deathImg && decoded.accessToken) {
 				connected = true;
 				username = decoded.username;
 				accessToken = decoded.accessToken;
-				
 				skin = decoded.skin;
 				deathImg = decoded.deathImg;
 				console.log(skin)
