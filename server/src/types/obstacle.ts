@@ -1,3 +1,4 @@
+import { Player } from "../store/entities";
 import { Roof } from "../store/obstacles";
 import { ID } from "../utils";
 import { Entity } from "./entity";
@@ -21,6 +22,7 @@ export class Obstacle {
 	maxHealth: number;
 	discardable = false;
 	despawn = false;
+	interactable = false;
 	animations: string[] = [];
 	dirty = true;
 	// Particle type to emit when damaged
@@ -79,6 +81,16 @@ export class Obstacle {
 		}
 	}
 
+	interact(_player: Player) { }
+
+	interactionKey() {
+		return this.translationKey();
+	}
+
+	translationKey() {
+		return `obstacle.${this.type}`;
+	}
+
 	// No implementation by default
 	onCollision(_thing: Entity | Obstacle) { }
 
@@ -113,6 +125,6 @@ export class Obstacle {
 	}
 
 	minmin() {
-		return <MinMinObstacle>{ type: this.type, position: this.position };
+		return <MinMinObstacle>{ id: this.id, type: this.type, position: this.position };
 	}
 }

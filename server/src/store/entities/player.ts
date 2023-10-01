@@ -1,8 +1,6 @@
 import { world } from "../..";
 import { GLOBAL_UNIT_MULTIPLIER, TICKS_PER_SECOND } from "../../constants";
-//import { updateUserScore } from "../../currencyUpdate";
 import { Entity, Inventory } from "../../types/entity";
-import { PickupableEntity } from "../../types/extensions";
 import { CircleHitbox, Vec2 } from "../../types/math";
 import { CollisionType, GunColor } from "../../types/misc";
 import { Obstacle } from "../../types/obstacle";
@@ -18,7 +16,7 @@ import Vest from "./vest";
 export default class Player extends Entity {
 	type = "player";
 	currentHealItem: string | null;
-	onTopOfLoot: string | null;
+	interactMessage: string | null;
 	hitbox = new CircleHitbox(1);
 	id: string;
 	username: string;
@@ -56,7 +54,7 @@ export default class Player extends Entity {
 	constructor(id: string, username: string, skin: string | null, deathImg: string | null, accessToken?: string) {
 		super();
 		this.id = id;
-		this.onTopOfLoot = null;
+		this.interactMessage = null;
 		this.username = username;
 		this.skin = skin;
 		this.deathImg = deathImg
@@ -125,16 +123,28 @@ export default class Player extends Entity {
 		// Check for entity hitbox intersection
 		let breaked = false;
 		for (const entity of entities) {
-			if (entity.hitbox.inside(this.position, entity.position, entity.direction) && (<any>entity)['picked']) {
+			if (!entity.interactable) continue;
+			if (entity.hitbox.inside(this.position, entity.position, entity.direction)) {
 				this.canInteract = true;
-				this.onTopOfLoot = entity.translationKey();
+				this.interactMessage = entity.interactionKey();
 				// Only interact when trying
 				if (this.tryInteracting) {
 					this.canInteract = false;
-					if ((<PickupableEntity><unknown>entity).picked(this)) {
-						entity.die();
-						this.markDirty();
-					}
+					entity.interact(this);
+				}
+				breaked = true;
+				break;
+			}
+		}
+		for (const obstacle of obstacles) {
+			if (!obstacle.interactable) continue;
+			if (obstacle.hitbox.scaleAll(1.25).collideCircle(obstacle.position, obstacle.direction, this.hitbox, this.position, this.direction)) {
+				this.canInteract = true;
+				this.interactMessage = obstacle.interactionKey();
+				// Only interact when trying
+				if (this.tryInteracting) {
+					this.canInteract = false;
+					obstacle.interact(this);
 				}
 				breaked = true;
 				break;
@@ -273,15 +283,13 @@ export default class Player extends Entity {
 			world.entities.push(item);
 		}
 		world.playerDied();
-		// Add currency to user if they are logged in and have kills
+		// Add kill count to killer
 		if (this.potentialKiller) {
 			const entity = world.entities.find(e => e.id == this.potentialKiller);
 			if (entity?.type === this.type) (<Player>entity).killCount++;
-			console.log("sup boi", this.killCount)
 		}
-		if (this.accessToken && this.killCount) { changeCurrency(this.accessToken, this.killCount * 100); console.log("success") }
-		console.log(this.killCount, this.potentialKiller, typeof this.potentialKiller);
-		// Add kill count to killer
+		// Add currency to user if they are logged in and have kills
+		if (this.accessToken && this.killCount) changeCurrency(this.accessToken, this.killCount * 100);
 	}
 
 	reload() {
@@ -299,7 +307,7 @@ export default class Player extends Entity {
 		if (this.maxHealTicks) return;
 		if (!this.inventory.healings[item]) return;
 		if (this.health >= this.maxHealth && !Healing.healingData.get(item)?.boost) return;
-		world.onceSounds.push({ path: `item_usage/${item}.mp3`, position: this.position })
+		world.onceSounds.push({ path: `items/${item}.mp3`, position: this.position })
 		this.maxHealTicks = this.healTicks = Healing.healingData.get(item)!.time * TICKS_PER_SECOND / 1000;
 		this.currentHealItem = `entity.healing.${item}`;
 		this.healItem = item;

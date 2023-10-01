@@ -1,9 +1,9 @@
-import { OBSTACLE_SUPPLIERS } from ".";
+import { MAP_OBSTACLE_SUPPLIERS, OBSTACLE_SUPPLIERS } from ".";
 import { world } from "../..";
-import { ObstacleData } from "../../types/data";
+import { MapObstacleData, ObstacleData } from "../../types/data";
 import { CircleHitbox } from "../../types/math";
 import { Obstacle } from "../../types/obstacle";
-import { ObstacleSupplier } from "../../types/supplier";
+import { MapObstacleSupplier, ObstacleSupplier } from "../../types/supplier";
 import { GunWeapon } from "../../types/weapon";
 import { randomBetween, spawnGun } from "../../utils";
 import { WEAPON_SUPPLIERS } from "../weapons";
@@ -14,10 +14,17 @@ class TreeSupplier extends ObstacleSupplier {
 	}
 }
 
+class TreeMapSupplier extends MapObstacleSupplier {
+	make(data: MapObstacleData) {
+		return new Tree(data.args ? data.args[0] : "normal");
+	}
+}
+
 export default class Tree extends Obstacle {
 	static readonly TYPE = "tree";
 	type = Tree.TYPE;
 	special: "normal" | "mosin";
+	damageParticle = "wood";
 
 	constructor(special: "normal" | "mosin" = "normal") {
 		const salt = randomBetween(0.9, 1.1);
@@ -27,11 +34,12 @@ export default class Tree extends Obstacle {
 
 	static {
 		OBSTACLE_SUPPLIERS.set(Tree.TYPE, new TreeSupplier());
+		MAP_OBSTACLE_SUPPLIERS.set(Tree.TYPE, new TreeMapSupplier());
 	}
 	
 	damage(dmg: number) {
 		super.damage(dmg);
-		world.onceSounds.push({ path: `objects/wood/wood_hit_01.mp3`, position: this.position });
+		world.onceSounds.push({ path: `obstacles/tree_hit.mp3`, position: this.position });
 	}
 
 	die() {

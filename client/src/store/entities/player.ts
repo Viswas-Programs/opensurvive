@@ -35,7 +35,7 @@ interface AdditionalEntity {
 	maxHealTicks: number;
 	skin: string | null;
 	deathImg: string | null;
-	onTopOfLoot: string | null;
+	interactMessage: string | null;
 	currentHealItem: string | null;
 }
 
@@ -56,7 +56,7 @@ export default class Player extends Entity {
 	deathImg!: string | null
 	currentSkinImg = new Image();
 	currentDeathImg = new Image();
-	onTopOfLoot: string | null = null;
+	interactMessage: string | null = null;
 	currentHealItem: string | null = null;
 	
 
@@ -72,7 +72,7 @@ export default class Player extends Entity {
 		this.username = minEntity.username;
 		this.skin = minEntity.skin;
 		this.deathImg = minEntity.deathImg;
-		this.onTopOfLoot = minEntity.onTopOfLoot;
+		this.interactMessage = minEntity.interactMessage;
 		
 		if (typeof minEntity.inventory.holding === "number") {
 			const inventory = <Inventory>minEntity.inventory;
@@ -171,10 +171,8 @@ export class FullPlayer extends Player {
 	maxReloadTicks!: number;
 	healTicks!: number;
 	maxHealTicks!: number;
-	onTopOfLoot!: string | null;
+	interactMessage!: string | null;
 	currentHealItem!: string | null;
-	skin!: string | null;
-	deathImg!: string | null;
 
 	copy(minEntity: MinEntity & AdditionalEntity) {
 		super.copy(minEntity);
@@ -182,7 +180,7 @@ export class FullPlayer extends Player {
 		this.maxHealth = minEntity.maxHealth;
 		this.boost = minEntity.boost;
 		this.maxBoost = minEntity.maxBoost;
-		this.onTopOfLoot = minEntity.onTopOfLoot;
+		this.interactMessage = minEntity.interactMessage;
 		this.currentHealItem = minEntity.currentHealItem;
 		this.scope = minEntity.scope;
 		this.canInteract = minEntity.canInteract || false;
@@ -190,7 +188,5 @@ export class FullPlayer extends Player {
 		this.maxReloadTicks = minEntity.maxReloadTicks;
 		this.healTicks = minEntity.healTicks;
 		this.maxHealTicks = minEntity.maxHealTicks;
-		this.skin = minEntity.skin;
-		this.deathImg = minEntity.deathImg;
 	}
 }
