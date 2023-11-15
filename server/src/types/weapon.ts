@@ -93,55 +93,55 @@ export class MeleeWeapon extends Weapon {
 }
 
 export class GunWeapon extends Weapon {
-  // More like constants
-  type = WeaponType.GUN;
-  color: GunColor;
-  ammo: number; // Ammo spawn
-  bullets: number;
-  spread: number;
-  moveSpread: number;
-  offset: Vec2;
-  bullet: BulletStats;
-  tracer: TracerData;
-  reloadTicks: number;
-  reloadBullets: number;
-  capacity: number;
+	// More like constants
+	type = WeaponType.GUN;
+	color: GunColor;
+	ammo: number; // Ammo spawn
+	bullets: number;
+	spread: number;
+	moveSpread: number;
+	offset: Vec2;
+	bullet: BulletStats;
+	tracer: TracerData;
+	reloadTicks: number;
+	reloadBullets: number;
+	capacity: number;
 
-  // Actual variables
-  magazine = 0;
+	// Actual variables
+	magazine = 0;
 
-  constructor(nameId: string, data: GunData) {
-    super(nameId, (data.normal.delay.firing / 1000) * TICKS_PER_SECOND, data.normal.speed.equip, data.normal.speed.attack, data.auto || false, data.droppable);
-    this.color = data.color;
-    this.ammo = data.ammo;
-    this.bullets = data.normal.bullets;
-    this.spread = data.normal.spread.still;
-    this.moveSpread = data.normal.spread.still;
-    this.offset = new Vec2(data.length, 0);
-    this.bullet = data.normal.bullet;
-    this.tracer = data.visuals.tracer;
-    this.reloadTicks = (data.normal.reload.time / 1000) * TICKS_PER_SECOND;
-    this.reloadBullets = data.normal.reload.bullets || data.normal.capacity;
-    this.capacity = data.normal.capacity;
-  }
+	constructor(nameId: string, data: GunData) {
+		super(nameId, (data.normal.delay.firing / 1000) * (TICKS_PER_SECOND), data.normal.speed.equip, data.normal.speed.attack, data.auto || false, data.droppable);
+		this.color = data.color;
+		this.ammo = data.ammo;
+		this.bullets = data.normal.bullets;
+		this.spread = data.normal.spread.still;
+		this.moveSpread = data.normal.spread.still;
+		this.offset = new Vec2(data.length, 0);
+		this.bullet = data.normal.bullet;
+		this.tracer = data.visuals.tracer;
+		this.reloadTicks = (data.normal.reload.time / 1000) * (60);
+		this.reloadBullets = data.normal.reload.bullets || data.normal.capacity;
+		this.capacity = data.normal.capacity;
+	}
 
-  attack(attacker: Entity, _entities: Entity[], _obstacles: Obstacle[]) {
-    this.shoot(attacker);
-  }
+	attack(attacker: Entity, _entities: Entity[], _obstacles: Obstacle[]) {
+		this.shoot(attacker);
+	}
 
-  // Spawn the bullet(s)
-  shoot(attacker: Entity) {
-    if (!attacker.despawn && this.magazine > 0) {
-      this.magazine--;
-      for (let ii = 0; ii < this.bullets; ii++) {
-        var angles = attacker.direction.angle() + toRadians((Math.random() - 0.5) * (attacker.velocity.magnitudeSqr() != 0 ? this.moveSpread : this.spread));
-        const position = attacker.position.addVec(this.offset.addAngle(attacker.direction.angle()));
-        const bullet = new Bullet(attacker, this.bullet.damage, Vec2.UNIT_X.addAngle(angles).scaleAll(this.bullet.speed / TICKS_PER_SECOND), randomBetween(this.bullet.range[0], this.bullet.range[1]) / (this.bullet.speed / TICKS_PER_SECOND), this.bullet.falloff, this.tracer);
-        bullet.position = position;
-        world.entities.push(bullet);
-      }
-    }
-  }
+	// Spawn the bullet(s)
+	shoot(attacker: Entity) {
+		if (!attacker.despawn && this.magazine > 0) {
+			this.magazine--;
+			for (let ii = 0; ii < this.bullets; ii++) {
+				var angles = attacker.direction.angle() + toRadians((Math.random() - 0.5) * (attacker.velocity.magnitudeSqr() != 0 ? this.moveSpread : this.spread));
+				const position = attacker.position.addVec(this.offset.addAngle(attacker.direction.angle()));
+				const bullet = new Bullet(attacker, this.bullet.damage, Vec2.UNIT_X.addAngle(angles).scaleAll(this.bullet.speed / TICKS_PER_SECOND), randomBetween(this.bullet.range[0], this.bullet.range[1]) / (this.bullet.speed / TICKS_PER_SECOND), this.bullet.falloff, this.tracer);
+				bullet.position = position;
+				world.entities.push(bullet);
+			}
+		}
+	}
 }
 
 export class GrenadeWeapon extends Weapon {
