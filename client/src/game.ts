@@ -1,20 +1,21 @@
-import * as dotenv from "dotenv"
-dotenv.config({ path: __dirname + '/.env' })
+/* eslint-disable no-fallthrough */
 import { Howl, Howler } from "howler";
 import { KeyBind, movementKeys, TIMEOUT } from "./constants";
 import { start, stop } from "./renderer";
 import { initMap } from "./rendering/map";
 import { addKeyPressed, addMousePressed, getToken, isKeyPressed, isMenuHidden, isMouseDisabled, removeKeyPressed, removeMousePressed, toggleBigMap, toggleHud, toggleMap, toggleMenu, toggleMinimap, toggleMouseDisabled } from "./states";
 import { FullPlayer, Healing } from "./store/entities";
-import { castObstacle, castMinObstacle } from "./store/obstacles";
+import { castObstacle, castMinObstacle, Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table } from "./store/obstacles";
 import { castTerrain } from "./store/terrains";
 import { Vec2 } from "./types/math";
-import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket } from "./types/packet";
+import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket } from "./types/packet";
 import { World } from "./types/world";
 import { receive, send } from "./utils";
 import Building from "./types/building";
 import { cookieExists, getCookieValue } from "cookies-utils";
 import { Obstacle } from "./types/obstacle";
+import { getMode } from "./homepage";
+import { MovementDirection } from "./types/misc";
 
 //handle users that tried to go to old domain name, or direct ip
 var urlargs = new URLSearchParams(window.location.search);
@@ -43,7 +44,11 @@ export function getTPS() { return tps; }
 
 var ws: WebSocket;
 var connected = false;
-
+enum modeMapColours {
+	normal = 0x80B251,
+	suroi_collab = 0x4823358
+}
+declare type modeMapColourType = keyof typeof modeMapColours
 async function init(address: string) {
 	// Initialize the websocket
 	var protocol = "wss";
@@ -61,7 +66,9 @@ async function init(address: string) {
 			const data = <AckPacket>receive(event.data);
 			id = data.id;
 			tps = data.tps;
-			world = new World(new Vec2(data.size[0], data.size[1]), castTerrain(data.terrain));
+			world = new World(new Vec2(data.size[0], data.size[1]), castTerrain(data.terrain).setColour((modeMapColours[getMode() as modeMapColourType])));
+			const gameObjects = [Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table]
+			gameObjects.forEach(OBJ => {OBJ.updateAssets() })
 	
 			// Call renderer start to setup
 			await start();
@@ -69,7 +76,7 @@ async function init(address: string) {
 			if (!currentCursor){localStorage.setItem("selectedCursor", "default"); currentCursor = localStorage.getItem("selectedCursor")}
 			if (currentCursor) {document.documentElement.style.cursor = currentCursor}
 			console.log("from game.ts client skin! > " + skin! + " and death img > " + deathImg!)
-			send(ws, new ResponsePacket(id, username!, skin!, deathImg!, cookieExists("gave_me_cookies") ? getCookieValue("access_token") : getToken()));
+			send(ws, new ResponsePacket(id, username!, skin!, deathImg!, (cookieExists("gave_me_cookies") ? getCookieValue("access_token") : getToken()) as string));
 			connected = true;
 			clearTimeout(timer);
 			
@@ -123,7 +130,7 @@ async function init(address: string) {
 						if (!player) break;
 						const soundPkt = <SoundPacket>data;
 						const howl = new Howl({
-							src: `assets/sounds/${soundPkt.path}`
+							src: `assets/${getMode()}/sounds/${soundPkt.path}`
 						});
 						const pos = Vec2.fromMinVec2(soundPkt.position);
 						const relative = pos.addVec(player.position.inverse()).scaleAll(1/60);
@@ -176,6 +183,137 @@ document.getElementById("connect")?.addEventListener("click", async () => {
 	}
 });
 
+const touchdevice = /Android/.test(navigator.userAgent) || /iPhone/.test(navigator.userAgent) || /iPad/.test(navigator.userAgent) || /Tablet/.test(navigator.userAgent)
+if (touchdevice) {
+	var joystickActive = false;
+	var joystickDirection = '';
+	var aimJoystickActive = false;
+
+	// Get the joystick and handle elements
+	const joystick = document.getElementsByClassName('joystick-container')[0];
+	const handle = document.getElementsByClassName('joystick-handle')[0];
+	const aimJoystick = document.getElementsByClassName('aimjoystick-container')[0];
+	const aimHandle = document.getElementsByClassName('aimjoystick-handle')[0];
+	const HandlerObjects = [joystick, handle, aimJoystick, aimHandle];
+	HandlerObjects.forEach(handler => {
+		(<HTMLElement>handler).style.display = 'block';
+	});
+	// Add event listeners for touch events
+	(<HTMLElement>handle).addEventListener('touchstart', handleTouchStart);
+	(<HTMLElement>handle).addEventListener('touchmove', handleTouchMove);
+	(<HTMLElement>handle).addEventListener('touchcancel', handleTouchEnd);
+	(<HTMLElement>handle).addEventListener('touchend', handleTouchEnd);
+	(<HTMLElement>joystick).addEventListener('touchcancel', handleTouchEnd);
+	(<HTMLElement>joystick).addEventListener('touchend', handleTouchEnd);
+
+	//Add event listeners for the aim joystick
+	(<HTMLElement>aimJoystick).addEventListener('touchcancel', handleAimJoystickTouchEnd);
+	(<HTMLElement>aimJoystick).addEventListener('touchend', handleAimJoystickTouchEnd);
+	(<HTMLElement>aimHandle).addEventListener('touchstart', handleAimJoystickTouchStart);
+	(<HTMLElement>aimHandle).addEventListener('touchmove', handleTouchMoveAimJoystick);
+	(<HTMLElement>aimHandle).addEventListener('touchcancel', handleAimJoystickTouchEnd);
+	(<HTMLElement>aimHandle).addEventListener('touchend', handleAimJoystickTouchEnd);
+
+	// Function to handle touchstart event
+	function handleTouchStart(event: Event) {
+		event.preventDefault();
+		joystickActive = true;
+		return 0;
+	}
+	function handleAimJoystickTouchStart(event: Event) { event.preventDefault(); aimJoystickActive = true; return 0; }
+
+	// Function to handle touchmove event
+	function handleTouchMove(event: any) {
+		event.preventDefault();
+		if (joystickActive) {
+			var touch = event.targetTouches[0];
+			var posX = touch.pageX - (<HTMLElement>joystick).offsetLeft;
+			var posY = touch.pageY - (<HTMLElement>joystick).offsetTop;
+			// Calculate the distance from the center of the joystick
+			var distance = Math.sqrt(Math.pow(posX - (<HTMLElement>joystick).offsetWidth / 2, 2) + Math.pow(posY - (<HTMLElement>joystick).offsetHeight / 2, 2));
+			var maxDistance = 50;
+			// If the distance exceeds the maximum, limit it
+			if (distance > maxDistance) {
+				var angle = Math.atan2(posY - (<HTMLElement>joystick).offsetHeight / 2, posX - (<HTMLElement>joystick).offsetWidth / 2);
+				var deltaX = Math.cos(angle) * maxDistance;
+				var deltaY = Math.sin(angle) * maxDistance;
+				posX = (<HTMLElement>joystick).offsetWidth / 2 + deltaX;
+				posY = (<HTMLElement>joystick).offsetHeight / 2 + deltaY;}
+			// Move the handle to the current position
+			(<HTMLElement>handle).style.left = posX + 'px';
+			(<HTMLElement>handle).style.top = posY + 'px';
+			// Calculate the joystick direction based on the handle position
+			var centerX = (<HTMLElement>joystick).offsetWidth / 2;
+			var centerY = (<HTMLElement>joystick).offsetHeight / 2;
+			var directionX = posX - centerX;
+			var directionY = posY - centerY;
+			joystickDirection = '';
+			if (Math.abs(directionX) > Math.abs(directionY)) {
+				if (directionX > 0) { joystickDirection = 'D'; send(ws, new MovementPressPacket(MovementDirection.RIGHT)); send(ws, new MovementReleasePacket(MovementDirection.LEFT)); }
+				if (directionX < 0) { joystickDirection = 'A'; send(ws, new MovementReleasePacket(MovementDirection.RIGHT)); send(ws, new MovementPressPacket(MovementDirection.LEFT));}}
+			if (Math.abs(directionX) < Math.abs(directionY)) {
+				if (directionY > 0) {
+					joystickDirection = 'S'; send(ws, new MovementPressPacket(MovementDirection.DOWN)); send(ws, new MovementReleasePacket(MovementDirection.UP))
+				} if (directionY < 0) { joystickDirection = 'W'; send(ws, new MovementPressPacket(MovementDirection.UP)); send(ws, new MovementReleasePacket(MovementDirection.DOWN)) }
+			}
+		}
+	}
+	//function for joystick aim part
+	function handleTouchMoveAimJoystick(event: any) {
+		event.preventDefault()
+		if (!aimJoystickActive) return;
+		var touch = event.targetTouches[0];
+		var posX = touch.pageX - (<HTMLElement>aimJoystick).offsetLeft;
+		var posY = touch.pageY - (<HTMLElement>aimJoystick).offsetTop;
+		// Calculate the distance from the center of the joystick
+		var distance = Math.sqrt(Math.pow(posX - (<HTMLElement>aimJoystick).offsetWidth / 2, 2) + Math.pow(posY - (<HTMLElement>aimJoystick).offsetHeight / 2, 2));
+		// Set the maximum distance to 50px (half of the handle size)
+		var maxDistance = 75;
+			// If the distance exceeds the maximum, limit it
+		if (distance > maxDistance) {
+			var angle = Math.atan2(posY - (<HTMLElement>aimJoystick).offsetHeight / 2, posX - (<HTMLElement>aimJoystick).offsetWidth / 2);
+			var deltaX = Math.cos(angle) * maxDistance;
+			var deltaY = Math.sin(angle) * maxDistance;
+			posX = (<HTMLElement>aimJoystick).offsetWidth / 2 + deltaX;
+			posY = (<HTMLElement>aimJoystick).offsetHeight / 2 + deltaY;
+		}
+		// Move the handle to the current position
+		(<HTMLElement>aimHandle).style.left = posX + 'px';
+		(<HTMLElement>aimHandle).style.top = posY + 'px';
+		// Calculate the joystick direction based on the handle position
+		var centerX = (<HTMLElement>aimJoystick).offsetWidth / 2;
+		var centerY = (<HTMLElement>aimJoystick).offsetHeight / 2;
+		var directionX = posX - centerX;
+		var directionY = posY - centerY;
+		send(ws, new MouseMovePacket(directionX - maxDistance / 2, directionY - maxDistance / 2))
+		if (distance > 37) {
+			send(ws, new MousePressPacket(1))
+		}
+	}
+	// Function to handle touchend event
+	function handleAimJoystickTouchEnd(event: Event) {
+		event.preventDefault();
+		aimJoystickActive = false;
+		send(ws, new MouseReleasePacket(1));
+	}
+	function handleTouchEnd(event: Event) {
+		event.preventDefault();
+		console.log("done")
+		joystickActive = false;
+		(<HTMLElement>handle).style.left = '50%';
+		(<HTMLElement>handle).style.top = '50%';
+		joystickDirection = '';
+		send(ws, new MovementResetPacket())
+	}
+
+	// Event listener to capture joystick direction changes
+	setInterval(function () {
+		if (joystickDirection == '' || !joystickActive) {
+			send(ws, new MovementResetPacket())
+			// You can perform your desired actions here based on the joystick direction
+		}
+	}, 100);
+}
 function check(username: string, address: string): Error | void {
 	if (!username)
 		throw new Error("Please provide a username.");

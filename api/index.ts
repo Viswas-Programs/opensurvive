@@ -8,7 +8,7 @@ const sqlite3 = verbose();
 const db = new sqlite3.Database("players.db");
 db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='players'", (err, row) => {
 	if (err) throw err;
-	if (!row) db.run("CREATE TABLE players (id integer PRIMARY KEY AUTOINCREMENT, username varchar(255) NOT NULL, password char(16) NOT NULL, access_token char(128), games_played int DEFAULT 0, kills int DEFAULT 0, currency int DEFAULT 0, skinsAvailable varchar(255) DEFAULT 'default')");
+	if (!row) db.run("CREATE TABLE players (id integer PRIMARY KEY AUTOINCREMENT, username varchar(255) NOT NULL, password char(16) NOT NULL, access_token char(128), games_played int DEFAULT 0, kills int DEFAULT 0, currency int DEFAULT 0, skinsAvailable varchar(255) DEFAULT 'default;')");
 });
 
 const app = express();
@@ -34,7 +34,7 @@ app.get("/deathMarker", (_req, res) => {
 		res.setHeader(key, value);
 	res.sendFile("deathMarker.html", { root: "client" });
 });
-app.get("/changelog.txt", (_req, res) => {
+app.get("/changelog", (_req, res) => {
 	for (const [key, value] of Object.entries(defaultHeaders))
 		res.setHeader(key, value);
 	res.sendFile("changelog.txt", { root: "client" });
@@ -214,6 +214,7 @@ app.post("/api/addSkins", jsonParser, (req, res) => {
 		}
 	});
 });
+app.get("/gameStatus", (req, res) => { res.status(204).json({ success: true, message: "Game is running!" }); });
 app.use("/data", express.static("data", { dotfiles: "allow", fallthrough: false }));
 app.use("/assets", express.static("client/assets", { fallthrough: false }));
 app.use("/scripts", express.static("client/scripts", { fallthrough: false }));
