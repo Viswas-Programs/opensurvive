@@ -7,7 +7,6 @@ import { DIRECTION_VEC, TICKS_PER_SECOND } from "./constants";
 import { CommonAngles, Vec2 } from "./types/math";
 import { Player } from "./store/entities";
 import { World } from "./types/world";
-import { MapTerrainSupplier } from "./types/supplier";
 import { Plain, castMapTerrain } from "./store/terrains";
 import { castMapObstacle } from "./store/obstacles";
 import { castBuilding } from "./store/buildings";
@@ -98,11 +97,10 @@ server.on("connection", async socket => {
 				connected = true;
 				username = decoded.username;
 				accessToken = decoded.accessToken;
-				
 				skin = decoded.skin;
 				deathImg = decoded.deathImg;
 				console.log(skin)
-			} else try { socket.close(); } catch (err) { }
+			} else try { console.log("insufficient info"); socket.close(); } catch (err) { }
 			resolve();
 		})
 	})]);
@@ -135,6 +133,10 @@ server.on("connection", async socket => {
 		switch (decoded.type) {
 			case "ping":
 				timeout.refresh();
+				break;
+			case "movementReset":
+				for (let ii = 0; ii < movements.length; ii++) { movements[ii] = false }
+				player.setVelocity(Vec2.ZERO)
 				break;
 			case "movementpress":
 				// Make the direction true
