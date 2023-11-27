@@ -14,7 +14,7 @@ import { MapData } from "./types/data";
 
 export var ticksElapsed = 0;
 
-const server = new ws.Server({ port: 8080 });
+const server = new ws.Server({ port: 80 });
 server.once("listening", () => console.log(`WebSocket Server listening at port ${server.options.port}`));
 
 export const sockets = new Map<string, ws.WebSocket>();
@@ -202,18 +202,18 @@ server.on("connection", async socket => {
 });
 
 setInterval(() => {
-	world.tick();
-	// Filter players from entities and send them packets
-	const players = <Player[]>world.entities.filter(entity => entity.type === "player");
-	players.forEach(player => {
-		const socket = sockets.get(player.id);
-		if (!socket) return;
-		const pkt = new GamePacket(world.dirtyEntities, world.dirtyObstacles, player, world.playerCount, false, world.discardEntities, world.discardObstacles)
-		if (world.zoneMoving) pkt.addSafeZoneData(world.safeZone);
-		else pkt.addNextSafeZoneData(world.nextSafeZone);
-		send(socket, pkt);
-		if (world.particles.length) send(socket, new ParticlesPacket(world.particles, player));
-		for (const sound of world.onceSounds) send(socket, new SoundPacket(sound.path, sound.position));
-	});
-	world.postTick();
+  world.tick();
+  // Filter players from entities and send them packets
+  const players = <Player[]>world.entities.filter(entity => entity.type === "player");
+  players.forEach(player => {
+    const socket = sockets.get(player.id);
+    if (!socket) return;
+    const pkt = new GamePacket(world.dirtyEntities, world.dirtyObstacles, player, world.playerCount, false, world.discardEntities, world.discardObstacles)
+    if (world.zoneMoving) pkt.addSafeZoneData(world.safeZone);
+    else pkt.addNextSafeZoneData(world.nextSafeZone);
+    send(socket, pkt);
+    if (world.particles.length) send(socket, new ParticlesPacket(world.particles, player));
+    for (const sound of world.onceSounds) send(socket, new SoundPacket(sound.path, sound.position));
+  });
+  world.postTick();
 }, 1000 / TICKS_PER_SECOND);
