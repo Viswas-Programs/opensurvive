@@ -2,7 +2,7 @@ import "dotenv/config";
 import { readFileSync } from "fs";
 import * as ws from "ws";
 import { ID, receive, send, wait } from "./utils";
-import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket } from "./types/packet";
+import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket } from "./types/packet";
 import { DIRECTION_VEC, TICKS_PER_SECOND } from "./constants";
 import { CommonAngles, Vec2 } from "./types/math";
 import { Player } from "./store/entities";
@@ -112,8 +112,6 @@ server.on("connection", async socket => {
 	// Create the new player and add it to the entity list.
 	const player = new Player(id, username, skin, deathImg, accessToken, isMobile);
 	world.addPlayer(player);
-	player.boost *= 1.5;
-
 	// Send the player the entire map
 	send(socket, new MapPacket(world.obstacles, world.buildings, world.terrains.concat(...world.buildings.map(b => b.floors.map(fl => fl.terrain)))));
 	// Send the player initial objects
@@ -143,7 +141,6 @@ server.on("connection", async socket => {
 			case "mobilemovement":
 				const MMvPacket = <MobileMovementPacket>decoded
 				player.setVelocity(new Vec2(Math.cos(MMvPacket.direction) * 1.45, Math.sin(MMvPacket.direction) * 1.45))
-				console.log(new Vec2(Math.cos(MMvPacket.direction) * 1.45, Math.sin(MMvPacket.direction) * 1.45))
 				break;
 			case "movementpress":
 				// Make the direction true
@@ -209,18 +206,19 @@ server.on("connection", async socket => {
 });
 
 setInterval(() => {
-  world.tick();
-  // Filter players from entities and send them packets
-  const players = <Player[]>world.entities.filter(entity => entity.type === "player");
-  players.forEach(player => {
-    const socket = sockets.get(player.id);
-    if (!socket) return;
-    const pkt = new GamePacket(world.dirtyEntities, world.dirtyObstacles, player, world.playerCount, false, world.discardEntities, world.discardObstacles)
-    if (world.zoneMoving) pkt.addSafeZoneData(world.safeZone);
-    else pkt.addNextSafeZoneData(world.nextSafeZone);
-    send(socket, pkt);
-    if (world.particles.length) send(socket, new ParticlesPacket(world.particles, player));
-    for (const sound of world.onceSounds) send(socket, new SoundPacket(sound.path, sound.position));
-  });
-  world.postTick();
+	world.tick();
+	// Filter players from entities and send them packets
+	const players = <Player[]>world.entities.filter(entity => entity.type === "player");
+	players.forEach(player => {
+		const socket = sockets.get(player.id);
+		if (!socket) return;
+		const pkt = new GamePacket(world.dirtyEntities, world.dirtyObstacles, player, world.playerCount, false, world.discardEntities, world.discardObstacles)
+		if (world.zoneMoving) pkt.addSafeZoneData(world.safeZone);
+		else pkt.addNextSafeZoneData(world.nextSafeZone);
+		send(socket, pkt);
+		if (world.particles.length) send(socket, new ParticlesPacket(world.particles, player));
+		for (const sound of world.onceSounds) send(socket, new SoundPacket(sound.path, sound.position));
+		for (const killFeed of world.killFeeds) send(socket, new AnnouncePacket(killFeed.killFeed, killFeed.killer))
+	});
+	world.postTick();
 }, 1000 / TICKS_PER_SECOND);
