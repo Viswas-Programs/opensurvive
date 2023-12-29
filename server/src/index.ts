@@ -2,7 +2,7 @@ import "dotenv/config";
 import { readFileSync } from "fs";
 import * as ws from "ws";
 import { ID, receive, send, wait } from "./utils";
-import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket } from "./types/packet";
+import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta } from "./types/packet";
 import { DIRECTION_VEC, TICKS_PER_SECOND } from "./constants";
 import { CommonAngles, Vec2 } from "./types/math";
 import { Player } from "./store/entities";
@@ -130,13 +130,17 @@ server.on("connection", async socket => {
 
 	socket.on("message", (msg: ArrayBuffer) => {
 		const decoded = receive(msg);
+		console.log(decoded.type	)
 		switch (decoded.type) {
 			case "ping":
 				timeout.refresh();
 				break;
 			case "movementReset":
-				for (let ii = 0; ii < movements.length; ii++) { movements[ii] = false }
 				player.setVelocity(Vec2.ZERO)
+				break;
+			case "playerRotation":
+				const RotationPacket = <PlayerRotationDelta>decoded;
+				player.setDirection(new Vec2(Math.cos(RotationPacket.angle) * 1.45, Math.sin(RotationPacket.angle) * 1.45))
 				break;
 			case "mobilemovement":
 				const MMvPacket = <MobileMovementPacket>decoded
