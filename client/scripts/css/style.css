@@ -22,17 +22,21 @@ canvas {
 }
 
 div#scopes {
+    display: flex;
     position: fixed;
     height: 10vh;
     top: 2vh;
     left: 50%;
     transform: translateX(-50%);
+    justify-content: center;
+    align-items: center;
 }
 
-.scope {
+#scope{
     border-width: 0;
     border-radius: 50%;
     border-color: #7CFC00;
+    margin: 4px;
     opacity: 0.6;
     transition: all ease .5s;
 }

@@ -173,6 +173,12 @@ export class ParticlesPacket implements IPacket {
 	}
 }
 
+export class ScopeUpdatePacket implements IPacket {
+	type = "scopeUpdate";
+	scope!: number;
+
+	constructor(scope: number) {this.scope = scope }
+}
 export class SoundPacket implements IPacket {
 	type = "sound";
 	// No need to include "client/assets/sounds"

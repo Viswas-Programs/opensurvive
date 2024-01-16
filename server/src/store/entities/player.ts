@@ -21,9 +21,11 @@ export default class Player extends Entity {
 	id: string;
 	username: string;
 	collisionLayers = [0];
+	lastPickedUpScope = 1
 	boost = 0;
 	maxBoost = 100;
 	scope = 1;
+	changedScope = false;
 	buildingEnterScope = 1;
 	_scope = 1;
 	tryAttacking = false;

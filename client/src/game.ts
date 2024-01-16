@@ -9,7 +9,7 @@ import { FullPlayer, Healing } from "./store/entities";
 import { castObstacle, castMinObstacle, Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table } from "./store/obstacles";
 import { castTerrain } from "./store/terrains";
 import { Vec2 } from "./types/math";
-import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta } from "./types/packet";
+import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta, ScopeUpdatePacket } from "./types/packet";
 import { World } from "./types/world";
 import { receive, send } from "./utils";
 import Building from "./types/building";
@@ -184,6 +184,13 @@ async function init(address: string) {
 							console.log(killFeeds?.childNodes, killFeeds?.children)
 							killFeeds?.childNodes[killFeeds.childNodes.length-1].remove();
 						}, 5000);
+						break;
+					}
+					case "scopeUpdate": {
+						const scopeChangePkt = <ScopeUpdatePacket>data;
+						const scopes = document.getElementById(`scopes`);
+						const scopeList = [1, 2, 4, 8, 15];
+						(scopes?.children.item(scopeList.indexOf(scopeChangePkt.scope)) as HTMLElement).style.display = "block";
 					}
 				}
 			}

@@ -177,4 +177,10 @@ export class AnnouncementPacket implements IPacket {
 	announcement!: string;
 	killer!: string;
 }
-export type ServerPacketResolvable = AckPacket | GamePacket | MapPacket | SoundPacket | ParticlesPacket | AnnouncementPacket;
+
+export class ScopeUpdatePacket implements IPacket {
+	type = "scopeUpdate";
+	scope!: number;
+
+}
+export type ServerPacketResolvable = AckPacket | GamePacket | MapPacket | SoundPacket | ParticlesPacket | AnnouncementPacket | ScopeUpdatePacket;
