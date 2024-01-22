@@ -223,7 +223,7 @@ setInterval(() => {
 		for (const sound of world.onceSounds) send(socket, new SoundPacket(sound.path, sound.position));
 		for (const killFeed of world.killFeeds) send(socket, new AnnouncePacket(killFeed.killFeed, killFeed.killer))
 		if (player.changedScope) {
-			setTimeout(() => { send(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false; console.log("someone here changed scopes") }, 40) }
+			setTimeout(() => { send(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false; }, 40) }
 	});
 	world.postTick();
 }, 1000 / TICKS_PER_SECOND);
