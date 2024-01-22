@@ -32,16 +32,21 @@ div#scopes {
     align-items: center;
 }
 
-#scope{
+#scope {
+    position: absolute;
     border-width: 0;
     border-radius: 50%;
     border-color: #7CFC00;
     margin: 4px;
     opacity: 0.6;
     transition: all ease .5s;
+    background: rgba(51, 51, 51, 0.5);
+    width: 35px;
+    height: 35px;
+    vertical-align: middle;
 }
 
-.scope:hover {
+#scope:hover {
     border-width: 2px;
     transition: all ease .5s;
 }
