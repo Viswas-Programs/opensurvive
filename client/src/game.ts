@@ -9,7 +9,7 @@ import { FullPlayer, Healing } from "./store/entities";
 import { castObstacle, castMinObstacle, Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table } from "./store/obstacles";
 import { castTerrain } from "./store/terrains";
 import { Vec2 } from "./types/math";
-import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta, ScopeUpdatePacket } from "./types/packet";
+import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta, ScopeUpdatePacket, ServerScopeUpdatePacket } from "./types/packet";
 import { World } from "./types/world";
 import { receive, send } from "./utils";
 import Building from "./types/building";
@@ -55,6 +55,8 @@ const joystick = document.getElementsByClassName('joystick-container')[0];
 const handle = document.getElementsByClassName('joystick-handle')[0];
 const aimJoystick = document.getElementsByClassName('aimjoystick-container')[0];
 const aimHandle = document.getElementsByClassName('aimjoystick-handle')[0];
+let _selectedScope = 1;
+let scopeChanged = false;
 declare type modeMapColourType = keyof typeof modeMapColours
 async function init(address: string) {
 	// Initialize the websocket
@@ -89,7 +91,28 @@ async function init(address: string) {
 			setConnected(true)
 			showMobControls();
 			clearTimeout(timer);
-			
+			const scopes = document.getElementById(`scopes`);
+			const scopeList = [1, 2, 4, 8, 15];
+			const x1scope = scopes?.children.item(0) as HTMLElement
+			x1scope.style.background = "rgba(55, 55, 55, 1.5)"
+			x1scope.addEventListener("click", () => {
+				if (_selectedScope == 1) return;
+				_selectedScope = 1;
+				send(ws, new ServerScopeUpdatePacket(1));
+				for (let ii = 0; ii < scopeList.length; ii++) {
+					console.log(scopeList[ii], ii)
+					if (_selectedScope == scopeList[ii]) {
+						console.log('yuh');
+						(scopes?.children.item(ii) as HTMLElement).style.background = "rgba(55, 55, 55, 1.5)"
+					}
+					else {
+						console.log('nop');
+						(scopes?.children.item(ii) as HTMLElement).style.background = "rgba(51, 51, 51, 0.5)"
+					}
+				}
+			}
+
+			)
 			// Setup healing items click events
 			for (const element of document.getElementsByClassName("healing-panel")) {
 				const el = <HTMLElement> element;
@@ -172,9 +195,22 @@ async function init(address: string) {
 					}
 					case "scopeUpdate": {
 						const scopeChangePkt = <ScopeUpdatePacket>data;
-						const scopes = document.getElementById(`scopes`);
-						const scopeList = [1, 2, 4, 8, 15];
-						(scopes?.children.item(scopeList.indexOf(scopeChangePkt.scope)) as HTMLElement).style.display = "block";
+						const scopeElement = (scopes?.children.item(scopeList.indexOf(scopeChangePkt.scope)) as HTMLElement);
+						scopeElement.style.display = "block";
+						scopeElement.style.background = "rgba(55, 55, 55, 1.5)"
+						scopeElement.addEventListener("click", () => {
+							if (scopeElement.textContent!.includes(String(_selectedScope))) return;
+							_selectedScope = scopeChangePkt.scope
+							send(ws, new ServerScopeUpdatePacket((scopeElement.textContent?.replace("x", "") as unknown) as number))
+							for (let ii = 0; ii < scopeList.length; ii++) {
+								if (_selectedScope == scopeList[ii]) {
+									(scopes?.children.item(ii) as HTMLElement).style.background = "rgba(55, 55, 55, 1.5)"
+								}
+								else {
+									(scopes?.children.item(ii) as HTMLElement).style.background = "rgba(51, 51, 51, 0.5)"
+								}
+							}
+						})
 					}
 				}
 			}

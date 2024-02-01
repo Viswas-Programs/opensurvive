@@ -93,7 +93,7 @@ export class UseHealingPacket {
 	type = "usehealing";
 	item!: string;
 }
-export type ClientPacketResolvable = ResponsePacket | PingPacket | MousePressPacket | MouseReleasePacket | MouseMovePacket | MovementPressPacket | MovementReleasePacket | InteractPacket | SwitchWeaponPacket | ReloadWeaponPacket | MovementPacket | MovementResetPacket;
+export type ClientPacketResolvable = ResponsePacket | PingPacket | MousePressPacket | MouseReleasePacket | MouseMovePacket | MovementPressPacket | MovementReleasePacket | InteractPacket | SwitchWeaponPacket | ReloadWeaponPacket | MovementPacket | MovementResetPacket | ServerSideScopeUpdate;
 
 export class AckPacket implements IPacket {
 	type = "ack";
@@ -178,6 +178,11 @@ export class ScopeUpdatePacket implements IPacket {
 	scope!: number;
 
 	constructor(scope: number) {this.scope = scope }
+}
+
+export class ServerSideScopeUpdate implements IPacket {
+	type = "serverSideScopeUpdate";
+	scope!: number
 }
 export class SoundPacket implements IPacket {
 	type = "sound";
