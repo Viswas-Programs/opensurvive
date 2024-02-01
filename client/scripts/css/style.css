@@ -22,18 +22,17 @@ canvas {
 }
 
 div#scopes {
+    pointer-events:all;
     display: flex;
     position: fixed;
     height: 10vh;
     top: 2vh;
     left: 50%;
     transform: translateX(-50%);
-    justify-content: center;
-    align-items: center;
 }
 
 #scope {
-    position: absolute;
+    pointer-events: all;
     border-width: 0;
     border-radius: 50%;
     border-color: #7CFC00;
@@ -271,7 +270,7 @@ div#menu div#connection.panel {
 
 #healing-container {
     position: inherit;
-    top: 27vh;
+    top: 35vh;
     right: 2vh;
     height: 8vh;
     width: 7vw;

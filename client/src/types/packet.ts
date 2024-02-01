@@ -130,6 +130,13 @@ export class UseHealingPacket implements IPacket {
 	}
 }
 
+export class ServerScopeUpdatePacket implements IPacket {
+	type = "serverSideScopeUpdate";
+	scope!: number;
+	constructor(scope: number) {
+		this.scope = scope
+	}
+}
 /// Packet from server acknowledgement
 export class AckPacket implements IPacket {
 	type = "ack";
