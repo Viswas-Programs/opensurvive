@@ -18,6 +18,7 @@ export default class Player extends Entity {
 	currentHealItem: string | null;
 	interactMessage: string | null;
 	hitbox = new CircleHitbox(1);
+	waitingForReload = false;
 	id: string;
 	username: string;
 	collisionLayers = [0];
@@ -33,6 +34,10 @@ export default class Player extends Entity {
 	tryInteracting = false;
 	canInteract = false;
 	inventory: Inventory;
+	//for ammos and all dat 
+	pickedAmmo = false;
+	ammoChanged!: string;
+	numberOfAmmo!: string;
 	// Last held weapon. Used for tracking weapon change
 	lastHolding = "fists";
 	normalVelocity = Vec2.ZERO;
@@ -212,6 +217,9 @@ export default class Player extends Entity {
 					delta -= gun.magazine;
 					this.inventory.setWeapon(gun);
 					this.inventory.ammos[gun.color] += delta;
+					this.pickedAmmo = true;
+					this.ammoChanged = gun.color.toString();
+					this.numberOfAmmo = this.inventory.ammos[gun.color].toString();
 				}
 			}
 			this.markDirty();
@@ -305,14 +313,16 @@ export default class Player extends Entity {
 	}
 
 	reload() {
-		if (this.maxReloadTicks) return;
+		this.waitingForReload = true;
+		if (this.maxReloadTicks) { console.log("yo wth man");  return; } 
 		const weapon = this.inventory.getWeapon();
 		if (weapon?.type != WeaponType.GUN) return;
 		const gun = <GunWeapon>weapon;
 		world.onceSounds.push({ path: `guns/${gun.nameId}_reload.mp3`, position: this.position })
-		if (!this.inventory.ammos[gun.color] || gun.magazine == gun.capacity) return;
+		if (!this.inventory.ammos[gun.color] || gun.magazine == gun.capacity) { this.waitingForReload = true; return; } 
 		this.maxReloadTicks = this.reloadTicks = gun.reloadTicks;
 		this.markDirty();
+		this.waitingForReload = false;
 	}
 
 	heal(item: string) {

@@ -1,7 +1,7 @@
 /* eslint-disable no-fallthrough */
 import $ from "jquery"
 import { Howl, Howler } from "howler";
-import { KeyBind, movementKeys, TIMEOUT } from "./constants";
+import { KeyBind, LANG, movementKeys, TIMEOUT } from "./constants";
 import { start, stop } from "./renderer";
 import { initMap } from "./rendering/map";
 import { addKeyPressed, addMousePressed, getToken, isKeyPressed, isMenuHidden, isMouseDisabled, removeKeyPressed, removeMousePressed, toggleBigMap, toggleHud, toggleMap, toggleMenu, toggleMinimap, toggleMouseDisabled } from "./states";
@@ -9,13 +9,14 @@ import { FullPlayer, Healing } from "./store/entities";
 import { castObstacle, castMinObstacle, Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table } from "./store/obstacles";
 import { castTerrain } from "./store/terrains";
 import { Vec2 } from "./types/math";
-import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta, ScopeUpdatePacket, ServerScopeUpdatePacket } from "./types/packet";
+import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta, ScopeUpdatePacket, ServerScopeUpdatePacket, AmmoUpdatePacket, CancelActionsPacket } from "./types/packet";
 import { World } from "./types/world";
 import { receive, send } from "./utils";
 import Building from "./types/building";
 import { cookieExists, getCookieValue } from "cookies-utils";
 import { Obstacle } from "./types/obstacle";
 import { getMode } from "./homepage";
+import { translate } from "./languages";
 
 export var world: World;
 
@@ -30,7 +31,9 @@ var deathImg: string | null = localStorage.getItem("playerDeathImg");
 
 console.log(skin)
 console.log(deathImg)
-const isMobile = /Android/.test(navigator.userAgent) || /iPhone/.test(navigator.userAgent) || /iPad/.test(navigator.userAgent) || /Tablet/.test(navigator.userAgent)
+const isMobile = /Android/.test(navigator.userAgent) || /iPhone/.test(navigator.userAgent) || /iPad/.test(navigator.userAgent) || /Tablet/.test(navigator.userAgent) || /Macintosh/.test(navigator.userAgent)
+console.log(isMobile, navigator.userAgent)
+const _ammosToDisplay = ["9mm", "12 gauge", "7.62mm", "5.56mm", "5.7mm", ".308 subsonic"]
 var player: FullPlayer | null;
 
 /**
@@ -63,6 +66,9 @@ const aimJoystick = document.getElementsByClassName('aimjoystick-container')[0];
 const aimHandle = document.getElementsByClassName('aimjoystick-handle')[0];
 let _selectedScope = 1;
 let scopeChanged = false;
+const ammosContainer = document.getElementsByClassName("ammos")
+
+
 declare type modeMapColourType = keyof typeof modeMapColours
 
 /**
@@ -212,8 +218,18 @@ async function init(address: string) {
 					case "scopeUpdate": {
 						const scopeChangePkt = <ScopeUpdatePacket>data;
 						const scopeElement = (scopes?.children.item(scopeList.indexOf(scopeChangePkt.scope)) as HTMLElement);
+						_selectedScope = Number(scopeChangePkt.scope)
 						scopeElement.style.display = "block";
-						scopeElement.style.background = "rgba(55, 55, 55, 1.5)"
+						if (Number(scopeChangePkt.scope) > _selectedScope) {
+							for (let ii = 0; ii < scopeList.length; ii++) {
+								if (_selectedScope == scopeList[ii]) {
+									(scopes?.children.item(ii) as HTMLElement).style.background = "rgba(55, 55, 55, 1.5)"
+								}
+								else {
+									(scopes?.children.item(ii) as HTMLElement).style.background = "rgba(51, 51, 51, 0.5)"
+								}
+							}
+						}
 						scopeElement.addEventListener("click", () => {
 							if (scopeElement.textContent!.includes(String(_selectedScope))) return;
 							_selectedScope = scopeChangePkt.scope
@@ -227,6 +243,14 @@ async function init(address: string) {
 								}
 							}
 						})
+						break;
+					}
+					case "ammoUpdatePacket": {
+						const ammoUpdatePkt = <AmmoUpdatePacket>data;
+						const ammoChange = translate(LANG, "_ammosDisplay." + ammoUpdatePkt.ammoToChange)
+						const ammoElement = ammosContainer.item(_ammosToDisplay.indexOf(ammoChange)) as HTMLElement;
+						ammoElement.textContent = `${ammoChange}: ${ammoUpdatePkt.numberOfAmmo}`;
+
 					}
 				}
 			}
@@ -469,6 +493,8 @@ window.onkeydown = (event) => {
 			send(ws, new InteractPacket());
 		else if (event.key == KeyBind.RELOAD)
 			send(ws, new ReloadWeaponPacket());
+		else if (event.key == KeyBind.CANCEL)
+			send(ws, new CancelActionsPacket());
 		else if (!isNaN(parseInt(event.key)))
 			send(ws, new SwitchWeaponPacket(parseInt(event.key) - 1, true));
 	}

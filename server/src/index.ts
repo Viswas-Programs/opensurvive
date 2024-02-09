@@ -3,7 +3,7 @@ import "dotenv/config";
 import { readFileSync } from "fs";
 import * as ws from "ws";
 import { ID, receive, send, wait } from "./utils";
-import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ScopeUpdatePacket, ServerSideScopeUpdate } from "./types/packet";
+import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ScopeUpdatePacket, ServerSideScopeUpdate, AmmoUpdatePacket } from "./types/packet";
 import { DIRECTION_VEC, TICKS_PER_SECOND } from "./constants";
 import { CommonAngles, Vec2 } from "./types/math";
 import { Player } from "./store/entities";
@@ -208,6 +208,9 @@ server.on("connection", async socket => {
 				const data = (<ServerSideScopeUpdate>decoded)
 				player.inventory.selectScope(Number(data.scope))
 				break;
+			case "cancelActionsPacket":
+				player.healTicks = 0;
+				player.reloadTicks = 0;
 		}
 	});
 });
@@ -227,7 +230,12 @@ setInterval(() => {
 		for (const sound of world.onceSounds) send(socket, new SoundPacket(sound.path, sound.position));
 		for (const killFeed of world.killFeeds) send(socket, new AnnouncePacket(killFeed.killFeed, killFeed.killer))
 		if (player.changedScope) {
-			setTimeout(() => { send(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false; }, 40) }
+			send(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false;
+		}
+		if (player.pickedAmmo) {
+			send(socket, new AmmoUpdatePacket(player.ammoChanged, player.numberOfAmmo));
+			player.pickedAmmo = false;
+		}
 	});
 	world.postTick();
 }, 1000 / TICKS_PER_SECOND);
