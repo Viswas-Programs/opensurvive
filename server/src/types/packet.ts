@@ -89,11 +89,14 @@ export class ReloadWeaponPacket {
 	type = "reloadweapon";
 }
 
+export class CancelActionsPacket {
+	type = "cancelActionsPacket";
+}
 export class UseHealingPacket {
 	type = "usehealing";
 	item!: string;
 }
-export type ClientPacketResolvable = ResponsePacket | PingPacket | MousePressPacket | MouseReleasePacket | MouseMovePacket | MovementPressPacket | MovementReleasePacket | InteractPacket | SwitchWeaponPacket | ReloadWeaponPacket | MovementPacket | MovementResetPacket | ServerSideScopeUpdate;
+export type ClientPacketResolvable = ResponsePacket | PingPacket | MousePressPacket | MouseReleasePacket | MouseMovePacket | MovementPressPacket | MovementReleasePacket | InteractPacket | SwitchWeaponPacket | ReloadWeaponPacket | MovementPacket | MovementResetPacket | ServerSideScopeUpdate | CancelActionsPacket;
 
 export class AckPacket implements IPacket {
 	type = "ack";
@@ -178,6 +181,16 @@ export class ScopeUpdatePacket implements IPacket {
 	scope!: number;
 
 	constructor(scope: number) {this.scope = scope }
+}
+
+export class AmmoUpdatePacket implements IPacket {
+	type = "ammoUpdatePacket"
+	ammoToChange!: string;
+	numberOfAmmo!: string;
+	constructor(ammoToChange: string, numberOfAmmo: string) {
+		this.ammoToChange = ammoToChange
+		this.numberOfAmmo = numberOfAmmo
+	}
 }
 
 export class ServerSideScopeUpdate implements IPacket {

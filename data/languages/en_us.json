@@ -63,5 +63,12 @@
 	"hud.weapon.fn_five_seven": "FN Five Seven",
 
 
-	"hud.weapon.fists": "Fists"
+	"hud.weapon.fists": "Fists",
+
+	"_ammosDisplay.0": "9mm",
+	"_ammosDisplay.1": "12 Gauge",
+	"_ammosDisplay.2": "7.62mm",
+	"_ammosDisplay.3": "5.56mm",
+	"_ammosDisplay.8": "5.7mm",
+	"_ammosDisplay.5": ".308 subsonic"
 }

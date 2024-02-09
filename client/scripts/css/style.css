@@ -201,7 +201,7 @@ div#menu div#connection.panel {
 
 #weapon-container {
     position: relative;
-    left: 84%;
+    left: 83%;
     top: 33.5%;
     height: 30vh;
     width: 15vw;
@@ -277,6 +277,17 @@ div#menu div#connection.panel {
     empty-cells: show;
 }
 
+#ammo-container{
+    position: absolute;
+    top: 50%;
+    left: 14%;
+    height: 3vh;
+    width: 20vh;
+}
+.ammos {
+    background-color: rgba(5, 5, 5, 0.5);
+    border-radius: 2px;
+}
 .healing-panel {
     position: relative;
     width: 100%;
