@@ -1,6 +1,9 @@
 import { IslandrBitStream } from "./packets";
+import { Gun } from "./store/entities";
 import Player from "./store/entities/player";
+import { castCorrectWeapon } from "./store/weapons";
 import { MinEntity, MinObstacle, MinParticle} from "./types/minimized";
+import { GunWeapon } from "./types/weapon";
 
 export function serialiseMinParticles(particleArray: MinParticle[], stream: IslandrBitStream) {
     stream.writeInt8(particleArray.length)
@@ -80,7 +83,10 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 	stream.writeInt8(player.inventory.holding) // inventory holding currently
 	for (let ii = 0; ii < 4; ii++) {
 		if (player.inventory.getWeapon(ii) == undefined) stream.writeId("null");
-		else stream.writeId(player.inventory.getWeapon(ii)!.minimize().nameId)
+		else {
+			stream.writeId(player.inventory.getWeapon(ii)!.minimize().nameId)
+			if (ii < 3 && player.inventory.getWeapon(ii)?.type == "gun") { stream.writeInt8((player.inventory.getWeapon(ii)! as GunWeapon).magazine) }
+		}
 	}
 	if (player.inventory.healings) {
 		stream.writeInt8(Object.keys(player.inventory.healings).length)

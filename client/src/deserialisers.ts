@@ -52,7 +52,9 @@ function _getWeapons(stream: IslandrBitStream): Weapon[] {
         if (id == "null") weapons.push(null)
         else {
             const weapon: MinWeapon = { nameId: id };
-            weapons.push(castCorrectWeapon(weapon));
+
+            if (castCorrectWeapon(weapon).type == "gun") { const mag = stream.readInt8(); weapons.push(castCorrectWeapon(weapon, mag)); }
+            else { weapons.push(castCorrectWeapon(weapon)); }
         }
     }
     return <Weapon[]>weapons;
