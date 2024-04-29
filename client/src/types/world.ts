@@ -75,7 +75,7 @@ export class World {
 		(document.getElementById("playercount") as HTMLInputElement).innerText = this.aliveCount.toString();
 	}
 
-	updateSafeZone(safeZone: { hitbox: MinCircleHitbox; position: MinVec2; }) {
+	/*updateSafeZone(safeZone: { hitbox: MinCircleHitbox; position: MinVec2; }) {
 		this.safeZone.hitbox = CircleHitbox.fromMinCircleHitbox(safeZone.hitbox);
 		this.safeZone.position = Vec2.fromMinVec2(safeZone.position);
 	}
@@ -84,7 +84,7 @@ export class World {
 		this.nextSafeZone.hitbox = CircleHitbox.fromMinCircleHitbox(nextSafeZone.hitbox);
 		this.nextSafeZone.position = Vec2.fromMinVec2(nextSafeZone.position);
 	}
-
+	*/
 	addParticles(minParticles: MinParticle[]) {
 		this.particles.push(...minParticles.map(p => castParticle(p)).filter(p => p.id !== DummyParticle.TYPE));
 	}

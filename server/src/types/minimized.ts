@@ -1,3 +1,5 @@
+import { IslandrBitStream } from "../packets";
+
 export interface MinVec2 {
 	x: number;
 	y: number;
@@ -22,14 +24,15 @@ export interface MinCircleHitbox {
 
 export type MinHitbox = MinRectHitbox | MinCircleHitbox;
 
-export interface MinEntity {
-	id: string;
-	type: string;
-	position: MinVec2;
-	direction: MinVec2;
-	hitbox: MinHitbox;
-	animations: string[];
-	despawn: boolean;
+export class MinEntity {
+	id!: string;
+	type!: string;
+	position!: MinVec2;
+	direction!: MinVec2;
+	hitbox!: MinHitbox;
+	animations!: string[];
+	despawn!: boolean;
+	serialise(stream: IslandrBitStream): void{ }
 }
 
 export interface MinInventory {

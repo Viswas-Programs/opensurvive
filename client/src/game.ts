@@ -9,14 +9,16 @@ import { FullPlayer, Healing } from "./store/entities";
 import { castObstacle, castMinObstacle, Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table } from "./store/obstacles";
 import { castTerrain } from "./store/terrains";
 import { Vec2 } from "./types/math";
-import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta, ScopeUpdatePacket, ServerScopeUpdatePacket } from "./types/packet";
+import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta, ScopeUpdatePacket, ServerScopeUpdatePacket, ServerPacketResolvable } from "./types/packet";
 import { World } from "./types/world";
 import { receive, send } from "./utils";
 import Building from "./types/building";
 import { cookieExists, getCookieValue } from "cookies-utils";
 import { Obstacle } from "./types/obstacle";
 import { getMode } from "./homepage";
-
+import { IslandrBitStream } from "./packets";
+import { MinCircleHitbox, MinTerrain, MinVec2 } from "./types/minimized";
+import { deserialiseDiscardables, deserialiseMinEntities, deserialiseMinObstacles, deserialiseMinParticles, deserialisePlayer } from "./deserialisers";
 //handle users that tried to go to old domain name, or direct ip
 var urlargs = new URLSearchParams(window.location.search);
 if(urlargs.get("from")){
@@ -56,7 +58,7 @@ const handle = document.getElementsByClassName('joystick-handle')[0];
 const aimJoystick = document.getElementsByClassName('aimjoystick-container')[0];
 const aimHandle = document.getElementsByClassName('aimjoystick-handle')[0];
 let _selectedScope = 1;
-let scopeChanged = false;
+let data: any;
 declare type modeMapColourType = keyof typeof modeMapColours
 async function init(address: string) {
 	// Initialize the websocket
@@ -72,10 +74,17 @@ async function init(address: string) {
 		}, TIMEOUT);
 
 		ws.onmessage = async (event) => {
-			const data = <AckPacket>receive(event.data);
-			id = data.id;
-			tps = data.tps;
-			world = new World(new Vec2(data.size[0], data.size[1]), castTerrain(data.terrain).setColour((modeMapColours[getMode() as modeMapColourType])));
+			const stream = new IslandrBitStream(event.data)
+			const dataA = <AckPacket>{
+				type:stream.readPacketType(),
+				id:stream.readId(),
+				tps:stream.readInt8(),
+				size:[stream.readInt16(),stream.readInt16()],
+				terrain: <MinTerrain>{ id:stream.readId() }
+			}
+			id = dataA.id;
+			tps = dataA.tps;
+			world = new World(new Vec2(dataA.size[0], dataA.size[1]), castTerrain(dataA.terrain).setColour((modeMapColours[getMode() as modeMapColourType])));
 			const gameObjects = [Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table]
 			gameObjects.forEach(OBJ => {OBJ.updateAssets() })
 	
@@ -128,30 +137,46 @@ async function init(address: string) {
 			const interval = setInterval(() => {
 				if (connected) send(ws, new PingPacket());
 				else clearInterval(interval);
-			}, 1000);
-	
+			}, 1000);/*
 			ws.onmessage = (event) => {
-				const data = receive(event.data);
-				switch (data.type) {
-					case "game": {
-						const gamePkt = <GamePacket>data;
-						world.updateEntities(gamePkt.entities, gamePkt.discardEntities);
-						world.updateObstacles(gamePkt.obstacles, gamePkt.discardObstacles);
-						world.updateLiveCount(gamePkt.alivecount);
-						if (gamePkt.safeZone) world.updateSafeZone(gamePkt.safeZone);
-						if (gamePkt.nextSafeZone) world.updateNextSafeZone(gamePkt.nextSafeZone);
-						if (!player) player = new FullPlayer(gamePkt.player);
-						else player.copy(gamePkt.player);
-						// Client side ticking
-						world.clientTick(player);
-						break;
-					}
+				console.log(receive(event.data))
+				console.log("MAP PACKET BOIII GO BRRRRRR")
+				const data = receive(event.data)
+				const mapPkt = <MapPacket>data;
+				console.log("packet terrains:", mapPkt.terrains);
+				world.terrains = mapPkt.terrains.map(ter => castTerrain(ter));
+				console.log("terrains:", world.terrains);
+				world.obstacles = <Obstacle[]>mapPkt.obstacles.map(obs => castObstacle(castMinObstacle(obs))).filter(obs => !!obs);
+				world.buildings = mapPkt.buildings.map(bui => new Building(bui));
+				console.log("WORLD OBSTACLES ARE:", world.obstacles)
+				initMap();
+				//Show player count once game starts
+				(document.querySelector("#playercountcontainer") as HTMLInputElement).style.display = "block";
+			}
+			ws.onmessage = (event) => {
+				const data = receive(event.data)
+				console.log("OG GAME DATA PACT", data)
+				const gamePkt = <GamePacket>data;
+				world.updateEntities(gamePkt.entities, gamePkt.discardEntities);
+				world.updateObstacles(gamePkt.obstacles, gamePkt.discardObstacles);
+				world.updateLiveCount(gamePkt.alivecount);
+				if (gamePkt.safeZone) world.updateSafeZone(gamePkt.safeZone);
+				if (gamePkt.nextSafeZone) world.updateNextSafeZone(gamePkt.nextSafeZone);
+				if (!player) player = new FullPlayer(gamePkt.player);
+				else player.copy(gamePkt.player);
+				// Client side ticking
+				world.clientTick(player);
+			}*/
+			ws.onmessage = (event) => {
+				let bitstream = true;
+				let stream;
+				let packetType: string;
+				if (receive(event.data) && (receive(event.data)!.type == "game" || receive(event.data)!.type == "map")) { data = receive(event.data); bitstream = false; packetType = receive(event.data)!.type }
+				else { stream = new IslandrBitStream(event.data); packetType = (stream as IslandrBitStream).readPacketType() } 
+				switch (packetType) {
 					case "map": {
-						// This should happen once only normally
 						const mapPkt = <MapPacket>data;
-						console.log("packet terrains:", mapPkt.terrains);
 						world.terrains = mapPkt.terrains.map(ter => castTerrain(ter));
-						console.log("terrains:" , world.terrains);
 						world.obstacles = <Obstacle[]>mapPkt.obstacles.map(obs => castObstacle(castMinObstacle(obs))).filter(obs => !!obs);
 						world.buildings = mapPkt.buildings.map(bui => new Building(bui));
 						initMap();
@@ -159,8 +184,39 @@ async function init(address: string) {
 						(document.querySelector("#playercountcontainer") as HTMLInputElement).style.display = "block";
 						break;
 					}
+					case "game": {
+						if (bitstream) {
+							data = {
+								type: "game",
+								entities: deserialiseMinEntities(stream as IslandrBitStream as IslandrBitStream),
+								obstacles: deserialiseMinObstacles(stream as IslandrBitStream),
+								alivecount: (stream as IslandrBitStream).readInt8(),
+								discardEntities: deserialiseDiscardables(stream as IslandrBitStream),
+								discardObstacles: deserialiseDiscardables(stream as IslandrBitStream),
+							}
+						}
+						if (data.obstacles.length > 0)console.log(data.obstacles)
+						const gamePkt = <GamePacket>data;
+						world.updateEntities(gamePkt.entities, gamePkt.discardEntities);
+						world.updateObstacles(gamePkt.obstacles, gamePkt.discardObstacles);
+						world.updateLiveCount(gamePkt.alivecount);
+						break;
+					}
+					case "playerTick": {
+						const playerSrvr = deserialisePlayer(stream as IslandrBitStream)
+						if (!player) player = new FullPlayer(playerSrvr);
+						else player.copy(playerSrvr);
+						// Client side ticking
+						world.clientTick(player);
+						break;
+					}
 					case "sound": {
 						if (!player) break;
+						const data = {
+							type: "sound",
+							path: (stream as IslandrBitStream).readASCIIString(50),
+							position: Vec2.fromMinVec2(<MinVec2>{x: (stream as IslandrBitStream).readInt16(), y: (stream as IslandrBitStream).readInt16()})
+						}
 						const soundPkt = <SoundPacket>data;
 						const howl = new Howl({
 							src: `assets/${getMode()}/sounds/${soundPkt.path}`
@@ -174,11 +230,20 @@ async function init(address: string) {
 						break;
 					}
 					case "particles": {
+						const data = {
+							type: "particles",
+							particles: deserialiseMinParticles(stream as IslandrBitStream)
+						}
 						const partPkt = <ParticlesPacket>data;
 						world.addParticles(partPkt.particles);
 						break;
 					}
 					case "announce": {
+						const data = {
+							type: "announce",
+							announcement: (stream as IslandrBitStream).readASCIIString(65),
+							killer: (stream as IslandrBitStream).readUsername()
+						}
 						const announcementPacket = <AnnouncementPacket>data;
 						const killFeeds = document.getElementById("kill-feeds")
 						const killFeedItem = document.createElement("div")
@@ -194,6 +259,10 @@ async function init(address: string) {
 						break;
 					}
 					case "scopeUpdate": {
+						const data = {
+							type:"scopeUpdate",
+							scope: (stream as IslandrBitStream).readInt8()
+						}
 						const scopeChangePkt = <ScopeUpdatePacket>data;
 						const scopeElement = (scopes?.children.item(scopeList.indexOf(scopeChangePkt.scope)) as HTMLElement);
 						scopeElement.style.display = "block";

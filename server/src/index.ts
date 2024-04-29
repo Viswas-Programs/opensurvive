@@ -2,8 +2,8 @@
 import "dotenv/config";
 import { readFileSync } from "fs";
 import * as ws from "ws";
-import { ID, receive, send, wait } from "./utils";
-import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ScopeUpdatePacket, ServerSideScopeUpdate } from "./types/packet";
+import { ID, receive, send, wait, sendBitstream} from "./utils";
+import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ScopeUpdatePacket, ServerSideScopeUpdate, PlayerTickPkt } from "./types/packet";
 import { DIRECTION_VEC, TICKS_PER_SECOND } from "./constants";
 import { CommonAngles, Vec2 } from "./types/math";
 import { Player } from "./store/entities";
@@ -12,6 +12,8 @@ import { Plain, castMapTerrain } from "./store/terrains";
 import { castMapObstacle } from "./store/obstacles";
 import { castBuilding } from "./store/buildings";
 import { MapData } from "./types/data";
+import { IslandrBitStream } from "./packets"
+import { Socket } from "net";
 
 export var ticksElapsed = 0;
 
@@ -66,6 +68,7 @@ export function reset(map = "regular") {
 	}
 }
 reset();
+const playerInitialPacketsSent = new Map<ws.WebSocket, boolean>()
 
 server.on("connection", async socket => {
 	console.log("Received a connection request");
@@ -93,10 +96,13 @@ server.on("connection", async socket => {
 	var isMobile = false;
 	// Communicate with the client by sending the ID and map size. The client should respond with ID and username, or else close the connection.
 	await Promise.race([wait(10000), new Promise<void>(resolve => {
-		send(socket, new AckPacket(id, TICKS_PER_SECOND, world.size, world.defaultTerrain));
+		sendBitstream(socket, new AckPacket(id, TICKS_PER_SECOND, world.size, world.defaultTerrain));
 		socket.once("message", (msg: ArrayBuffer) => {
-			const decoded = <ResponsePacket>receive(msg);
-			if (decoded.id == id && decoded.username && decoded.skin && decoded.deathImg) {
+			const stream = new IslandrBitStream(msg)
+			const type = stream.readPacketType()
+			const decoded = new ResponsePacket();
+			decoded.deserialise(stream);
+			if (id.includes(decoded.id) && decoded.username && decoded.skin && decoded.deathImg) {
 				connected = true;
 				username = decoded.username;
 				accessToken = decoded.accessToken;
@@ -109,16 +115,18 @@ server.on("connection", async socket => {
 	})]);
 	if (!connected) return;
 	console.log(`A new player with ID ${id} connected!`);
-
+	playerInitialPacketsSent.set(socket, false)
 	// Create the new player and add it to the entity list.
 	const player = new Player(id, username, skin, deathImg, accessToken, isMobile);
 	world.addPlayer(player);
 	// Send the player the entire map
 	send(socket, new MapPacket(world.obstacles, world.buildings, world.terrains.concat(...world.buildings.map(b => b.floors.map(fl => fl.terrain)))));
+	wait(100)
 	// Send the player initial objects
 	send(socket, new GamePacket(world.entities, world.obstacles.concat(...world.buildings.map(b => b.obstacles.map(o => o.obstacle))), player, world.playerCount, true));
+	playerInitialPacketsSent.set(socket, true);
 	// Send the player music
-	for (const sound of world.joinSounds) send(socket, new SoundPacket(sound.path, sound.position));
+	for (const sound of world.joinSounds) sendBitstream(socket, new SoundPacket(sound.path, sound.position));
 	// If the client doesn't ping for 30 seconds, we assume it is a disconnection.
 	const timeout = setTimeout(() => {
 		try {socket.close(); } catch (err) { }
@@ -129,8 +137,9 @@ server.on("connection", async socket => {
 	const buttons = new Map<number, boolean>();
 
 	socket.on("message", (msg: ArrayBuffer) => {
-		const decoded = receive(msg);
-		switch (decoded.type) {
+		const stream = new IslandrBitStream(msg)
+		const type = stream.readPacketType()
+		switch (type) {
 			case "ping":
 				timeout.refresh();
 				break;
@@ -138,16 +147,19 @@ server.on("connection", async socket => {
 				player.setVelocity(Vec2.ZERO)
 				break;
 			case "playerRotation":
-				const RotationPacket = <PlayerRotationDelta>decoded;
+				const RotationPacket = new PlayerRotationDelta()
+				RotationPacket.deserialise(stream)
 				player.setDirection(new Vec2(Math.cos(RotationPacket.angle) * 1.45, Math.sin(RotationPacket.angle) * 1.45))
 				break;
 			case "mobilemovement":
-				const MMvPacket = <MobileMovementPacket>decoded
+				const MMvPacket = new MobileMovementPacket()
+				MMvPacket.deserialise(stream)
 				player.setVelocity(new Vec2(Math.cos(MMvPacket.direction) * 1.45, Math.sin(MMvPacket.direction) * 1.45))
 				break;
 			case "movementpress":
 				// Make the direction true
-				const mvPPacket = <MovementPressPacket>decoded;
+				const mvPPacket = new MovementPressPacket()
+				mvPPacket.deserialise(stream)
 				movements[mvPPacket.direction] = true;
 				// Add corresponding direction vector to a zero vector to determine the velocity and direction.
 				var angleVec = Vec2.ZERO;
@@ -156,7 +168,8 @@ server.on("connection", async socket => {
 				break;
 			case "movementrelease":
 				// Make the direction false
-				const mvRPacket = <MovementReleasePacket>decoded;
+				const mvRPacket = new MovementReleasePacket();
+				mvRPacket.deserialise(stream)
 				movements[mvRPacket.direction] = false;
 				// Same as movementpress
 				var angleVec = Vec2.ZERO;
@@ -165,15 +178,20 @@ server.on("connection", async socket => {
 				break;
 			// Very not-done. Will probably change to "attack" and "use" tracking.
 			case "mousepress":
-				buttons.set((<MousePressPacket>decoded).button, true);
+				const msPresspkt = new MousePressPacket()
+				msPresspkt.deserialise(stream)
+				buttons.set((msPresspkt).button, true);
 				if (buttons.get(0)) player.tryAttacking = true;
 				break;
 			case "mouserelease":
-				buttons.set((<MouseReleasePacket>decoded).button, false);
+				const msReleasePkt = new MouseReleasePacket()
+				msReleasePkt.deserialise(stream);
+				buttons.set(msReleasePkt.button, false);
 				if (!buttons.get(0)) player.tryAttacking = false;
 				break;
 			case "mousemove":
-				const mMvPacket = <MouseMovePacket>decoded;
+				const mMvPacket = new MouseMovePacket();
+				mMvPacket.deserialise(stream);
 				// { x, y } will be x and y offset of the client from the centre of the screen.
 				player.setDirection(new Vec2(mMvPacket.x, mMvPacket.y));
 				break;
@@ -181,7 +199,8 @@ server.on("connection", async socket => {
 				player.tryInteracting = true;
 				break;
 			case "switchweapon":
-				const swPacket = <SwitchWeaponPacket>decoded;
+				const swPacket = new SwitchWeaponPacket();
+				swPacket.deserialise(stream)
 				if (swPacket.setMode) {
 					if (player.inventory.getWeapon(swPacket.delta))
 						player.inventory.holding = swPacket.delta;
@@ -202,12 +221,18 @@ server.on("connection", async socket => {
 				player.reload();
 				break;
 			case "usehealing":
-				player.heal((<UseHealingPacket>decoded).item);
+				const healPkt = new UseHealingPacket()
+				healPkt.deserialise(stream);
+				player.heal((healPkt).item);
 				break;
 			case "serverSideScopeUpdate":
-				const data = (<ServerSideScopeUpdate>decoded)
+				const data = (new ServerSideScopeUpdate());
+				data.deserialise(stream);
 				player.inventory.selectScope(Number(data.scope))
 				break;
+			case "cancelActionsPacket":
+				player.healTicks = 0;
+				player.reloadTicks = 0;
 		}
 	});
 });
@@ -218,16 +243,17 @@ setInterval(() => {
 	const players = <Player[]>world.entities.filter(entity => entity.type === "player");
 	players.forEach(player => {
 		const socket = sockets.get(player.id);
-		if (!socket) return;
+		if (!socket || !playerInitialPacketsSent.get(socket)) return;
 		const pkt = new GamePacket(world.dirtyEntities, world.dirtyObstacles, player, world.playerCount, false, world.discardEntities, world.discardObstacles)
 		if (world.zoneMoving) pkt.addSafeZoneData(world.safeZone);
 		else pkt.addNextSafeZoneData(world.nextSafeZone);
-		send(socket, pkt);
-		if (world.particles.length) send(socket, new ParticlesPacket(world.particles, player));
-		for (const sound of world.onceSounds) send(socket, new SoundPacket(sound.path, sound.position));
-		for (const killFeed of world.killFeeds) send(socket, new AnnouncePacket(killFeed.killFeed, killFeed.killer))
+		sendBitstream(socket, pkt);
+		sendBitstream(socket, new PlayerTickPkt(player));
+		if (world.particles.length) sendBitstream(socket, new ParticlesPacket(world.particles, player));
+		//for (const sound of world.onceSounds) sendBitstream(socket, new SoundPacket(sound.path, sound.position));
+		for (const killFeed of world.killFeeds) sendBitstream(socket, new AnnouncePacket(killFeed.killFeed, killFeed.killer))
 		if (player.changedScope) {
-			setTimeout(() => { send(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false; }, 40) }
+			setTimeout(() => { sendBitstream(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false; }, 40) }
 	});
 	world.postTick();
 }, 1000 / TICKS_PER_SECOND);

@@ -2,7 +2,7 @@ import * as crypto from "crypto";
 
 // ID generator
 export function ID() {
-    return crypto.randomBytes(24).toString("hex");
+    return crypto.randomBytes(6).toString("hex");
 }
 
 // Promisified setTimeout
@@ -30,11 +30,15 @@ export function toRadians(degree: number) {
 import { encode, decode } from "msgpack-lite";
 import { deflate, inflate } from "pako";
 import WebSocket = require("ws");
-import { ClientPacketResolvable, IPacket } from "./types/packet";
+import { ClientPacketResolvable, IPacket, IPacketSERVER } from "./types/packet";
 // Send packet
 export function send(socket: WebSocket, packet: IPacket) {
     //socket.send(deflate(deflate(encode(packet).buffer)));
     socket.send(deflate(encode(packet).buffer));
+}
+export function sendBitstream(socket: WebSocket, packet: IPacketSERVER) {
+    packet.serialise();
+    socket.send(packet.getBuffer());
 }
 // Receive packet
 export function receive(msg: ArrayBuffer) {
@@ -48,6 +52,7 @@ import { Ammo, Gun, Grenade } from "./store/entities";
 import { Vec2 } from "./types/math";
 import { GunColor } from "./types/misc";
 import fetch from "node-fetch";
+import { IslandrBitStream } from "./packets";
 
 // Spawners
 export function spawnGun(id: string, color: GunColor, position: Vec2, ammoAmount: number) {
