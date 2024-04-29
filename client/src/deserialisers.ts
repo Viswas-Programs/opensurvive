@@ -176,7 +176,7 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
             entities.push(minEntity)
         }
         else if (type == "gun") {
-            const minEntity = Object.assign(baseMinEntity, { nameId: stream.readId(), color: GunColor[stream.readInt8()] })
+            const minEntity = Object.assign(baseMinEntity, { nameId: stream.readId(), color: stream.readInt8() })
             entities.push(minEntity)
         }
         else {
