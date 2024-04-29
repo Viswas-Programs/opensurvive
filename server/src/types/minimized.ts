@@ -32,7 +32,6 @@ export class MinEntity {
 	hitbox!: MinHitbox;
 	animations!: string[];
 	despawn!: boolean;
-	serialise(stream: IslandrBitStream): void{ }
 }
 
 export interface MinInventory {

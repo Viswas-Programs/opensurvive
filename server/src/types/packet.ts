@@ -1,11 +1,11 @@
 import { BASE_RADIUS } from "../constants";
 import { IslandrBitStream } from "../packets";
-import { serialiseDiscardables, serialiseMinEntities, serialiseMinObstacles, serialiseMinParticles, serialisePlayer } from "../serialisers";
+import { serialiseDiscardables, serialiseMinObstacles, serialiseMinParticles, serialisePlayer } from "../serialisers";
 import { Player } from "../store/entities";
 import Building from "./building";
 import { Entity } from "./entity";
 import { CircleHitbox, Vec2 } from "./math";
-import { MinBuilding, MinCircleHitbox, MinEntity, MinMinObstacle, MinObstacle, MinParticle, MinTerrain, MinVec2 } from "./minimized";
+import { MinBuilding, MinCircleHitbox, MinMinObstacle, MinObstacle, MinParticle, MinTerrain, MinVec2 } from "./minimized";
 import { MovementDirection } from "./misc";
 import { Obstacle } from "./obstacle";
 import { Particle } from "./particle";
@@ -182,7 +182,7 @@ export class AckPacket extends IPacketSERVER {
 export class GamePacket extends IPacketSERVER {
 	type = "game";
 	allocBytes = 25 + 1 + 6 + 6+20+130;
-	entities: MinEntity[];
+	entities: Entity[];
 	obstacles: MinObstacle[];
 	alivecount: number;
 	discardEntities?: string[];
@@ -194,7 +194,7 @@ export class GamePacket extends IPacketSERVER {
 	anyDiscardObstacles = false;
 	constructor(entities: Entity[], obstacles: Obstacle[], player: Player, alivecount: number, sendAll = false, discardEntities: string[] = [], discardObstacles: string[] = []) {
 		super()
-		this.entities = (sendAll ? entities : entities.filter(entity => entity.position.addVec(player.position.inverse()).magnitudeSqr() < Math.pow(BASE_RADIUS * player.scope, 2))).map(entity => entity.minimize());
+		this.entities = (sendAll ? entities : entities.filter(entity => entity.position.addVec(player.position.inverse()).magnitudeSqr() < Math.pow(BASE_RADIUS * player.scope, 2)));
 		this.entities.forEach((entity) => {
 			if (entity.type != "player") this.allocBytes += 75
 			else this.allocBytes += 180;

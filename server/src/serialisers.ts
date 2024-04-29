@@ -1,6 +1,5 @@
 import { IslandrBitStream } from "./packets";
 import Player from "./store/entities/player";
-import Roof from "./store/obstacles/roof";
 import { MinEntity, MinObstacle, MinParticle} from "./types/minimized";
 
 export function serialiseMinParticles(particleArray: MinParticle[], stream: IslandrBitStream) {
@@ -40,50 +39,27 @@ export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: Isla
 		else {stream.writeBoolean(false) }
     })
 }
-export function serialiseMinEntities(entityArray: MinEntity[], stream: IslandrBitStream) {
-    stream.writeInt8(entityArray.length)
-	entityArray.forEach((entity: MinEntity) => {
-		stream.writeASCIIString(entity.type, 20);
-        if (entity.type != "player") {
-            stream.writeId(entity.id);
-			stream.writeFloat64(entity.position.x); stream.writeFloat64(entity.position.y);
-			stream.writeFloat64(entity.direction.x); stream.writeFloat64(entity.direction.y);
-            if (entity.hitbox.type == "circle") { stream.writeBoolean(true); stream.writeFloat64(entity.hitbox.radius); }
-			else { stream.writeBoolean(false); stream.writeFloat64(entity.hitbox.width); stream.writeFloat64(entity.hitbox.height); }
-            stream.writeBoolean(entity.despawn);
-            stream.writeInt8(entity.animations.length)
-            entity.animations.forEach((animation: string) => {
-                stream.writeASCIIString(animation, 15)
-            })
-        }
-		else {
-			console.log((<any>entity).skin, "ENTITY SKIN LA")
-			stream.writeId(entity.id);
-			//write position
-			stream.writeFloat64(entity.position.x)
-			stream.writeFloat64(entity.position.y)
-			//write direction
-			stream.writeFloat64(entity.direction.x)
-			stream.writeFloat64(entity.direction.y)
-			const hitbox = entity.hitbox
-			//write the hitbox configuration
-			if (hitbox.type == "circle") { stream.writeBoolean(true); stream.writeInt8(hitbox.radius) }
-			else { stream.writeBoolean(false); stream.writeFloat64(hitbox.height); stream.writeFloat64(hitbox.width) }
-			//write animations
-			stream.writeInt8(entity.animations.length)
-			entity.animations.forEach(animation => {stream.writeASCIIString(animation, 15) })
-			//despawn configs
-			stream.writeBoolean(entity.despawn);
-			stream.writeInt8((<any>entity).inventory.backpackLevel) //inventory's backpackLevel 
-			stream.writeInt8((<any>entity).inventory.helmetLevel) //inventory's helmetLevel
-			stream.writeInt8((<any>entity).inventory.vestLevel) // inventory vestLevel
-			stream.writeId((<any>entity).inventory.holding) // inventory holding currently,
-			stream.writeSkinOrLoadout((<any>entity).skin)
-			stream.writeSkinOrLoadout((<any>entity).deathImg)
-			
-        }
-    })
+export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitStream) {
+	stream.writeASCIIString(entity.type, 20)
+	stream.writeId(entity.id)
+	//write the type
+	//write position
+	stream.writeFloat64(entity.position.x)
+	stream.writeFloat64(entity.position.y)
+	//write direction
+	stream.writeFloat64(entity.direction.x)
+	stream.writeFloat64(entity.direction.y)
+	//write hitbox type
+	const hitbox = entity.hitbox;
+	if (hitbox.type == "circle") { stream.writeBoolean(true); stream.writeFloat64(hitbox.radius) }
+	else { stream.writeBoolean(false); stream.writeFloat64(hitbox.height); stream.writeFloat64(hitbox.width) }
+	//write the hitbox configuration
+	//despawn configs
+	stream.writeBoolean(entity.despawn);
+	stream.writeInt8(entity.animations.length)
+	entity.animations.forEach(animation => stream.writeASCIIString(animation, 15))
 }
+
 
 export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 	stream.writeASCIIString(player.type, player.type.length) //constantly 6  bytes :D

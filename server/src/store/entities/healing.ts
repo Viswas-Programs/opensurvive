@@ -5,6 +5,8 @@ import Item from "./item";
 import Player from "./player";
 import { HealingData } from "../../types/data";
 import { world } from "../..";
+import { IslandrBitStream } from "../../packets";
+import { standardEntitySerialiser } from "../../serialisers";
 
 export default class Healing extends Item {
 	static readonly healingData = new Map<string, { heal: number, boost: number, time: number }>();
@@ -48,5 +50,9 @@ export default class Healing extends Item {
 	minimize() {
 		const min = super.minimize();
 		return Object.assign(min, { nameId: this.nameId, });
+	}
+	serialise(stream: IslandrBitStream) {
+		standardEntitySerialiser(this.minimize(), stream)
+		stream.writeId(this.nameId)
 	}
 }

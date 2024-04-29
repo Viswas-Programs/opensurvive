@@ -1,5 +1,7 @@
 import { world } from "../..";
 import { GLOBAL_UNIT_MULTIPLIER, TICKS_PER_SECOND } from "../../constants";
+import { IslandrBitStream } from "../../packets";
+import { standardEntitySerialiser } from "../../serialisers";
 import { Entity, Inventory } from "../../types/entity";
 import { CircleHitbox, Vec2 } from "../../types/math";
 import { CollisionType, GunColor } from "../../types/misc";
@@ -329,5 +331,15 @@ export default class Player extends Entity {
 	minimize() {
 		const min = super.minimize();
 		return Object.assign(min, { username: this.username, inventory: this.inventory.minimize(), skin: this.skin, deathImg: this.deathImg })
+	}
+	serialise(stream: IslandrBitStream) {
+		const minPlayer = this.minimize()
+		standardEntitySerialiser(minPlayer, stream)
+		stream.writeInt8(minPlayer.inventory.backpackLevel) //inventory's backpackLevel 
+		stream.writeInt8(minPlayer.inventory.helmetLevel) //inventory's helmetLevel
+		stream.writeInt8(minPlayer.inventory.vestLevel) // inventory vestLevel
+		stream.writeId(minPlayer.inventory.holding.nameId) // inventory holding currently,
+		stream.writeSkinOrLoadout(minPlayer.skin!)
+		stream.writeSkinOrLoadout(minPlayer.deathImg!)
 	}
 }

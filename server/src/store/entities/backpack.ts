@@ -1,4 +1,6 @@
 import { world } from "../..";
+import { IslandrBitStream } from "../../packets";
+import { standardEntitySerialiser } from "../../serialisers";
 import { CircleHitbox } from "../../types/math";
 import Item from "./item";
 import Player from "./player";
@@ -34,5 +36,9 @@ export default class Backpack extends Item {
 
 	minimize() {
 		return Object.assign(super.minimize(), { level: this.level });
+	}
+	serialise(stream: IslandrBitStream) {
+		standardEntitySerialiser(this.minimize(), stream)
+		stream.writeInt8(this.level)
 	}
 }

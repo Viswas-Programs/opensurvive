@@ -1,5 +1,7 @@
 // Note: This is the grenade item
 
+import { IslandrBitStream } from "../../packets";
+import { standardEntitySerialiser } from "../../serialisers";
 import { Inventory } from "../../types/entity";
 import { CircleHitbox, Vec2 } from "../../types/math";
 import { WEAPON_SUPPLIERS } from "../weapons";
@@ -41,5 +43,9 @@ export default class Grenade extends Item {
 	minimize() {
 		const min = super.minimize();
 		return Object.assign(min, { nameId: this.nameId });
+	}
+	serialise(stream: IslandrBitStream) {
+		standardEntitySerialiser(this.minimize(), stream)
+		stream.writeId(this.nameId)
 	}
 }

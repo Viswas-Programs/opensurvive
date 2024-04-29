@@ -1,6 +1,8 @@
 // Note: This is the gun item
 
 import { world } from "../..";
+import { IslandrBitStream } from "../../packets";
+import { standardEntitySerialiser } from "../../serialisers";
 import { CircleHitbox, CommonAngles, Vec2 } from "../../types/math";
 import { GunColor } from "../../types/misc";
 import { GunWeapon } from "../../types/weapon";
@@ -54,5 +56,10 @@ export default class Gun extends Item {
 	minimize() {
 		const min = super.minimize();
 		return Object.assign(min, { nameId: this.nameId, color: this.color });
+	}
+	serialise(stream: IslandrBitStream) {
+		standardEntitySerialiser(this.minimize(), stream)
+		stream.writeId(this.nameId);
+		stream.writeInt8(this.color)
 	}
 }

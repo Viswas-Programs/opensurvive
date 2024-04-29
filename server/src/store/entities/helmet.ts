@@ -3,6 +3,8 @@ import { CircleHitbox } from "../../types/math";
 import Item from "./item";
 import Player from "./player";
 import * as fs from "fs";
+import { IslandrBitStream } from "../../packets";
+import { standardEntitySerialiser } from "../../serialisers";
 
 export default class Helmet extends Item {
 	static readonly HELMET_REDUCTION: number[] = [];
@@ -40,5 +42,9 @@ export default class Helmet extends Item {
 
 	minimize() {
 		return Object.assign(super.minimize(), { level: this.level });
+	}
+	serialise(stream: IslandrBitStream) {
+		standardEntitySerialiser(this.minimize(), stream)
+		stream.writeInt8(this.level)
 	}
 }

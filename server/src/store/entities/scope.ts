@@ -1,4 +1,6 @@
 import { world } from "../..";
+import { IslandrBitStream } from "../../packets";
+import { standardEntitySerialiser } from "../../serialisers";
 import { CircleHitbox } from "../../types/math";
 import Item from "./item";
 import Player from "./player";
@@ -17,7 +19,6 @@ export default class Scope extends Item {
 		world.onceSounds.push({ "path": "items/scope_equip.mp3", "position": this.position })
 		player.changedScope = true;
 		player.lastPickedUpScope = this.zoom
-		console.log(player.changedScope)
 		return player.inventory.addScope(this.zoom);
 	}
 
@@ -27,5 +28,9 @@ export default class Scope extends Item {
 
 	minimize() {
 		return Object.assign(super.minimize(), { zoom: this.zoom });
+	}
+	serialise(stream: IslandrBitStream) {
+		standardEntitySerialiser(this.minimize(), stream)
+		stream.writeInt8(this.zoom)
 	}
 }

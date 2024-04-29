@@ -3,7 +3,7 @@ import Player from "./store/entities/player"
 import { castCorrectWeapon, WEAPON_SUPPLIERS } from "./store/weapons"
 import { CircleHitbox, Vec2 } from "./types/math"
 import { MinCircleHitbox, MinEntity, MinHitbox, MinObstacle, MinParticle, MinRectHitbox, MinVec2, MinWeapon } from "./types/minimized"
-import { CountableString } from "./types/misc"
+import { CountableString, GunColor } from "./types/misc"
 import { Weapon } from "./types/weapon"
 import AdditionalEntity from "./store/entities/player"
 import { Inventory } from "./types/entity"
@@ -72,6 +72,7 @@ function _getHitboxes(stream: IslandrBitStream, callFrom = "others"): MinHitbox 
     if (stream.readBoolean()) {
         if (callFrom != "player") {
             hitbox = <MinCircleHitbox>{
+                type:"circle",
                 radius: stream.readFloat64()
             }
         }
@@ -83,6 +84,7 @@ function _getHitboxes(stream: IslandrBitStream, callFrom = "others"): MinHitbox 
     }
     else {
         hitbox = <MinRectHitbox>{
+            type: "rect",
             width: stream.readFloat64(),
             height: stream.readFloat64()
         }
@@ -133,28 +135,52 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
     const entities = [];
     const size = stream.readInt8()
     for (let ii = 0; ii < size; ii++) {
-        const type =  stream.readASCIIString(20)
-        if (type != "player") {
-            const minEntity: MinEntity = {
-                id: stream.readId(),
-                type: type,
-                position: <MinVec2>{ x: stream.readFloat64(), y: stream.readFloat64() },
-                direction: <MinVec2>{ x: stream.readFloat64(), y: stream.readFloat64() },
-                hitbox: <MinHitbox>_getHitboxes(stream),
-                despawn: stream.readBoolean(),
-                animations: <string[]>_getAnimations(stream)
-            };
+        const type = stream.readASCIIString(20)
+        const id = stream.readId()
+        const position: MinVec2 = { x: stream.readFloat64(), y: stream.readFloat64() }
+        const direction: MinVec2 = { x: stream.readFloat64(), y: stream.readFloat64() }
+        const hitbox = _getHitboxes(stream)
+        const despawn = stream.readBoolean()
+        const animations = _getAnimations(stream)
+        const baseMinEntity = {
+            id: id,
+            type: type,
+            position: position,
+            direction: direction,
+            hitbox: hitbox,
+            despawn: despawn,
+            animations: animations,
+        }
+        if (["vest", "helmet", "backpack"].includes(type)) {
+            const minEntity = Object.assign(baseMinEntity, { level: stream.readInt8() })
             entities.push(minEntity);
         }
+        else if (type == "scope") {
+            const minEntity = Object.assign(baseMinEntity, { zoom: stream.readInt8() })
+            entities.push(minEntity);
+        }
+        else if (type == "ammo") {
+            const minEntity = Object.assign(baseMinEntity, { amount: stream.readInt8(), color: stream.readInt8() })
+            entities.push(minEntity)
+        }
+        else if (type == "bullet") {
+            const minEntity = Object.assign(baseMinEntity, { type: stream.readASCIIString(15), length: stream.readFloat64(), width: stream.readFloat64() })
+            entities.push(minEntity)
+        }
+        else if (type == "explosion") {
+            const minEntity = Object.assign(baseMinEntity, { health: stream.readInt8(), maxHealth: stream.readInt8() })
+            entities.push(minEntity)
+        }
+        else if (["grenade", "healing"].includes(type)) {
+            const minEntity = Object.assign(baseMinEntity, { nameId: stream.readId() })
+            entities.push(minEntity)
+        }
+        else if (type == "gun") {
+            const minEntity = Object.assign(baseMinEntity, { nameId: stream.readId(), color: GunColor[stream.readInt8()] })
+            entities.push(minEntity)
+        }
         else {
-            const player = {
-                id: stream.readId(),
-                type: type,
-                position: <MinVec2>{ x: stream.readFloat64(), y: stream.readFloat64() },
-                direction: <MinVec2>{ x: stream.readFloat64(), y: stream.readFloat64() },
-                hitbox: <MinHitbox>_getHitboxes(stream, "player"),
-                animations: _getAnimations(stream),
-                despawn: stream.readBoolean(),
+            const player = Object.assign(baseMinEntity, {
                 inventory: {
                     backpackLevel: stream.readInt8(),
                     helmetLevel: stream.readInt8(),
@@ -163,7 +189,7 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
                 },
                 skin: stream.readSkinOrLoadout(),
                 deathImg: stream.readSkinOrLoadout()
-            }
+            })
             entities.push(player)
         }
     }

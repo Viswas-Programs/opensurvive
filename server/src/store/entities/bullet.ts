@@ -1,4 +1,6 @@
 import { GLOBAL_UNIT_MULTIPLIER } from "../../constants";
+import { IslandrBitStream } from "../../packets";
+import { standardEntitySerialiser } from "../../serialisers";
 import { TracerData } from "../../types/data";
 import { Entity } from "../../types/entity";
 import { CircleHitbox, Line, Vec2 } from "../../types/math";
@@ -66,5 +68,11 @@ export default class Bullet extends Entity {
 	minimize() {
 		const min = super.minimize();
 		return Object.assign(min, { tracer: this.data });
+	}
+	serialise(stream: IslandrBitStream) {
+		standardEntitySerialiser(this.minimize(), stream)
+		stream.writeASCIIString(this.data.type, 15);
+		stream.writeFloat64(this.data.length);
+		stream.writeFloat64(this.data.width);
 	}
 }

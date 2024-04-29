@@ -209,90 +209,19 @@ export class Entity {
 	unmarkDirty() {
 		this.dirty = false;
 	}
-	serialise(stream: IslandrBitStream) { }
 	minimize() {
-		if (this.type == "player") {
-			const a = <MinEntity>{
-				id: this.id,
-				type: this.type,
-				position: this.position.minimize(),
-				direction: this.direction.minimize(),
-				hitbox: this.hitbox.minimize(),
-				animations: this.animations,
-				despawn: this.despawn,
-				inventory: {
-					helmetLevel: (<any>this).inventory.helmetLevel,
-					backpackLevel: (<any>this).inventory.backpackLevel,
-					vestLevel: (<any>this).inventory.vestLevel,
-					holding: (<any>this).inventory.holding
-				},
-				skin: (<any>this).skin,
-				deathImg: (<any>this).deathImg,
-				serialise: (stream: IslandrBitStream) => {
-					stream.writeASCIIString(this.type, 20)
-					stream.writeId(this.id)
-					//write the type
-					
-					//write position
-					stream.writeFloat64(this.position.x)
-					stream.writeFloat64(this.position.y)
-					//write direction
-					stream.writeFloat64(this.direction.x)
-					stream.writeFloat64(this.direction.y)
-					//write hitbox type
-					const hitbox = this.hitbox.minimize();
-					//write the hitbox configuration
-					if (hitbox.type == "circle") { stream.writeBoolean(true);  stream.writeInt8(hitbox.radius) }
-					else { stream.writeBoolean(false);  stream.writeInt8(hitbox.height); stream.writeInt8(hitbox.width) }
-					//write animations
-					stream.writeInt8(this.animations.length);
-					this.animations.forEach(animation => {stream.writeASCIIString(animation, 15) })
-					//despawn configs
-					stream.writeBoolean(this.despawn);
-					stream.writeInt8((<any>this).inventory.backpackLevel) //inventory's backpackLevel 
-					stream.writeInt8((<any>this).inventory.helmetLevel) //inventory's helmetLevel
-					stream.writeInt8((<any>this).inventory.vestLevel) // inventory vestLevel
-					stream.writeId((<any>this).inventory.weapons[(<any>this).inventory.holding].nameId) // inventory holding currently,
-					stream.writeSkinOrLoadout((<any>this).skin)
-					stream.writeSkinOrLoadout((<any>this).deathImg)
-				}
-			}
-			return a
+		const a = <MinEntity>{
+			id: this.id,
+			type: this.type,
+			position: this.position.minimize(),
+			direction: this.direction.minimize(),
+			hitbox: this.hitbox.minimize(),
+			animations: this.animations,
+			despawn: this.despawn
 		}
-		else {
-			return <MinEntity>{
-				id: this.id,
-				type: this.type,
-				position: this.position.minimize(),
-				direction: this.direction.minimize(),
-				hitbox: this.hitbox.minimize(),
-				animations: this.animations,
-				despawn: this.despawn,
-				serialise: (stream: IslandrBitStream) => {
-					stream.writeId(this.id)
-					//write the type
-					stream.writeASCIIString(this.type, 15)
-					//write position
-					stream.writeFloat64(this.position.x)
-					stream.writeFloat64(this.position.y)
-					//write direction
-					stream.writeFloat64(this.direction.x)
-					stream.writeFloat64(this.direction.y)
-					//write hitbox type
-					const hitbox = this.hitbox.minimize();
-					stream.writeASCIIString(hitbox.type, 6)
-					//write the hitbox configuration
-					if (hitbox.type == "circle") stream.writeInt8(hitbox.radius)
-					else { stream.writeInt8(hitbox.height); stream.writeInt8(hitbox.width) }
-					//despawn configs
-					stream.writeBoolean(this.despawn);
-					//write animations
-					stream.writeInt8(this.animations.length)
-					this.animations.forEach(animation => stream.writeASCIIString(animation, 15))
-				}
-			}
-		}
+		return a
 	}
+	serialise(stream: IslandrBitStream) { }
 	protected handleCircleCircleCollision(obstacle: Obstacle) {
 		const relative = this.position.addVec(obstacle.position.inverse());
 		this.position = obstacle.position.addVec(relative.scaleAll((obstacle.hitbox.comparable + this.hitbox.comparable) / relative.magnitude()));
