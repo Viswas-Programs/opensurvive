@@ -34,6 +34,9 @@ export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: Isla
 			for (let ii = 0; ii < (<any>obstacle).roofless.length; ii++) {
 				stream.writeId((<any>obstacle).roofless[ii])
 			}
+			stream.writeInt32((<any>obstacle).color)
+			stream.writeASCIIString((<any>obstacle).texture.path, 25)
+			stream.writeInt8((<any>obstacle).texture.horizontalFill)
 		}
 		if ((<any>obstacle).special) {
 			stream.writeBoolean(true)

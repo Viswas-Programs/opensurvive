@@ -106,7 +106,7 @@ export function deserialiseMinObstacles(stream: IslandrBitStream): MinObstacle[]
     const obstacles: MinObstacle[] = [];
     const size = stream.readInt8();
     for (let ii = 0; ii < size; ii++) {
-        const obstacle = {
+        let obstacle = {
             id: stream.readId(),
             type: stream.readASCIIString(11),
             position: <MinVec2>{ x: stream.readFloat64(), y: stream.readFloat64() },
@@ -125,6 +125,10 @@ export function deserialiseMinObstacles(stream: IslandrBitStream): MinObstacle[]
                     obstacle.roofless.add(stream.readId())
                 }
             }
+            obstacle = Object.assign(obstacle, {
+                color: stream.readInt32(),
+                texture: {path: stream.readASCIIString(25), horizontalFill: stream.readInt8()}
+            })
         }
         const specialOrNot = stream.readBoolean()
         if (specialOrNot) obstacle.special = stream.readASCIIString(20)
