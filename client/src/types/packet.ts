@@ -210,7 +210,7 @@ export class ReloadWeaponPacket extends IPacketCLIENT {
 
 //notify to cancel any actions going on 
 export class CancelActionsPacket extends IPacketCLIENT {
-	type = "cancelActionsPacket";
+	type = "cancelAct";
 	allocBytes = 2 + 25;
 }
 
@@ -231,7 +231,7 @@ export class UseHealingPacket extends IPacketCLIENT {
 }
 
 export class ServerScopeUpdatePacket extends IPacketCLIENT {
-	type = "serverSideScopeUpdate";
+	type = "srvrScopeUpd";
 	scope!: number;
 	allocBytes = 2 + 27;
 	constructor(scope: number) {

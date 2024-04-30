@@ -1,7 +1,5 @@
 import { IslandrBitStream } from "./packets";
-import { Gun } from "./store/entities";
 import Player from "./store/entities/player";
-import { castCorrectWeapon } from "./store/weapons";
 import { MinEntity, MinObstacle, MinParticle} from "./types/minimized";
 import { GunWeapon } from "./types/weapon";
 
@@ -9,8 +7,8 @@ export function serialiseMinParticles(particleArray: MinParticle[], stream: Isla
     stream.writeInt8(particleArray.length)
     particleArray.forEach((particle: MinParticle) => {
         stream.writeId(particle.id);
-        stream.writeInt16(particle.position.x); stream.writeInt16(particle.position.y);
-        stream.writeInt8(particle.size);
+        stream.writeFloat64(particle.position.x); stream.writeFloat64(particle.position.y);
+        stream.writeFloat32(particle.size);
     })
 
 }
@@ -40,7 +38,7 @@ export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: Isla
 		}
 		if ((<any>obstacle).special) {
 			stream.writeBoolean(true)
-			stream.writeASCIIString((<any>obstacle).special, 20)
+			stream.writeASCIIString((<any>obstacle).special, 10)
 		}
 		else {stream.writeBoolean(false) }
     })

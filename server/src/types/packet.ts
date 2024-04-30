@@ -144,7 +144,7 @@ export class ReloadWeaponPacket {
 }
 
 export class CancelActionsPacket {
-	type = "cancelActionsPacket";
+	type = "cancelAct";
 }
 export class UseHealingPacket {
 	type = "usehealing";
@@ -298,7 +298,7 @@ export class ScopeUpdatePacket extends IPacketSERVER {
 }
 
 export class ServerSideScopeUpdate extends IPacketCLIENTSERVERCOM {
-	type = "serverSideScopeUpdate";
+	type = "srvrScopeUpd";
 	scope!: number
 	deserialise(stream: IslandrBitStream) {this.scope = stream.readInt8()}
 }

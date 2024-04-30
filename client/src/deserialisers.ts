@@ -7,13 +7,14 @@ import { CountableString, GunColor } from "./types/misc"
 import { Weapon } from "./types/weapon"
 import AdditionalEntity from "./store/entities/player"
 import { Inventory } from "./types/entity"
+import { TracerData } from "./types/data"
 export function deserialiseMinParticles(stream: IslandrBitStream): MinParticle[]{
     const particles: MinParticle[] = []
     for (let ii = 0; ii < stream.readInt8(); ii++) {
         const particle: MinParticle = {
             id: stream.readId(),
-            position: <MinVec2>{ x: stream.readInt16(), y: stream.readInt16() },
-            size: stream.readInt8()
+            position: <MinVec2>{ x: stream.readFloat64(), y: stream.readFloat64() },
+            size: stream.readFloat32()
         }
         particles.push(particle)
     }
@@ -131,7 +132,7 @@ export function deserialiseMinObstacles(stream: IslandrBitStream): MinObstacle[]
             })
         }
         const specialOrNot = stream.readBoolean()
-        if (specialOrNot) obstacle.special = stream.readASCIIString(20)
+        if (specialOrNot) obstacle.special = stream.readASCIIString(10)
         obstacles.push(<MinObstacle>obstacle)
     }
     return obstacles
@@ -170,7 +171,8 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
             entities.push(minEntity)
         }
         else if (type == "bullet") {
-            const minEntity = Object.assign(baseMinEntity, { type: stream.readASCIIString(15), length: stream.readFloat64(), width: stream.readFloat64() })
+            const minEntity = Object.assign(baseMinEntity, { tracer: <TracerData>{ type: stream.readASCIIString(11), length: stream.readFloat64(), width: stream.readFloat64() } })
+            console.log("bullet e e", minEntity)
             entities.push(minEntity)
         }
         else if (type == "explosion") {

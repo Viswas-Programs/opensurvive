@@ -71,7 +71,7 @@ export default class Bullet extends Entity {
 	}
 	serialise(stream: IslandrBitStream) {
 		standardEntitySerialiser(this.minimize(), stream)
-		stream.writeASCIIString(this.data.type, 15);
+		stream.writeASCIIString(this.data.type, 11);
 		stream.writeFloat64(this.data.length);
 		stream.writeFloat64(this.data.width);
 	}

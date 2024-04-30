@@ -225,12 +225,12 @@ server.on("connection", async socket => {
 				healPkt.deserialise(stream);
 				player.heal((healPkt).item);
 				break;
-			case "serverSideScopeUpdate":
+			case "srvrScopeUpd":
 				const data = (new ServerSideScopeUpdate());
 				data.deserialise(stream);
 				player.inventory.selectScope(Number(data.scope))
 				break;
-			case "cancelActionsPacket":
+			case "cancelAct":
 				player.healTicks = 0;
 				player.reloadTicks = 0;
 		}
