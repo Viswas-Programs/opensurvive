@@ -43,7 +43,6 @@ export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: Isla
     })
 }
 export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitStream) {
-	if (entity.type == "bullet") console.log(entity)
 	stream.writeASCIIString(entity.type, 20)
 	stream.writeId(entity.id)
 	//write the type

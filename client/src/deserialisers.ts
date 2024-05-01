@@ -258,7 +258,8 @@ export function deserialisePlayer(stream: IslandrBitStream) {
 
 export function deserialiseDiscardables(stream: IslandrBitStream): string[] {
     const discardables: string[] = []
-    for (let ii = 0; ii < stream.readInt8(); ii++) {
+    const size = stream.readInt8()
+    for (let ii = 0; ii < size; ii++) {
         const discardable = stream.readASCIIString(15);
         discardables.push(discardable)
     }

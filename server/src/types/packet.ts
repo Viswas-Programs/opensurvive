@@ -221,7 +221,9 @@ export class GamePacket extends IPacketSERVER {
 		serialiseMinObstacles(this.obstacles, this.stream)
 		this.stream.writeInt8(this.alivecount)
 		if (this.anyDiscardEntities) serialiseDiscardables(this.discardEntities as string[], this.stream);
+		else {this.stream.writeInt8(0) }
 		if (this.anyDiscardObstacles) serialiseDiscardables(this.discardObstacles as string[], this.stream);
+		else { this.stream.writeInt8(0) }
 	}
 }
 
