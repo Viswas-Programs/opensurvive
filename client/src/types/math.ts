@@ -67,7 +67,9 @@ export class Vec2 {
 	addVec(vec: Vec2) {
 		return new Vec2(this.x + vec.x, this.y + vec.y);
 	}
-
+	static addDiffVec(firstVec: Vec2, secondVec: Vec2) {
+		return new Vec2(firstVec.x+secondVec.x, firstVec.y+secondVec.y)
+	}
 	addX(x: number) {
 		return new Vec2(this.x + x, this.y);
 	}
@@ -78,6 +80,9 @@ export class Vec2 {
 
 	scale(x: number, y: number) {
 		return new Vec2(this.x * x, this.y * y);
+	}
+	static scaleDiffVec(vec: Vec2, x: number, y: number) {
+		return new Vec2(vec.x * x, vec.y * y)
 	}
 
 	scaleAll(ratio: number) {
@@ -106,6 +111,9 @@ export class Vec2 {
 
 	minimize() {
 		return <MinVec2>{ x: this.x, y: this.y };
+	}
+	static interpolate(startVec: Vec2, endVec: Vec2, factor: number) {
+		return Vec2.addDiffVec(Vec2.scaleDiffVec(startVec,  1-factor, 1-factor), Vec2.scaleDiffVec(endVec, factor, factor))
 	}
 }
 
