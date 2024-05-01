@@ -60,6 +60,7 @@ export default class Bullet extends Entity {
 	}
 
 	die() {
+		console.log("BULLET DIE EEE", this)
 		super.die();
 		// Needs a state marker to determine what particle gets played
 		//addParticles(new Particle("blood", this.position));

@@ -15,7 +15,6 @@ export function serialiseMinParticles(particleArray: MinParticle[], stream: Isla
 export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: IslandrBitStream) {
     stream.writeInt8(obstacleArray.length)
 	obstacleArray.forEach((obstacle: MinObstacle) => {
-		if (obstacle.hitbox.type != "circle") {console.log(obstacle) }
         stream.writeId(obstacle.id);
         stream.writeASCIIString(obstacle.type, 11);
 		stream.writeFloat64(obstacle.position.x); stream.writeFloat64(obstacle.position.y);
@@ -44,6 +43,7 @@ export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: Isla
     })
 }
 export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitStream) {
+	if (entity.type == "bullet") console.log(entity)
 	stream.writeASCIIString(entity.type, 20)
 	stream.writeId(entity.id)
 	//write the type
@@ -122,10 +122,10 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 	stream.writeSkinOrLoadout(player.skin as string)
 	stream.writeSkinOrLoadout(player.deathImg as string)
 	// ticks
-	stream.writeInt8(player.reloadTicks)
-	stream.writeInt8(player.maxReloadTicks)
-	stream.writeInt8(player.healTicks)
-	stream.writeInt8(player.maxHealTicks)
+	stream.writeInt16(player.reloadTicks)
+	stream.writeInt16(player.maxReloadTicks)
+	stream.writeInt16(player.healTicks)
+	stream.writeInt16(player.maxHealTicks)
 	stream.writeInt8(player.health)
 	stream.writeInt8(player.maxHealth)
 	// positioning

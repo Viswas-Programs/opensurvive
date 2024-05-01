@@ -1,11 +1,9 @@
 import { IslandrBitStream } from "./packets"
-import Player from "./store/entities/player"
 import { castCorrectWeapon, WEAPON_SUPPLIERS } from "./store/weapons"
-import { CircleHitbox, Vec2 } from "./types/math"
-import { MinCircleHitbox, MinEntity, MinHitbox, MinObstacle, MinParticle, MinRectHitbox, MinVec2, MinWeapon } from "./types/minimized"
-import { CountableString, GunColor } from "./types/misc"
+import { Vec2} from "./types/math"
+import { MinCircleHitbox, MinHitbox, MinObstacle, MinParticle, MinRectHitbox, MinVec2, MinWeapon } from "./types/minimized"
+import { CountableString } from "./types/misc"
 import { Weapon } from "./types/weapon"
-import AdditionalEntity from "./store/entities/player"
 import { Inventory } from "./types/entity"
 import { TracerData } from "./types/data"
 export function deserialiseMinParticles(stream: IslandrBitStream): MinParticle[]{
@@ -28,7 +26,7 @@ function _getUtilities(stream: IslandrBitStream): CountableString {
     return utilities
 }
 
-function _getAmmos(stream: IslandrBitStream, callingFrom = "entityDeserialiser"): number[] {
+function _getAmmos(stream: IslandrBitStream): number[] {
     const ammos: number[] = []
     const size = stream.readInt8()
     for (let ii = 0; ii < size; ii++) {
@@ -172,7 +170,6 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
         }
         else if (type == "bullet") {
             const minEntity = Object.assign(baseMinEntity, { tracer: <TracerData>{ type: stream.readASCIIString(11), length: stream.readFloat64(), width: stream.readFloat64() } })
-            console.log("bullet e e", minEntity)
             entities.push(minEntity)
         }
         else if (type == "explosion") {
@@ -184,7 +181,7 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
             entities.push(minEntity)
         }
         else if (type == "gun") {
-            const minEntity = Object.assign(baseMinEntity, { nameId: stream.readId(), color: stream.readInt8() })
+            const minEntity = Object.assign(baseMinEntity, { nameId: stream.readASCIIString(13), color: stream.readInt8() })
             entities.push(minEntity)
         }
         else {
@@ -227,7 +224,7 @@ export function deserialisePlayer(stream: IslandrBitStream) {
             scopes: _getScopes(stream),
             utilities: _getUtilities(stream),
             slots: [],
-            ammos: _getAmmos(stream, "playerTickPkt"),
+            ammos: _getAmmos(stream),
             selectedScope: stream.readInt8(),
             getWeapon: (index = -1) =>  {
                 if (index < 0) index = playerSrvr.inventory.holding as number;
@@ -239,10 +236,10 @@ export function deserialisePlayer(stream: IslandrBitStream) {
         },
         skin: stream.readSkinOrLoadout(),
         deathImg: stream.readSkinOrLoadout(),
-        reloadTicks: stream.readInt8(),
-        maxReloadTicks: stream.readInt8(),
-        healTicks: stream.readInt8(),
-        maxHealTicks: stream.readInt8(),
+        reloadTicks: stream.readInt16(),
+        maxReloadTicks: stream.readInt16(),
+        healTicks: stream.readInt16(),
+        maxHealTicks: stream.readInt16(),
         health: stream.readInt8(),
         maxHealth: stream.readInt8(),
         position: Vec2.fromMinVec2(<MinVec2>{

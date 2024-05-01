@@ -59,7 +59,7 @@ export default class Gun extends Item {
 	}
 	serialise(stream: IslandrBitStream) {
 		standardEntitySerialiser(this.minimize(), stream)
-		stream.writeId(this.nameId);
+		stream.writeASCIIString(this.nameId, 13);
 		stream.writeInt8(this.color)
 	}
 }
