@@ -183,11 +183,7 @@ export class FullPlayer extends Player {
 	currentHealItem!: string | null;
 	copy(minEntity: MinEntity & AdditionalEntity) {
 		super.copy(minEntity);
-		if (!this.position) { this.position = Vec2.fromMinVec2(minEntity.position); this._lastPosChange = Date.now() }
-		else {
-			this.position = Vec2.interpolate(this.position, Vec2.fromMinVec2(minEntity.position), Math.min((Date.now() - this._lastPosChange) / getTPS()));
-		} this._lastPosChange = Date.now()
-		this.oldPos = this.position
+		this.oldPos = this.position = Vec2.fromMinVec2(minEntity.position)
 		this.health = minEntity.health;
 		this.maxHealth = minEntity.maxHealth;
 		this.boost = minEntity.boost;
