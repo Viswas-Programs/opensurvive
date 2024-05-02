@@ -105,8 +105,10 @@ export default class Player extends Entity {
 	}
 
 	render(you: Player, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scale: number) {
+		you.position = you.oldPos = Vec2.interpolate(you.oldPos, you.position, Math.min((Date.now() - you._lastPosChange) / getTPS()));
+		you._lastPosChange = Date.now()
+		this.position = Vec2.interpolate(this.oldPos, this.position, Math.min((Date.now() - this._lastPosChange) / getTPS())); 
 		this._lastPosChange = Date.now()
-		this.position = Vec2.interpolate(this.oldPos, Vec2.fromMinVec2(this.position), Math.min((Date.now() - this._lastPosChange) / getTPS())); 
 		this.oldPos = this.position
 		const relative = this.position.addVec(you.position.inverse());
 		const radius = scale * this.hitbox.comparable;
