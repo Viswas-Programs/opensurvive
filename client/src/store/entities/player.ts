@@ -9,6 +9,8 @@ import { GunWeapon, WeaponType } from "../../types/weapon";
 import { circleFromCenter } from "../../utils";
 import { castCorrectWeapon, WEAPON_SUPPLIERS } from "../weapons";
 import { getMode } from "../../homepage";
+import { Vec2 } from "../../types/math";
+import { getTPS } from "../../game";
 
 const weaponPanelDivs: HTMLDivElement[] = [];
 const weaponNameDivs: HTMLDivElement[] = [];
@@ -59,7 +61,7 @@ export default class Player extends Entity {
 	currentDeathImg = new Image();
 	interactMessage: string | null = null;
 	currentHealItem: string | null = null;
-	
+	_lastPosChange = Date.now();
 
 	constructor(minEntity: MinEntity & AdditionalEntity) {
 		super(minEntity);
@@ -103,6 +105,9 @@ export default class Player extends Entity {
 	}
 
 	render(you: Player, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scale: number) {
+		this._lastPosChange = Date.now()
+		this.position = Vec2.interpolate(this.oldPos, Vec2.fromMinVec2(this.position), Math.min((Date.now() - this._lastPosChange) / getTPS())); 
+		this.oldPos = this.position
 		const relative = this.position.addVec(you.position.inverse());
 		const radius = scale * this.hitbox.comparable;
 		ctx.translate(canvas.width / 2 + relative.x * scale, canvas.height / 2 + relative.y * scale);
@@ -174,9 +179,13 @@ export class FullPlayer extends Player {
 	maxHealTicks!: number;
 	interactMessage!: string | null;
 	currentHealItem!: string | null;
-
 	copy(minEntity: MinEntity & AdditionalEntity) {
 		super.copy(minEntity);
+		if (!this.position) { this.position = Vec2.fromMinVec2(minEntity.position); this._lastPosChange = Date.now() }
+		else {
+			this.position = Vec2.interpolate(this.position, Vec2.fromMinVec2(minEntity.position), Math.min((Date.now() - this._lastPosChange) / getTPS()));
+		} this._lastPosChange = Date.now()
+		this.oldPos = this.position
 		this.health = minEntity.health;
 		this.maxHealth = minEntity.maxHealth;
 		this.boost = minEntity.boost;
