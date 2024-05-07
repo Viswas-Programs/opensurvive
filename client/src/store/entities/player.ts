@@ -105,8 +105,9 @@ export default class Player extends Entity {
 	}
 
 	render(you: Player, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scale: number) {
-		you.position = you.oldPos = Vec2.interpolate(you.oldPos, you.position, Math.min((Date.now() - you._lastPosChange) / getTPS()));
+		you.position = Vec2.interpolate(you.oldPos, you.position, Math.min((Date.now() - you._lastPosChange) / getTPS()));
 		you._lastPosChange = Date.now()
+		you.oldPos = you.position
 		this.position = Vec2.interpolate(this.oldPos, this.position, Math.min((Date.now() - this._lastPosChange) / getTPS())); 
 		this._lastPosChange = Date.now()
 		this.oldPos = this.position
@@ -182,8 +183,8 @@ export class FullPlayer extends Player {
 	interactMessage!: string | null;
 	currentHealItem!: string | null;
 	copy(minEntity: MinEntity & AdditionalEntity) {
+		this.position = this.oldPos = Vec2.fromMinVec2(minEntity.position)
 		super.copy(minEntity);
-		this.oldPos = this.position = Vec2.fromMinVec2(minEntity.position)
 		this.health = minEntity.health;
 		this.maxHealth = minEntity.maxHealth;
 		this.boost = minEntity.boost;

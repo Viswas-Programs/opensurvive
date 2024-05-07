@@ -36,8 +36,6 @@ if (!localStorage.getItem("playerDeathImg")) localStorage.setItem("playerDeathIm
 
 var deathImg: string | null = localStorage.getItem("playerDeathImg");
 
-console.log(skin)
-console.log(deathImg)
 const isMobile = /Android/.test(navigator.userAgent) || /iPhone/.test(navigator.userAgent) || /iPad/.test(navigator.userAgent) || /Tablet/.test(navigator.userAgent)
 var player: FullPlayer | null;
 
@@ -95,7 +93,6 @@ async function init(address: string) {
 			if (currentCursor) { document.documentElement.style.cursor = currentCursor }
 			const responsePacket = new ResponsePacket(id, username!, skin!, deathImg!, isMobile!, (cookieExists("gave_me_cookies") ? getCookieValue("access_token") : getToken()) as string)
 			send(ws, responsePacket);
-			console.log(responsePacket)
 			connected = true;
 			setConnected(true)
 			showMobControls();
@@ -109,13 +106,10 @@ async function init(address: string) {
 				_selectedScope = 1;
 				send(ws, new ServerScopeUpdatePacket(1));
 				for (let ii = 0; ii < scopeList.length; ii++) {
-					console.log(scopeList[ii], ii)
 					if (_selectedScope == scopeList[ii]) {
-						console.log('yuh');
 						(scopes?.children.item(ii) as HTMLElement).style.background = "rgba(55, 55, 55, 1.5)"
 					}
 					else {
-						console.log('nop');
 						(scopes?.children.item(ii) as HTMLElement).style.background = "rgba(51, 51, 51, 0.5)"
 					}
 				}
@@ -137,36 +131,7 @@ async function init(address: string) {
 			const interval = setInterval(() => {
 				if (connected) send(ws, new PingPacket());
 				else clearInterval(interval);
-			}, 1000);/*
-			ws.onmessage = (event) => {
-				console.log(receive(event.data))
-				console.log("MAP PACKET BOIII GO BRRRRRR")
-				const data = receive(event.data)
-				const mapPkt = <MapPacket>data;
-				console.log("packet terrains:", mapPkt.terrains);
-				world.terrains = mapPkt.terrains.map(ter => castTerrain(ter));
-				console.log("terrains:", world.terrains);
-				world.obstacles = <Obstacle[]>mapPkt.obstacles.map(obs => castObstacle(castMinObstacle(obs))).filter(obs => !!obs);
-				world.buildings = mapPkt.buildings.map(bui => new Building(bui));
-				console.log("WORLD OBSTACLES ARE:", world.obstacles)
-				initMap();
-				//Show player count once game starts
-				(document.querySelector("#playercountcontainer") as HTMLInputElement).style.display = "block";
-			}
-			ws.onmessage = (event) => {
-				const data = receive(event.data)
-				console.log("OG GAME DATA PACT", data)
-				const gamePkt = <GamePacket>data;
-				world.updateEntities(gamePkt.entities, gamePkt.discardEntities);
-				world.updateObstacles(gamePkt.obstacles, gamePkt.discardObstacles);
-				world.updateLiveCount(gamePkt.alivecount);
-				if (gamePkt.safeZone) world.updateSafeZone(gamePkt.safeZone);
-				if (gamePkt.nextSafeZone) world.updateNextSafeZone(gamePkt.nextSafeZone);
-				if (!player) player = new FullPlayer(gamePkt.player);
-				else player.copy(gamePkt.player);
-				// Client side ticking
-				world.clientTick(player);
-			}*/
+			}, 1000);
 			ws.onmessage = (event) => {
 				let bitstream = true;
 				let stream;
@@ -205,9 +170,8 @@ async function init(address: string) {
 					case "playerTick": {
 						const playerSrvr = deserialisePlayer(stream as IslandrBitStream)
 						if (!player) player = new FullPlayer(playerSrvr);
-						else player.copy(playerSrvr);
-						// Client side ticking
-						world.clientTick(player);
+						else { player.copy(playerSrvr); world.updateEntities([playerSrvr], []); }
+						//else player.copy(playerSrvr);
 						break;
 					}
 					case "sound": {

@@ -9,6 +9,7 @@ import Building from "./building";
 import { Terrain } from "./terrain";
 import { DummyParticle, Particle } from "./particle";
 import { castParticle } from "../store/particles";
+import { getPlayer } from "../game";
 
 export class World {
 	size: Vec2;
@@ -40,6 +41,7 @@ export class World {
 	updateEntities(entities: MinEntity[], discardEntities: string[] = []) {
 		const pending: Entity[] = [];
 		for (const entity of this.entities) {
+			if (entity.type == "player" && entity.id == getPlayer()?.id) continue;
 			if (discardEntities.includes(entity.id)) continue;
 			const newData = entities.find(e => e.id == entity.id);
 			if (newData) entity.copy(newData);
@@ -47,6 +49,7 @@ export class World {
 		}
 		for (const entity of entities) {
 			const existing = this.entities.find(e => e.id == entity.id);
+			if (entity.type == "player" && entity.id == getPlayer()?.id) continue;
 			if (!existing) pending.push(castEntity(entity));
 		}
 		this.entities = pending;

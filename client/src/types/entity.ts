@@ -8,7 +8,7 @@ import { GunColor } from "../constants";
 import { DEFINED_ANIMATIONS } from "../store/animations";
 import { Animation } from "./animation";
 import { CountableString } from "./misc";
-import { getTPS } from "../game";
+import { getPlayer, getTPS } from "../game";
 
 export class Inventory {
 	helmetLevel !: number
@@ -72,6 +72,7 @@ export abstract class Entity implements Renderable {
 	despawn!: boolean;
 	zIndex = 0;
 	oldPos!: Vec2
+	_lastPosChange = Date.now()
 
 	constructor(minEntity: MinEntity) {
 		this.copy(minEntity);
@@ -81,8 +82,9 @@ export abstract class Entity implements Renderable {
 		this.id = minEntity.id;
 		this.type = minEntity.type;
 		this.position = new Vec2(minEntity.position.x, minEntity.position.y)
-		if (!this.oldPos) this.oldPos = this.position
+		if (!this.oldPos) this.oldPos = this.position;
 		this.direction = new Vec2(minEntity.direction.x, minEntity.direction.y);
+		
 		if (minEntity.hitbox.type === "rect") {
 			const rect = <MinRectHitbox> minEntity.hitbox;
 			this.hitbox = new RectHitbox(rect.width, rect.height);
