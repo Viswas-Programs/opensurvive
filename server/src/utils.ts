@@ -38,7 +38,7 @@ export function send(socket: WebSocket, packet: IPacket) {
 }
 export function sendBitstream(socket: WebSocket, packet: IPacketSERVER) {
     packet.serialise();
-    socket.send(packet.getBuffer());
+    socket.send(deflate(packet.getBuffer()).buffer);
 }
 // Receive packet
 export function receive(msg: ArrayBuffer) {

@@ -195,7 +195,6 @@ export class GamePacket extends IPacketSERVER {
 	constructor(entities: Entity[], obstacles: Obstacle[], player: Player, alivecount: number, sendAll = false, discardEntities: string[] = [], discardObstacles: string[] = []) {
 		super()
 		this.entities = (sendAll ? entities : entities.filter(entity => entity.position.addVec(player.position.inverse()).magnitudeSqr() < Math.pow(BASE_RADIUS * player.scope, 2)));
-		if (this.entities.length > 0) console.log(this.entities);
 		this.entities.forEach((entity) => {this.allocBytes += entity.allocBytes})
 		this.obstacles = (sendAll ? obstacles : obstacles.filter(obstacle => obstacle.position.addVec(player.position.inverse()).magnitudeSqr() < Math.pow(BASE_RADIUS * player.scope, 2))).map(obstacle => obstacle.minimize());
 		this.allocBytes += calculateAllocBytesForObs(obstacles)

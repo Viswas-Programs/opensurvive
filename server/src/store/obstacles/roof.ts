@@ -66,7 +66,6 @@ export default class Roof extends Obstacle {
 	}*/
 
 	minimize() {
-		console.log(this.roofless)
 		return Object.assign(super.minimize(), { color: this.color, texture: this.texture, roofless: [...this.roofless] });
 	}
 }

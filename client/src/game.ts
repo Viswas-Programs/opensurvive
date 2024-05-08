@@ -19,6 +19,7 @@ import { getMode } from "./homepage";
 import { IslandrBitStream } from "./packets";
 import { MinCircleHitbox, MinTerrain, MinVec2 } from "./types/minimized";
 import { deserialiseDiscardables, deserialiseMinEntities, deserialiseMinObstacles, deserialiseMinParticles, deserialisePlayer } from "./deserialisers";
+import { inflate } from "pako";
 //handle users that tried to go to old domain name, or direct ip
 var urlargs = new URLSearchParams(window.location.search);
 if(urlargs.get("from")){
@@ -72,7 +73,7 @@ async function init(address: string) {
 		}, TIMEOUT);
 
 		ws.onmessage = async (event) => {
-			const stream = new IslandrBitStream(event.data)
+			const stream = new IslandrBitStream(inflate(event.data).buffer)
 			const dataA = <AckPacket>{
 				type:stream.readPacketType(),
 				id:stream.readId(),
@@ -137,7 +138,7 @@ async function init(address: string) {
 				let stream;
 				let packetType: string;
 				if (receive(event.data) && (receive(event.data)!.type == "game" || receive(event.data)!.type == "map")) { data = receive(event.data); bitstream = false; packetType = receive(event.data)!.type }
-				else { stream = new IslandrBitStream(event.data); packetType = (stream as IslandrBitStream).readPacketType() } 
+				else { stream = new IslandrBitStream(inflate(event.data).buffer); packetType = (stream as IslandrBitStream).readPacketType() } 
 				switch (packetType) {
 					case "map": {
 						const mapPkt = <MapPacket>data;
