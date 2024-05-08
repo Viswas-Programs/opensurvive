@@ -1,6 +1,8 @@
 import { IslandrBitStream } from "./packets";
 import Player from "./store/entities/player";
+import { Roof } from "./store/obstacles";
 import { MinEntity, MinObstacle, MinParticle} from "./types/minimized";
+import { Obstacle } from "./types/obstacle";
 import { GunWeapon } from "./types/weapon";
 
 export function serialiseMinParticles(particleArray: MinParticle[], stream: IslandrBitStream) {
@@ -11,6 +13,22 @@ export function serialiseMinParticles(particleArray: MinParticle[], stream: Isla
         stream.writeFloat32(particle.size);
     })
 
+}
+
+export function calculateAllocBytesForObs(obstacleArray: Obstacle[]): number {
+	let allocBytes = 1;
+	obstacleArray.forEach(obstacle => {
+		allocBytes += 59
+		if (obstacle.hitbox.type == "circle") allocBytes += 8;
+		else allocBytes += 16;
+		obstacle.animations.forEach(animation => { allocBytes += 15 })
+		if (obstacle.type == "roof") {
+			allocBytes += 31;
+			(<Roof>obstacle).roofless.forEach(id => allocBytes += 12);
+		}
+		if ((obstacle as any).special) {allocBytes +=10 }
+	})
+	return allocBytes
 }
 export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: IslandrBitStream) {
     stream.writeInt8(obstacleArray.length)

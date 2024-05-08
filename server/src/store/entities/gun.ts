@@ -21,6 +21,7 @@ export default class Gun extends Item {
 		if (!WEAPON_SUPPLIERS.has(nameId)) console.warn("Creating a gun entity that doesn't have a supplier for its type");
 		this.nameId = nameId;
 		this.color = color;
+		this.allocBytes += 14
 	}
 
 	picked(player: Player) {

@@ -27,6 +27,7 @@ export default class Explosion extends Entity {
 		this.discardable = true;
 		this.noCollision = true;
 		this.vulnerable = false;
+		this.allocBytes += 2;
 	}
 
 	tick(entities: Entity[], obstacles: Obstacle[]) {

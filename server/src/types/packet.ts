@@ -1,6 +1,6 @@
 import { BASE_RADIUS } from "../constants";
 import { IslandrBitStream } from "../packets";
-import { serialiseDiscardables, serialiseMinObstacles, serialiseMinParticles, serialisePlayer } from "../serialisers";
+import { calculateAllocBytesForObs, serialiseDiscardables, serialiseMinObstacles, serialiseMinParticles, serialisePlayer } from "../serialisers";
 import { Player } from "../store/entities";
 import Building from "./building";
 import { Entity } from "./entity";
@@ -181,7 +181,7 @@ export class AckPacket extends IPacketSERVER {
 
 export class GamePacket extends IPacketSERVER {
 	type = "game";
-	allocBytes = 25 + 1 + 6 + 6+20+130;
+	allocBytes = 25 + 4;
 	entities: Entity[];
 	obstacles: MinObstacle[];
 	alivecount: number;
@@ -195,12 +195,10 @@ export class GamePacket extends IPacketSERVER {
 	constructor(entities: Entity[], obstacles: Obstacle[], player: Player, alivecount: number, sendAll = false, discardEntities: string[] = [], discardObstacles: string[] = []) {
 		super()
 		this.entities = (sendAll ? entities : entities.filter(entity => entity.position.addVec(player.position.inverse()).magnitudeSqr() < Math.pow(BASE_RADIUS * player.scope, 2)));
-		this.entities.forEach((entity) => {
-			if (entity.type != "player") this.allocBytes += 75
-			else this.allocBytes += 180;
-		})
+		if (this.entities.length > 0) console.log(this.entities);
+		this.entities.forEach((entity) => {this.allocBytes += entity.allocBytes})
 		this.obstacles = (sendAll ? obstacles : obstacles.filter(obstacle => obstacle.position.addVec(player.position.inverse()).magnitudeSqr() < Math.pow(BASE_RADIUS * player.scope, 2))).map(obstacle => obstacle.minimize());
-		this.allocBytes += this.obstacles.length * 60
+		this.allocBytes += calculateAllocBytesForObs(obstacles)
 		this.alivecount = alivecount;
 		this.player = player;
 		if (discardEntities.length) { this.discardEntities = discardEntities; this.allocBytes += this.discardEntities.length * 15; this.anyDiscardEntities = true }

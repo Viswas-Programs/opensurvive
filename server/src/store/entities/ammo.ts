@@ -16,6 +16,7 @@ export default class Ammo extends Item {
 		super();
 		this.amount = amount;
 		this.color = color;
+		this.allocBytes += 2;
 	}
 
 	picked(player: Player) {

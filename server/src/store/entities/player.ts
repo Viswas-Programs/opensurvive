@@ -71,6 +71,7 @@ export default class Player extends Entity {
 		this.currentHealItem = null;
 		this.accessToken = accessToken;
 		this.isMobile = isMobile!;
+		this.allocBytes += 35;
 	}
 
 	setVelocity(velocity?: Vec2) {

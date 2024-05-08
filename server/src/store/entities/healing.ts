@@ -19,6 +19,7 @@ export default class Healing extends Item {
 		super();
 		this.nameId = nameId;
 		this.amount = amount;
+		this.allocBytes += 12
 	}
 
 	static {

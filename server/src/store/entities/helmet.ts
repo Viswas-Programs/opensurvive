@@ -19,6 +19,8 @@ export default class Helmet extends Item {
 	constructor(level: number) {
 		super();
 		this.level = level;
+		this.allocBytes++;
+
 	}
 
 	picked(player: Player) {

@@ -13,6 +13,7 @@ export default class Scope extends Item {
 	constructor(zoom: number) {
 		super();
 		this.zoom = zoom;
+		this.allocBytes++;
 	}
 
 	picked(player: Player) {

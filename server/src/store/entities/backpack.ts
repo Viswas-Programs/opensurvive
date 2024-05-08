@@ -13,6 +13,7 @@ export default class Backpack extends Item {
 	constructor(level: number) {
 		super();
 		this.level = level;
+		this.allocBytes++;
 	}
 
 	picked(player: Player) {

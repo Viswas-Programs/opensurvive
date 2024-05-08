@@ -115,6 +115,7 @@ export class Entity {
 	// Particle type to emit when damaged
 	damageParticle?: string;
 	isMobile = false;
+	allocBytes = 98;
 
 	constructor() {
 		this.id = ID();

@@ -27,6 +27,7 @@ export default class Bullet extends Entity {
 		this.discardable = true;
 		this.vulnerable = false;
 		this.falloff = falloff;
+		this.allocBytes += 27;
 	}
 
 	tick(entities: Entity[], obstacles: Obstacle[]) {

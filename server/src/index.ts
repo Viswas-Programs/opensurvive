@@ -244,9 +244,7 @@ setInterval(() => {
 	players.forEach(player => {
 		const socket = sockets.get(player.id);
 		if (!socket || !playerInitialPacketsSent.get(socket)) return;
-		const pkt = new GamePacket(world.dirtyEntities, world.dirtyObstacles, player, world.playerCount, false, world.discardEntities, world.discardObstacles)
-		if (world.zoneMoving) pkt.addSafeZoneData(world.safeZone);
-		else pkt.addNextSafeZoneData(world.nextSafeZone);
+		const pkt = new GamePacket(world.dirtyEntities.filter(entity => entity.id != player.id), world.dirtyObstacles, player, world.playerCount, false, world.discardEntities, world.discardObstacles)
 		sendBitstream(socket, pkt);
 		sendBitstream(socket, new PlayerTickPkt(player));
 		if (world.particles.length) sendBitstream(socket, new ParticlesPacket(world.particles, player));
