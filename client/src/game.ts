@@ -161,7 +161,6 @@ async function init(address: string) {
 								discardObstacles: deserialiseDiscardables(stream as IslandrBitStream),
 							}
 						}
-						if (data.obstacles.length > 0)console.log(data.obstacles)
 						const gamePkt = <GamePacket>data;
 						world.updateEntities(gamePkt.entities, gamePkt.discardEntities);
 						world.updateObstacles(gamePkt.obstacles, gamePkt.discardObstacles);
@@ -218,7 +217,6 @@ async function init(address: string) {
 						killFeedItem.prepend(`${announcementPacket.announcement}\n`)
 						killFeeds?.prepend(killFeedItem);
 						setTimeout(() => {
-							console.log(killFeeds?.childNodes, killFeeds?.children)
 							killFeeds?.childNodes[killFeeds.childNodes.length-1].remove();
 						}, 5000);
 						break;
