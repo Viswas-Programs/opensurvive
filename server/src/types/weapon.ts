@@ -120,7 +120,7 @@ export class GunWeapon extends Weapon {
 		this.offset = new Vec2(data.length, 0);
 		this.bullet = data.normal.bullet;
 		this.tracer = data.visuals.tracer;
-		this.reloadTicks = (data.normal.reload.time / 1000) * (60);
+		this.reloadTicks = ((data.normal.reload.time / 1000) * (60))/1.5;
 		this.reloadBullets = data.normal.reload.bullets || data.normal.capacity;
 		this.capacity = data.normal.capacity;
 	}

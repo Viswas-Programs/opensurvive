@@ -18,9 +18,9 @@
 		{
 			"id": "outhouse",
 			"includeTerrains": [ "plain" ],
-			"amount": 15
+			"amount": 12
 		},
-		{ "id": "small_building", "includeTerrains": ["plain"], "amount": 5 }
+		{ "id": "small_building", "includeTerrains": ["plain"], "amount": 3 }
 	],
 	"obstacles": [
 		{ "type": "tree", "amount": 100 },
@@ -29,7 +29,6 @@
 		{ "type": "stone", "args": ["ak47"], "amount": 2 },
 		{ "type": "crate", "amount": 100 },
 		{ "type": "crate", "amount": 25, "args": ["soviet"] },
-		{ "type": "crate", "amount": 40, "args": ["grenade"] },
 		{ "type": "bush", "amount": 50 },
 		{ "type": "barrel", "amount": 50 }
 	]

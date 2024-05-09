@@ -47,9 +47,10 @@ function _getScopes(stream: IslandrBitStream): number[] {
 function _getWeapons(stream: IslandrBitStream): Weapon[] {
     const weapons = [];
     for (let ii = 0; ii < 4; ii++) {
-        const id = stream.readId()
-        if (id == "null") weapons.push(null)
+        const weaponExistOrNot = stream.readBoolean()
+        if (!weaponExistOrNot) weapons.push(null)
         else {
+            const id = stream.readASCIIString(13)
             const weapon: MinWeapon = { nameId: id };
 
             if (castCorrectWeapon(weapon).type == "gun") { const mag = stream.readInt8(); weapons.push(castCorrectWeapon(weapon, mag)); }
@@ -200,11 +201,24 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
     }
     return entities;
 }
+function _getCurrentHealItem(stream: IslandrBitStream): string | null {
+    const curHealItemExists = stream.readBoolean()
+    if (!curHealItemExists) return null;
+    else {
+        const curHealItem = stream.readHealingItem();
+        return `entity.healing.${curHealItem}`
+    }
+}
+function _getInteractMessage(stream: IslandrBitStream): string | null {
+    const interactMsgExists = stream.readBoolean()
+    if (!interactMsgExists) return null
+    else return stream.readASCIIString(40)
+}
 export function deserialisePlayer(stream: IslandrBitStream) {
     const playerSrvr: any = {
         type: stream.readASCIIString(6),  //constantly 6  bytes :D
-        currentHealItem: stream.readHealingItem(),
-        interactMessage: stream.readASCIIString(40),
+        currentHealItem: _getCurrentHealItem(stream),
+        interactMessage: _getInteractMessage(stream),
         hitbox: <MinCircleHitbox>{
             radius: stream.readInt8()
         }, // hitbox radius

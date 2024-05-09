@@ -81,13 +81,30 @@ export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitSt
 	entity.animations.forEach(animation => stream.writeASCIIString(animation, 15))
 }
 
-
+export function calculateAllocBytesForTickPkt(player: Player): number {
+	let allocBytes = 124;
+	if (player.currentHealItem) allocBytes += 15
+	if (player.interactMessage) allocBytes += 40
+	player.animations.forEach(() => allocBytes += 15)
+	for (let ii = 0; ii < 4; ii++) {
+		if (player.inventory.getWeapon(ii) != undefined){allocBytes += 13
+			if (ii < 3 && player.inventory.getWeapon(ii)?.type == "gun") {allocBytes++ }}}
+	if (player.inventory.healings) {
+		for (let ii = 0; ii < Object.keys(player.inventory.healings).length; ii++) {allocBytes += 16}}
+	for (let ii = 0; ii < player.inventory.scopes.length; ii++) { allocBytes++ }
+	if (player.inventory.utilities) {
+		for (let ii = 0; ii < Object.keys(player.inventory.utilities).length; ii++) { allocBytes += 16 }}
+	for (let ii = 0; ii < player.inventory.ammos.length; ii++) { allocBytes++ }
+	return allocBytes;
+}
 export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 	stream.writeASCIIString(player.type, player.type.length) //constantly 6  bytes :D
 	// heal items
-	stream.writeHealingItem(player.currentHealItem ? player.currentHealItem : "")
+	stream.writeBoolean(!!player.currentHealItem)
+	if (player.currentHealItem)stream.writeHealingItem(player.currentHealItem ? player.currentHealItem : "")
 	// interact message
-	stream.writeASCIIString(player.interactMessage ? player.interactMessage : "", 40)
+	stream.writeBoolean(!!player.interactMessage)
+	if (player.interactMessage)stream.writeASCIIString(player.interactMessage ? player.interactMessage : "", 40)
 	stream.writeInt8(player.hitbox.radius) // hitbox radius
 	stream.writeId(player.id) // id of player
 	stream.writeUsername(player.username)
@@ -100,9 +117,10 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 	stream.writeInt8(player.inventory.vestLevel) // inventory vestLevel
 	stream.writeInt8(player.inventory.holding) // inventory holding currently
 	for (let ii = 0; ii < 4; ii++) {
-		if (player.inventory.getWeapon(ii) == undefined) stream.writeId("null");
+		if (player.inventory.getWeapon(ii) == undefined) stream.writeBoolean(false);
 		else {
-			stream.writeId(player.inventory.getWeapon(ii)!.minimize().nameId)
+			stream.writeBoolean(true)
+			stream.writeASCIIString(player.inventory.getWeapon(ii)!.minimize().nameId, 13)
 			if (ii < 3 && player.inventory.getWeapon(ii)?.type == "gun") { stream.writeInt8((player.inventory.getWeapon(ii)! as GunWeapon).magazine) }
 		}
 	}
@@ -117,8 +135,8 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 		stream.writeInt8(0)
 	}
 	stream.writeInt8(player.inventory.scopes.length)
-	for (let ii = 0; ii < (<any>player).inventory.scopes.length; ii++) {
-		stream.writeInt8((<any>player).inventory.scopes[ii])
+	for (let ii = 0; ii < player.inventory.scopes.length; ii++) {
+		stream.writeInt8(player.inventory.scopes[ii])
 	}
 	if (player.inventory.utilities) {
 		stream.writeInt8(Object.keys(player.inventory.utilities).length)

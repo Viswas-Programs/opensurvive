@@ -1,6 +1,6 @@
 import { BASE_RADIUS } from "../constants";
 import { IslandrBitStream } from "../packets";
-import { calculateAllocBytesForObs, serialiseDiscardables, serialiseMinObstacles, serialiseMinParticles, serialisePlayer } from "../serialisers";
+import { calculateAllocBytesForObs, calculateAllocBytesForTickPkt, serialiseDiscardables, serialiseMinObstacles, serialiseMinParticles, serialisePlayer } from "../serialisers";
 import { Player } from "../store/entities";
 import Building from "./building";
 import { Entity } from "./entity";
@@ -157,7 +157,7 @@ export type ClientPacketResolvable = ResponsePacket | PingPacket | MousePressPac
 
 export class AckPacket extends IPacketSERVER {
 	type = "ack";
-	allocBytes = 65;
+	allocBytes = 44;
 	id: string;
 	tps: number;
 	size: number[];
@@ -181,7 +181,7 @@ export class AckPacket extends IPacketSERVER {
 
 export class GamePacket extends IPacketSERVER {
 	type = "game";
-	allocBytes = 25 + 4;
+	allocBytes = 15 + 4;
 	entities: Entity[];
 	obstacles: MinObstacle[];
 	alivecount: number;
@@ -238,11 +238,12 @@ export class MapPacket implements IPacket {
 }
 export class PlayerTickPkt extends IPacketSERVER {
 	type = "playerTick";
-	allocBytes = 330;
+	allocBytes = 15;
 	player: Player;
 	constructor(player: Player) {
 		super();
 		this.player = player; 
+		this.allocBytes += calculateAllocBytesForTickPkt(this.player)
 	}
 	serialise() {
 		super.serialise();
@@ -251,7 +252,7 @@ export class PlayerTickPkt extends IPacketSERVER {
 }
 export class AnnouncePacket extends IPacketSERVER {
 	type = "announce";
-	allocBytes = 2 + 25 + 20 + 20 + 25 + 20;
+	allocBytes = 100;
 	announcement: string;
 	killer: string;
 
@@ -270,7 +271,7 @@ export class AnnouncePacket extends IPacketSERVER {
 // Let the client handle particles
 export class ParticlesPacket extends IPacketSERVER {
 	type = "particles";
-	allocBytes = 25;
+	allocBytes = 15;
 	particles: MinParticle[];
 
 	constructor(particles: Particle[], player: Player) {
@@ -287,7 +288,7 @@ export class ParticlesPacket extends IPacketSERVER {
 export class ScopeUpdatePacket extends IPacketSERVER {
 	type = "scopeUpdate";
 	scope!: number;
-	allocBytes = 25+1
+	allocBytes = 15+1
 
 	constructor(scope: number) { super(); this.scope = scope }
 	serialise() {
@@ -306,7 +307,7 @@ export class SoundPacket extends IPacketSERVER {
 	// No need to include "client/assets/sounds"
 	path: string;
 	position: Vec2;
-	allocBytes = 25+50+4
+	allocBytes = 15+50+4
 
 	constructor(path: string, position: Vec2) {
 		super()
