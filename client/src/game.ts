@@ -1,7 +1,7 @@
 /* eslint-disable no-fallthrough */
 import $ from "jquery"
 import { Howl, Howler } from "howler";
-import { KeyBind, movementKeys, TIMEOUT } from "./constants";
+import { GunColor, KeyBind, movementKeys, TIMEOUT } from "./constants";
 import { start, stop } from "./renderer";
 import { initMap } from "./rendering/map";
 import { addKeyPressed, addMousePressed, getToken, isKeyPressed, isMenuHidden, isMouseDisabled, removeKeyPressed, removeMousePressed, toggleBigMap, toggleHud, toggleMap, toggleMenu, toggleMinimap, toggleMouseDisabled } from "./states";
@@ -170,8 +170,19 @@ async function init(address: string) {
 					case "playerTick": {
 						const playerSrvr = deserialisePlayer(stream as IslandrBitStream)
 						if (!player) player = new FullPlayer(playerSrvr);
-						else { player.copy(playerSrvr); world.updateEntities([playerSrvr], []); }
-						//else player.copy(playerSrvr);
+						else player.copy(playerSrvr);
+						const usableGunAmmoNames = ["9mm", "12 gauge", "7.62mm", "5.56mm", "5.7mm", ".308 subsonic"];
+						const usableGunAmmos = [
+							player.inventory.ammos[GunColor.YELLOW],
+							player.inventory.ammos[GunColor.RED],
+							player.inventory.ammos[GunColor.BLUE],
+							player.inventory.ammos[GunColor.GREEN],
+							player.inventory.ammos[GunColor.TEAL],
+							player.inventory.ammos[GunColor.OLIVE]];
+						const ammosElements = document.getElementsByClassName("ammos");
+						for (let ii = 0; ii < usableGunAmmoNames.length; ii++) {
+							(<HTMLElement>ammosElements.item(ii)).textContent = `${usableGunAmmoNames[ii]}: ${usableGunAmmos[ii]}`
+						}
 						break;
 					}
 					case "sound": {
