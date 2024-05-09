@@ -42,9 +42,11 @@ import { deflate, inflate } from "pako";
 import { ServerPacketResolvable, IPacketCLIENT } from "./types/packet";
 import { CommonAngles } from "./types/math";
 import axios from "axios";
+import { getConnected } from "./game";
 // Send packet
 export function send(socket: WebSocket, packet: IPacketCLIENT) {
 	//socket.send(deflate(deflate(encode(packet).buffer)));
+	if (!getConnected()) return;
 	packet.serialise();
 	socket.send(packet.getBuffer());
 }

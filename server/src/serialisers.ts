@@ -81,8 +81,11 @@ export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitSt
 	entity.animations.forEach(animation => stream.writeASCIIString(animation, 15))
 }
 
+let usernamesAndIDsSent = false;
+
 export function calculateAllocBytesForTickPkt(player: Player): number {
-	let allocBytes = 124;
+	let allocBytes = 69;
+	if (!usernamesAndIDsSent) allocBytes += 46
 	if (player.currentHealItem) allocBytes += 15
 	if (player.interactMessage) allocBytes += 40
 	player.animations.forEach(() => allocBytes += 15)
@@ -98,18 +101,15 @@ export function calculateAllocBytesForTickPkt(player: Player): number {
 	return allocBytes;
 }
 export function serialisePlayer(player: Player, stream: IslandrBitStream) {
-	stream.writeASCIIString(player.type, player.type.length) //constantly 6  bytes :D
 	// heal items
 	stream.writeBoolean(!!player.currentHealItem)
 	if (player.currentHealItem)stream.writeHealingItem(player.currentHealItem ? player.currentHealItem : "")
 	// interact message
 	stream.writeBoolean(!!player.interactMessage)
 	if (player.interactMessage)stream.writeASCIIString(player.interactMessage ? player.interactMessage : "", 40)
-	stream.writeInt8(player.hitbox.radius) // hitbox radius
-	stream.writeId(player.id) // id of player
-	stream.writeUsername(player.username)
+	if (!usernamesAndIDsSent) stream.writeId(player.id)
+	if (!usernamesAndIDsSent) stream.writeUsername(player.username)
 	stream.writeFloat32(player.boost)
-	stream.writeInt8(player.maxBoost)
 	stream.writeInt8(player.scope)
 	stream.writeBoolean(player.canInteract)
 	stream.writeInt8(player.inventory.backpackLevel) //inventory's backpackLevel 
@@ -155,14 +155,13 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 	stream.writeInt8(player.inventory.selectedScope)
 	//loadouts
 	stream.writeSkinOrLoadout(player.skin as string)
-	stream.writeSkinOrLoadout(player.deathImg as string)
+	if (!usernamesAndIDsSent) stream.writeSkinOrLoadout(player.deathImg as string)
 	// ticks
 	stream.writeInt16(player.reloadTicks)
 	stream.writeInt16(player.maxReloadTicks)
 	stream.writeInt16(player.healTicks)
 	stream.writeInt16(player.maxHealTicks)
 	stream.writeInt8(player.health)
-	stream.writeInt8(player.maxHealth)
 	// positioning
 	stream.writeFloat64(player.position.x)
 	stream.writeFloat64(player.position.y)
@@ -174,6 +173,7 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 		stream.writeASCIIString(animation, 15)
 	})
 	stream.writeBoolean(player.despawn)
+	usernamesAndIDsSent = true
 }
 export function serialiseDiscardables(discardables: string[], stream: IslandrBitStream) {
 	stream.writeInt8(discardables.length);

@@ -46,7 +46,7 @@ export function getTPS() { return tps; }
 
 var ws: WebSocket;
 var connected = false;
-function getConnected() { return connected; }
+export function getConnected() { return connected; }
 function setConnected(v: boolean) { connected = v; return connected; }
 enum modeMapColours {
 	normal = 0x80B251,
@@ -93,8 +93,8 @@ async function init(address: string) {
 			if (!currentCursor){localStorage.setItem("selectedCursor", "default"); currentCursor = localStorage.getItem("selectedCursor")}
 			if (currentCursor) { document.documentElement.style.cursor = currentCursor }
 			const responsePacket = new ResponsePacket(id, username!, skin!, deathImg!, isMobile!, (cookieExists("gave_me_cookies") ? getCookieValue("access_token") : getToken()) as string)
-			send(ws, responsePacket);
 			connected = true;
+			send(ws, responsePacket);
 			setConnected(true)
 			showMobControls();
 			clearTimeout(timer);
@@ -270,13 +270,21 @@ async function init(address: string) {
 			username = null;
 			player = null;
 			res(undefined);
-			
+			for (const element of document.getElementsByClassName("healing-panel")) {
+				element.classList.remove("enabled");
+				element.classList.add("disabled");
+				element.textContent = "0";
+			}
+			for (const ammoElement of document.getElementsByClassName("ammos")) {
+				ammoElement.textContent = "";
+			}
 			//remove playercount
 		}
 	
 		ws.onerror = (err) => {
 			console.error(err);
 			rej(new Error("Failed joining game"));
+			ws.close()
 		};
 	});
 }

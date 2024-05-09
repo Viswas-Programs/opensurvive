@@ -102,6 +102,7 @@ function _getAnimations(stream: IslandrBitStream): string[] {
     }
     return animations
 }
+
 export function deserialiseMinObstacles(stream: IslandrBitStream): MinObstacle[] {
     const obstacles: MinObstacle[] = [];
     const size = stream.readInt8();
@@ -209,6 +210,22 @@ function _getCurrentHealItem(stream: IslandrBitStream): string | null {
         return `entity.healing.${curHealItem}`
     }
 }
+let username = "";
+let id = "";
+let deathImg = "";
+
+function _getUsername(stream: IslandrBitStream) {
+    if (username == "") username = stream.readUsername()
+    return username
+}
+function _getUserID(stream: IslandrBitStream) {
+    if (id == "") id = stream.readId()
+    return id
+}
+function _getUserDeathImg(stream: IslandrBitStream) {
+    if (deathImg == "") deathImg = stream.readSkinOrLoadout()
+    return deathImg
+}
 function _getInteractMessage(stream: IslandrBitStream): string | null {
     const interactMsgExists = stream.readBoolean()
     if (!interactMsgExists) return null
@@ -216,16 +233,16 @@ function _getInteractMessage(stream: IslandrBitStream): string | null {
 }
 export function deserialisePlayer(stream: IslandrBitStream) {
     const playerSrvr: any = {
-        type: stream.readASCIIString(6),  //constantly 6  bytes :D
+        type: "player",  //constantly 6  bytes :D
         currentHealItem: _getCurrentHealItem(stream),
         interactMessage: _getInteractMessage(stream),
         hitbox: <MinCircleHitbox>{
-            radius: stream.readInt8()
+            radius: 1
         }, // hitbox radius
-        id: stream.readId(), // id of player
-        username: stream.readUsername(),
+        id: _getUserID(stream), // id of player
+        username: _getUsername(stream),
         boost: stream.readFloat32(),
-        maxBoost: stream.readInt8(),
+        maxBoost: 100,
         scope: stream.readInt8(),
         canInteract: stream.readBoolean(),
         inventory: <Inventory> {
@@ -249,13 +266,13 @@ export function deserialisePlayer(stream: IslandrBitStream) {
             }
         },
         skin: stream.readSkinOrLoadout(),
-        deathImg: stream.readSkinOrLoadout(),
+        deathImg: _getUserDeathImg(stream),
         reloadTicks: stream.readInt16(),
         maxReloadTicks: stream.readInt16(),
         healTicks: stream.readInt16(),
         maxHealTicks: stream.readInt16(),
         health: stream.readInt8(),
-        maxHealth: stream.readInt8(),
+        maxHealth: 100,
         position: Vec2.fromMinVec2(<MinVec2>{
             x: stream.readFloat64(),
             y: stream.readFloat64()
