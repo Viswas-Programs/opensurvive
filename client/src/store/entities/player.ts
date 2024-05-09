@@ -62,6 +62,7 @@ export default class Player extends Entity {
 	interactMessage: string | null = null;
 	currentHealItem: string | null = null;
 	_lastPosChange = Date.now();
+	_lastDirectionChng = Date.now();
 
 	constructor(minEntity: MinEntity & AdditionalEntity) {
 		super(minEntity);
@@ -111,6 +112,12 @@ export default class Player extends Entity {
 		this.position = Vec2.interpolate(this.oldPos, this.position, Math.min((Date.now() - this._lastPosChange) / getTPS())); 
 		this._lastPosChange = Date.now()
 		this.oldPos = this.position
+		you.direction = Vec2.interpolate(you.oldDir, you.direction, Math.min((Date.now() - you._lastPosChange) / getTPS()));
+		you._lastPosChange = Date.now()
+		you.oldDir = you.direction
+		this.direction = Vec2.interpolate(this.oldDir, this.direction, Math.min((Date.now() - this._lastPosChange) / getTPS()));
+		this._lastPosChange = Date.now()
+		this.oldDir = this.direction
 		const relative = this.position.addVec(you.position.inverse());
 		const radius = scale * this.hitbox.comparable;
 		ctx.translate(canvas.width / 2 + relative.x * scale, canvas.height / 2 + relative.y * scale);
@@ -184,6 +191,7 @@ export class FullPlayer extends Player {
 	currentHealItem!: string | null;
 	copy(minEntity: MinEntity & AdditionalEntity) {
 		this.position = this.oldPos = Vec2.fromMinVec2(minEntity.position)
+		this.direction = this.oldDir = Vec2.fromMinVec2(minEntity.direction)
 		super.copy(minEntity);
 		this.health = minEntity.health;
 		this.maxHealth = minEntity.maxHealth;

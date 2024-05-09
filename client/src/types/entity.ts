@@ -71,7 +71,9 @@ export abstract class Entity implements Renderable {
 	maxHealth!: number;
 	despawn!: boolean;
 	zIndex = 0;
-	oldPos!: Vec2
+	oldPos!: Vec2;
+	oldDir!: Vec2;
+	_lastDirectionChng = Date.now()
 	_lastPosChange = Date.now()
 
 	constructor(minEntity: MinEntity) {
@@ -84,7 +86,7 @@ export abstract class Entity implements Renderable {
 		this.position = new Vec2(minEntity.position.x, minEntity.position.y)
 		if (!this.oldPos) this.oldPos = this.position;
 		this.direction = new Vec2(minEntity.direction.x, minEntity.direction.y);
-		
+		if (!this.oldDir) this.oldDir = this.direction;
 		if (minEntity.hitbox.type === "rect") {
 			const rect = <MinRectHitbox> minEntity.hitbox;
 			this.hitbox = new RectHitbox(rect.width, rect.height);

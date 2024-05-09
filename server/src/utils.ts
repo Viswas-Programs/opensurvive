@@ -52,7 +52,6 @@ import { Ammo, Gun, Grenade } from "./store/entities";
 import { Vec2 } from "./types/math";
 import { GunColor } from "./types/misc";
 import fetch from "node-fetch";
-import { IslandrBitStream } from "./packets";
 
 // Spawners
 export function spawnGun(id: string, color: GunColor, position: Vec2, ammoAmount: number) {
