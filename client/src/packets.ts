@@ -8,13 +8,13 @@ export class IslandrBitStream extends BitStream {
         return new IslandrBitStream(new ArrayBuffer(buffer_length))
     }
     writePacketType(type: string) {
-        this.writeASCIIString(type, 15)
+        this.writeASCIIString(type)
     }
     writeNumber(size: number) {
         this.writeInt32(size)
     }
     writeUsername(data: string) {
-        this.writeASCIIString(data, 20)
+        this.writeASCIIString(data)
     }
     writeId(id: string) {
         this.writeASCIIString(id, 12)
@@ -50,10 +50,10 @@ export class IslandrBitStream extends BitStream {
         return this.readASCIIString(12)
     }
     readUsername() {
-        return this.readASCIIString(20)
+        return this.readASCIIString()
     }
     readPacketType() {
-        return this.readASCIIString(15)
+        return this.readASCIIString()
     }
     readNumber() {
         return this.readInt32()

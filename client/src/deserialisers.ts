@@ -50,7 +50,7 @@ function _getWeapons(stream: IslandrBitStream): Weapon[] {
         const weaponExistOrNot = stream.readBoolean()
         if (!weaponExistOrNot) weapons.push(null)
         else {
-            const id = stream.readASCIIString(13)
+            const id = stream.readASCIIString()
             const weapon: MinWeapon = { nameId: id };
 
             if (castCorrectWeapon(weapon).type == "gun") { const mag = stream.readInt8(); weapons.push(castCorrectWeapon(weapon, mag)); }
@@ -97,7 +97,7 @@ function _getAnimations(stream: IslandrBitStream): string[] {
     const animations: string[] = [];
     const size = stream.readInt8();
     for (let ii = 0; ii < size ; ii++) {
-        const animation: string = stream.readASCIIString(15)
+        const animation: string = stream.readASCIIString()
         animations.push(animation)
     }
     return animations
@@ -109,7 +109,7 @@ export function deserialiseMinObstacles(stream: IslandrBitStream): MinObstacle[]
     for (let ii = 0; ii < size; ii++) {
         let obstacle = {
             id: stream.readId(),
-            type: stream.readASCIIString(11),
+            type: stream.readASCIIString(),
             position: <MinVec2>{ x: stream.readFloat64(), y: stream.readFloat64() },
             direction: <MinVec2>{ x: stream.readFloat64(), y: stream.readFloat64() },
             hitbox: <MinHitbox>_getHitboxes(stream),
@@ -128,11 +128,11 @@ export function deserialiseMinObstacles(stream: IslandrBitStream): MinObstacle[]
             }
             obstacle = Object.assign(obstacle, {
                 color: stream.readInt32(),
-                texture: {path: stream.readASCIIString(25), horizontalFill: stream.readInt8()}
+                texture: {path: stream.readASCIIString(), horizontalFill: stream.readInt8()}
             })
         }
         const specialOrNot = stream.readBoolean()
-        if (specialOrNot) obstacle.special = stream.readASCIIString(10)
+        if (specialOrNot) obstacle.special = stream.readASCIIString()
         obstacles.push(<MinObstacle>obstacle)
     }
     return obstacles
@@ -142,7 +142,7 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
     const entities = [];
     const size = stream.readInt8()
     for (let ii = 0; ii < size; ii++) {
-        const type = stream.readASCIIString(20)
+        const type = stream.readASCIIString()
         const id = stream.readId()
         const position: MinVec2 = { x: stream.readFloat64(), y: stream.readFloat64() }
         const direction: MinVec2 = { x: stream.readFloat64(), y: stream.readFloat64() }
@@ -224,12 +224,13 @@ function _getUserID(stream: IslandrBitStream) {
 }
 function _getUserDeathImg(stream: IslandrBitStream) {
     if (deathImg == "") deathImg = stream.readSkinOrLoadout()
+    else deathImg = "default"
     return deathImg
 }
 function _getInteractMessage(stream: IslandrBitStream): string | null {
     const interactMsgExists = stream.readBoolean()
     if (!interactMsgExists) return null
-    else return stream.readASCIIString(40)
+    else return stream.readASCIIString()
 }
 export function deserialisePlayer(stream: IslandrBitStream) {
     const playerSrvr: any = {
@@ -291,7 +292,7 @@ export function deserialiseDiscardables(stream: IslandrBitStream): string[] {
     const discardables: string[] = []
     const size = stream.readInt8()
     for (let ii = 0; ii < size; ii++) {
-        const discardable = stream.readASCIIString(15);
+        const discardable = stream.readASCIIString();
         discardables.push(discardable)
     }
     return discardables

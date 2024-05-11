@@ -1,0 +1,51 @@
+{
+  "obstacles": [
+    {
+      "type": "wall",
+      "hitbox": [ 0.5, 40 ],
+      "position": [ -7, 0 ],
+      "color": 1566399999
+    },
+    {
+      "type": "wall",
+      "hitbox": [ 0.5, 40 ],
+      "position": [ 7, 0 ],
+      "color": 1566399999
+    },
+    {
+      "type": "wall",
+      "hitbox": [ 2.5, 0.5 ],
+      "position": [ -3.5, 20 ],
+      "color": 1566399999
+    },
+    {
+      "type": "wall",
+      "hitbox": [ 2.5, 0.5 ],
+      "position": [ 0, 20 ],
+      "color": 1566399999
+    },
+    {
+      "type": "wall",
+      "hitbox": [ 2.5, 0.5 ],
+      "position": [ -1.25, -20 ],
+      "color": 1566399888
+    },
+    {
+      "type": "wall",
+      "hitbox": [ 2.5, 0.5 ],
+      "position": [ 1.25, -20 ],
+      "color": 1566399888
+    }
+
+
+
+  ],
+  "mapColor": 1566399999,
+  "zones": [
+    {
+      "size": [ 7, 30 ],
+      "position": [ 0, 0 ],
+      "map": true
+    }
+  ]
+}

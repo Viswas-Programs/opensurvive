@@ -21,12 +21,12 @@ export function calculateAllocBytesForObs(obstacleArray: Obstacle[]): number {
 		allocBytes += 59
 		if (obstacle.hitbox.type == "circle") allocBytes += 8;
 		else allocBytes += 16;
-		obstacle.animations.forEach(animation => { allocBytes += 15 })
+		obstacle.animations.forEach(animation => { allocBytes += animation.length })
 		if (obstacle.type == "roof") {
 			allocBytes += 31;
 			(<Roof>obstacle).roofless.forEach(id => allocBytes += 12);
 		}
-		if ((obstacle as any).special) {allocBytes +=10 }
+		if ((obstacle as any).special) {allocBytes +=(<any>obstacle).special.length }
 	})
 	return allocBytes
 }
@@ -34,7 +34,7 @@ export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: Isla
     stream.writeInt8(obstacleArray.length)
 	obstacleArray.forEach((obstacle: MinObstacle) => {
         stream.writeId(obstacle.id);
-        stream.writeASCIIString(obstacle.type, 11);
+        stream.writeASCIIString(obstacle.type);
 		stream.writeFloat64(obstacle.position.x); stream.writeFloat64(obstacle.position.y);
 		stream.writeFloat64(obstacle.direction.x); stream.writeFloat64(obstacle.direction.y);
 		if (obstacle.hitbox.type == "circle") { stream.writeBoolean(true); stream.writeFloat64(obstacle.hitbox.radius); }
@@ -42,7 +42,7 @@ export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: Isla
         stream.writeBoolean(obstacle.despawn);
         stream.writeInt8(obstacle.animations.length)
         obstacle.animations.forEach((animation: string) => {
-            stream.writeASCIIString(animation, 15)
+            stream.writeASCIIString(animation)
 		})
 		if (obstacle.type == "roof") {
 			stream.writeInt8((<any>obstacle).roofless.length);
@@ -50,18 +50,18 @@ export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: Isla
 				stream.writeId((<any>obstacle).roofless[ii])
 			}
 			stream.writeInt32((<any>obstacle).color)
-			stream.writeASCIIString((<any>obstacle).texture.path, 25)
+			stream.writeASCIIString((<any>obstacle).texture.path)
 			stream.writeInt8((<any>obstacle).texture.horizontalFill)
 		}
 		if ((<any>obstacle).special) {
 			stream.writeBoolean(true)
-			stream.writeASCIIString((<any>obstacle).special, 10)
+			stream.writeASCIIString((<any>obstacle).special)
 		}
 		else {stream.writeBoolean(false) }
     })
 }
 export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitStream) {
-	stream.writeASCIIString(entity.type, 20)
+	stream.writeASCIIString(entity.type)
 	stream.writeId(entity.id)
 	//write the type
 	//write position
@@ -78,7 +78,7 @@ export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitSt
 	//despawn configs
 	stream.writeBoolean(entity.despawn);
 	stream.writeInt8(entity.animations.length)
-	entity.animations.forEach(animation => stream.writeASCIIString(animation, 15))
+	entity.animations.forEach(animation => stream.writeASCIIString(animation))
 }
 
 let usernamesAndIDsSent = false;
@@ -86,11 +86,13 @@ let usernamesAndIDsSent = false;
 export function calculateAllocBytesForTickPkt(player: Player): number {
 	let allocBytes = 69;
 	if (!usernamesAndIDsSent) allocBytes += 46
-	if (player.currentHealItem) allocBytes += 15
-	if (player.interactMessage) allocBytes += 40
-	player.animations.forEach(() => allocBytes += 15)
+	if (player.currentHealItem) allocBytes += player.currentHealItem.length
+	if (player.interactMessage) allocBytes += player.interactMessage.length
+	player.animations.forEach((animation) => allocBytes += animation.length)
+	for (let ii = 0; ii < player.inventory.ammos.length; ii++) {allocBytes++}
 	for (let ii = 0; ii < 4; ii++) {
-		if (player.inventory.getWeapon(ii) != undefined){allocBytes += 13
+		if (player.inventory.getWeapon(ii) != undefined) {
+			allocBytes += player.inventory.getWeapon(ii)!.nameId.length;
 			if (ii < 3 && player.inventory.getWeapon(ii)?.type == "gun") {allocBytes++ }}}
 	if (player.inventory.healings) {
 		for (let ii = 0; ii < Object.keys(player.inventory.healings).length; ii++) {allocBytes += 16}}
@@ -106,7 +108,7 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 	if (player.currentHealItem)stream.writeHealingItem(player.currentHealItem ? player.currentHealItem : "")
 	// interact message
 	stream.writeBoolean(!!player.interactMessage)
-	if (player.interactMessage)stream.writeASCIIString(player.interactMessage ? player.interactMessage : "", 40)
+	if (player.interactMessage)stream.writeASCIIString(player.interactMessage ? player.interactMessage : "")
 	if (!usernamesAndIDsSent) stream.writeId(player.id)
 	if (!usernamesAndIDsSent) stream.writeUsername(player.username)
 	stream.writeFloat32(player.boost)
@@ -120,7 +122,7 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 		if (player.inventory.getWeapon(ii) == undefined) stream.writeBoolean(false);
 		else {
 			stream.writeBoolean(true)
-			stream.writeASCIIString(player.inventory.getWeapon(ii)!.minimize().nameId, 13)
+			stream.writeASCIIString(player.inventory.getWeapon(ii)!.minimize().nameId)
 			if (ii < 3 && player.inventory.getWeapon(ii)?.type == "gun") { stream.writeInt8((player.inventory.getWeapon(ii)! as GunWeapon).magazine) }
 		}
 	}
@@ -170,12 +172,12 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 	stream.writeFloat64(player.direction.y)
 	stream.writeInt8(player.animations.length)
 	player.animations.forEach(animation => {
-		stream.writeASCIIString(animation, 15)
+		stream.writeASCIIString(animation)
 	})
 	stream.writeBoolean(player.despawn)
 	usernamesAndIDsSent = true
 }
 export function serialiseDiscardables(discardables: string[], stream: IslandrBitStream) {
 	stream.writeInt8(discardables.length);
-	discardables.forEach(discardable => stream.writeASCIIString(discardable, 15))
+	discardables.forEach(discardable => stream.writeASCIIString(discardable))
 }
