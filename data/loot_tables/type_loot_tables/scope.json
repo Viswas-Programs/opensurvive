@@ -5,17 +5,17 @@
 		"amount": 1
 	},
 	"4": {
-		"rarity": 0,
-		"weight": 10,
-		"amount": 1
-	},
-	"8": {
 		"rarity": 1,
 		"weight": 10,
 		"amount": 1
 	},
+	"8": {
+		"rarity": 4,
+		"weight": 10,
+		"amount": 1
+	},
 	"15": {
-		"rarity": 2,
+		"rarity": 5,
 		"weight": 4,
 		"amount": 1
 	}

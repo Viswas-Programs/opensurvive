@@ -188,6 +188,7 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
         }
         else {
             const player = Object.assign(baseMinEntity, {
+                username: stream.readASCIIString(),
                 inventory: {
                     backpackLevel: stream.readInt8(),
                     helmetLevel: stream.readInt8(),

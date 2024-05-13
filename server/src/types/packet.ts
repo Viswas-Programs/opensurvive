@@ -263,7 +263,7 @@ export class AnnouncePacket extends IPacketSERVER {
 // Let the client handle particles
 export class ParticlesPacket extends IPacketSERVER {
 	type = "particles";
-	allocBytes = 10;
+	allocBytes = 15;
 	particles: MinParticle[];
 
 	constructor(particles: Particle[], player: Player) {

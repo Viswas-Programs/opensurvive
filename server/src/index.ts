@@ -14,6 +14,9 @@ import { castBuilding } from "./store/buildings";
 import { MapData } from "./types/data";
 import { IslandrBitStream } from "./packets"
 import { Socket } from "net";
+import Backpack from "./store/entities/backpack";
+import Scope from "./store/entities/scope";
+import Helmet from "./store/entities/helmet";
 
 export var ticksElapsed = 0;
 
@@ -125,6 +128,18 @@ server.on("connection", async socket => {
 	send(socket, new GamePacket(world.entities, world.obstacles.concat(...world.buildings.map(b => b.obstacles.map(o => o.obstacle))), player, world.playerCount, true));
 	playerInitialPacketsSent.set(socket, true);
 	// Send the player music
+	const e = new Helmet(3)
+	e.position = player.position
+	const f = new Helmet(2)
+	f.position = player.position
+	const g = new Helmet(1)
+	g.position = player.position
+	world.entities.push(e, f, g)
+	const h = new Scope(4)
+	h.position = player.position
+	const i = new Scope(8)
+	i.position = player.position
+	world.entities.push(e, f, g, h, i)
 	for (const sound of world.joinSounds) sendBitstream(socket, new SoundPacket(sound.path, sound.position));
 	sendBitstream(socket, new PlayerTickPkt(player));
 	// If the client doesn't ping for 30 seconds, we assume it is a disconnection.

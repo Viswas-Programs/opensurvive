@@ -58,6 +58,7 @@ export default class Player extends Entity {
 	accessToken?: string;
 	killCount = 0;
 	currencyChanged = false;
+	usernamesAndIDsSent = false;
 
 	constructor(id: string, username: string, skin: string | null, deathImg: string | null, accessToken?: string, isMobile?: boolean) {
 		super();
@@ -71,7 +72,7 @@ export default class Player extends Entity {
 		this.currentHealItem = null;
 		this.accessToken = accessToken;
 		this.isMobile = isMobile!;
-		this.allocBytes += 35;
+		this.allocBytes += 35 + this.username.length +1;
 	}
 
 	setVelocity(velocity?: Vec2) {
@@ -336,6 +337,7 @@ export default class Player extends Entity {
 	serialise(stream: IslandrBitStream) {
 		const minPlayer = this.minimize()
 		standardEntitySerialiser(minPlayer, stream)
+		stream.writeASCIIString(minPlayer.username)
 		stream.writeInt8(minPlayer.inventory.backpackLevel) //inventory's backpackLevel 
 		stream.writeInt8(minPlayer.inventory.helmetLevel) //inventory's helmetLevel
 		stream.writeInt8(minPlayer.inventory.vestLevel) // inventory vestLevel

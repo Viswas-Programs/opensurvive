@@ -81,11 +81,10 @@ export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitSt
 	entity.animations.forEach(animation => stream.writeASCIIString(animation))
 }
 
-let usernamesAndIDsSent = false;
 
 export function calculateAllocBytesForTickPkt(player: Player): number {
 	let allocBytes = 69;
-	if (!usernamesAndIDsSent) allocBytes += 46
+	if (!player.usernamesAndIDsSent) allocBytes += 46
 	if (player.currentHealItem) allocBytes += player.currentHealItem.length
 	if (player.interactMessage) allocBytes += player.interactMessage.length
 	player.animations.forEach((animation) => allocBytes += animation.length)
@@ -109,8 +108,8 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 	// interact message
 	stream.writeBoolean(!!player.interactMessage)
 	if (player.interactMessage)stream.writeASCIIString(player.interactMessage ? player.interactMessage : "")
-	if (!usernamesAndIDsSent) stream.writeId(player.id)
-	if (!usernamesAndIDsSent) stream.writeUsername(player.username)
+	if (!player.usernamesAndIDsSent) stream.writeId(player.id)
+	if (!player.usernamesAndIDsSent) stream.writeUsername(player.username)
 	stream.writeFloat32(player.boost)
 	stream.writeInt8(player.scope)
 	stream.writeBoolean(player.canInteract)
@@ -157,7 +156,7 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 	stream.writeInt8(player.inventory.selectedScope)
 	//loadouts
 	stream.writeSkinOrLoadout(player.skin as string)
-	if (!usernamesAndIDsSent) stream.writeSkinOrLoadout(player.deathImg as string)
+	if (!player.usernamesAndIDsSent) stream.writeSkinOrLoadout(player.deathImg as string)
 	// ticks
 	stream.writeInt16(player.reloadTicks)
 	stream.writeInt16(player.maxReloadTicks)
@@ -175,7 +174,7 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 		stream.writeASCIIString(animation)
 	})
 	stream.writeBoolean(player.despawn)
-	usernamesAndIDsSent = true
+	player.usernamesAndIDsSent = true
 }
 export function serialiseDiscardables(discardables: string[], stream: IslandrBitStream) {
 	stream.writeInt8(discardables.length);
