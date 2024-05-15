@@ -38,6 +38,7 @@
 			"width": 0.1,
 			"length": 0.8
 		},
-		"animations": ["medium_recoil"]
-	}
+		"animations": [ "medium_recoil" ]
+	},
+	"fistPositions": [0.201, 0.5]
 }

@@ -1,3 +1,4 @@
+import { Vec2 } from "./math"
 import { GunColor } from "./misc"
 
 export interface BulletStats {
@@ -57,6 +58,7 @@ export type GunData = {
 		animations: string[]
 		hasBarrelImage: boolean
 	}
+	fistPositions?: Array<number>
 }
 
 interface MeleeStats {

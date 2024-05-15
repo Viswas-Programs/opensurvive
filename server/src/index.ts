@@ -6,7 +6,7 @@ import { ID, receive, send, wait, sendBitstream} from "./utils";
 import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ScopeUpdatePacket, ServerSideScopeUpdate, PlayerTickPkt } from "./types/packet";
 import { DIRECTION_VEC, TICKS_PER_SECOND } from "./constants";
 import { CommonAngles, Vec2 } from "./types/math";
-import { Player } from "./store/entities";
+import { Ammo, Gun, Player } from "./store/entities";
 import { World } from "./types/world";
 import { Plain, castMapTerrain } from "./store/terrains";
 import { castMapObstacle } from "./store/obstacles";
@@ -17,6 +17,7 @@ import { Socket } from "net";
 import Backpack from "./store/entities/backpack";
 import Scope from "./store/entities/scope";
 import Helmet from "./store/entities/helmet";
+import { GunColor } from "./types/misc";
 
 export var ticksElapsed = 0;
 
@@ -137,7 +138,7 @@ server.on("connection", async socket => {
 	world.entities.push(e, f, g)
 	const h = new Scope(4)
 	h.position = player.position
-	const i = new Scope(8)
+	const i = new Ammo(50,  GunColor.GREEN)
 	i.position = player.position
 	world.entities.push(e, f, g, h, i)
 	for (const sound of world.joinSounds) sendBitstream(socket, new SoundPacket(sound.path, sound.position));

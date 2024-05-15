@@ -4,8 +4,12 @@ import MarkdownIt from "markdown-it";
 import { createHash } from "crypto";
 import "./loadout";
 import { getToken, setToken, setUsername } from "./states";
+import { wait } from "./utils";
 let mode = "normal"
 console.log("homepage ts called")
+wait(10000).then(() => {
+	if (document.readyState.toLowerCase() != "complete") { document.getElementsByClassName("loading-text")[0]!.textContent = "Error in loading page, reloading in 5"; wait(5000).then(() => window.location.reload()) }
+})
 export function setMode(md: string) {
 	mode = md
 }
@@ -42,6 +46,7 @@ if (!window.location.href!.includes("/loadout")) {
 			document.getElementById('loading')!.style.display = 'none';
 		}, 1000);
 	};
+	
 	document.addEventListener('DOMContentLoaded', function () {
 		var audio = <HTMLAudioElement>document.getElementById('menu-audio');
 		var volumeIcon = <HTMLDivElement>document.getElementById('volume-icon');

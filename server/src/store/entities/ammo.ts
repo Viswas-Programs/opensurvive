@@ -1,14 +1,14 @@
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
 import { Inventory } from "../../types/entity";
-import { CircleHitbox, Vec2 } from "../../types/math";
+import { RectHitbox, Vec2 } from "../../types/math";
 import { GunColor } from "../../types/misc";
 import Item from "./item";
 import Player from "./player";
 
 export default class Ammo extends Item {
 	type = "ammo";
-	hitbox = new CircleHitbox(1);
+	hitbox = new RectHitbox(3, 2);
 	amount: number;
 	color: GunColor;
 

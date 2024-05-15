@@ -135,7 +135,7 @@ export default class Player extends Entity {
 		let breaked = false;
 		for (const entity of entities) {
 			if (!entity.interactable) continue;
-			if (entity.hitbox.inside(this.position, entity.position, entity.direction)) {
+			if (entity.hitbox.inside(this.position, entity.position, entity.direction) || this.collided(entity) ){
 				this.canInteract = true;
 				this.interactMessage = entity.interactionKey();
 				// Only interact when trying

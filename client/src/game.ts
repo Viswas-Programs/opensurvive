@@ -17,7 +17,7 @@ import { cookieExists, getCookieValue } from "cookies-utils";
 import { Obstacle } from "./types/obstacle";
 import { getMode } from "./homepage";
 import { IslandrBitStream } from "./packets";
-import { MinCircleHitbox, MinTerrain, MinVec2 } from "./types/minimized";
+import { MinTerrain, MinVec2 } from "./types/minimized";
 import { deserialiseDiscardables, deserialiseMinEntities, deserialiseMinObstacles, deserialiseMinParticles, deserialisePlayer } from "./deserialisers";
 import { inflate } from "pako";
 //handle users that tried to go to old domain name, or direct ip
@@ -177,7 +177,6 @@ async function init(address: string) {
 							player.inventory.ammos[GunColor.RED],
 							player.inventory.ammos[GunColor.BLUE],
 							player.inventory.ammos[GunColor.GREEN],
-							player.inventory.ammos[GunColor.TEAL],
 							player.inventory.ammos[GunColor.OLIVE]];
 						const ammosElements = document.getElementsByClassName("ammos");
 						for (let ii = 0; ii < usableGunAmmoNames.length; ii++) {

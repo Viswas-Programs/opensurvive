@@ -1,6 +1,6 @@
 {
 	"name": "FN Five Seven",
-	"color": 8,
+	"color": 3,
 	"ammo": 45,
 	"dual": true,
 	"length": 2.2,
@@ -34,7 +34,7 @@
 	},
 	"visuals": {
 		"tracer": {
-			"type": "5.7mm",
+			"type": "5.56mm",
 			"width": 0.1,
 			"length": 0.7
 		},

@@ -39,6 +39,7 @@
 			"width": 0.2,
 			"length": 1
 		},
-		"animations": ["large_recoil"]
-	}
+		"animations": [ "large_recoil" ]
+	},
+	"fistPositions": [0.06, 0.36]
 }

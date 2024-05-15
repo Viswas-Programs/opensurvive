@@ -56,7 +56,8 @@ export type GunData = {
 		tracer: TracerData
 		animations: string[]
 		hasBarrelImage: boolean
-	}
+	},
+	fistPositions?: Array<number>
 }
 
 interface MeleeStats {

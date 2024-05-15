@@ -87,6 +87,7 @@ export class GunWeapon extends Weapon {
 	length: number;
 	hasBarrelImage: boolean;
 	magazine: number;
+	fistPositions: Array<number> | undefined
 
 	constructor(nameId: string, data: GunData, magazine = 0) {
 		super(nameId);
@@ -94,6 +95,7 @@ export class GunWeapon extends Weapon {
 		this.length = data.length;
 		this.hasBarrelImage = data.visuals.hasBarrelImage;
 		this.magazine = magazine;
+		this.fistPositions = data.fistPositions
 	}
 
 	render(player: Player, _canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scale: number): void {
@@ -127,6 +129,7 @@ export class GunWeapon extends Weapon {
 			newImg.src = "assets/" + getMode() + "/images/game/fists/" + player.skin + ".svg";
 		} else if (img.complete)
 			for (const pos of fistPositions) {
+				if (this.fistPositions) offset = offset.addVec(Vec2.fromArray([this.fistPositions[fistPositions.indexOf(pos)], 0]))
 				const fist = pos.addVec(offset).scaleAll(scale);
 				ctx.drawImage(img, fist.x - fistRadius, fist.y - fistRadius, fistRadius *2, fistRadius*2)
 			}
