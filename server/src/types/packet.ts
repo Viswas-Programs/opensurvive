@@ -206,7 +206,7 @@ export class GamePacket extends IPacketSERVER {
 	serialise() {
 		super.serialise();
 		this.stream.writeInt8(this.entities.length)
-		this.entities.forEach(entity => { entity.serialise(this.stream) })
+		this.entities.forEach(entity => { entity.serialise(this.stream, this.player) })
 		serialiseMinObstacles(this.obstacles, this.stream)
 		this.stream.writeInt8(this.alivecount)
 		if (this.anyDiscardEntities) serialiseDiscardables(this.discardEntities as string[], this.stream);

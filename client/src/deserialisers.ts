@@ -6,6 +6,7 @@ import { CountableString } from "./types/misc"
 import { Weapon } from "./types/weapon"
 import { Inventory } from "./types/entity"
 import { TracerData } from "./types/data"
+import { world } from "./game"
 export function deserialiseMinParticles(stream: IslandrBitStream): MinParticle[]{
     const particles: MinParticle[] = []
     for (let ii = 0; ii < stream.readInt8(); ii++) {
@@ -71,7 +72,8 @@ function _getHealings(stream: IslandrBitStream): CountableString {
 }
 function _getHitboxes(stream: IslandrBitStream, callFrom = "others"): MinHitbox {
     let hitbox: MinHitbox;
-    if (stream.readBoolean()) {
+    const hitboxTypeVal = stream.readInt8()
+    if (hitboxTypeVal == 1) {
         if (callFrom != "player") {
             hitbox = <MinCircleHitbox>{
                 type:"circle",
@@ -85,10 +87,13 @@ function _getHitboxes(stream: IslandrBitStream, callFrom = "others"): MinHitbox 
         }
     }
     else {
-        hitbox = <MinRectHitbox>{
-            type: "rect",
-            width: stream.readFloat64(),
-            height: stream.readFloat64()
+        if (hitboxTypeVal == 3) { const HeightAndWidth = stream.readFloat64(); hitbox = <MinRectHitbox>{ type: "rect", height: HeightAndWidth, width: HeightAndWidth } }
+        else {
+            hitbox = <MinRectHitbox>{
+                type: "rect",
+                width: stream.readFloat64(),
+                height: stream.readFloat64()
+            }
         }
     }
     return hitbox
@@ -168,6 +173,7 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
         }
         else if (type == "ammo") {
             const minEntity = Object.assign(baseMinEntity, { amount: stream.readInt8(), color: stream.readInt8() })
+            console.log(minEntity)
             entities.push(minEntity)
         }
         else if (type == "bullet") {
@@ -183,7 +189,7 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
             entities.push(minEntity)
         }
         else if (type == "gun") {
-            const minEntity = Object.assign(baseMinEntity, { nameId: stream.readASCIIString(13), color: stream.readInt8() })
+            const minEntity = Object.assign(baseMinEntity, { nameId: stream.readASCIIString(), color: stream.readInt8() })
             entities.push(minEntity)
         }
         else {
@@ -211,20 +217,24 @@ function _getCurrentHealItem(stream: IslandrBitStream): string | null {
         return `entity.healing.${curHealItem}`
     }
 }
-let username = "";
-let id = "";
-let deathImg = "";
-
+let username: string | null;
+let id: string | null ;
+let deathImg : string | null;
+export function setUsrnameIdDeathImg(array: Array<string> | Array<null>) {
+    username = array[0];
+    id = array[1];
+    deathImg = array[2]
+}
 function _getUsername(stream: IslandrBitStream) {
-    if (username == "") username = stream.readUsername()
+    if (!username) username = stream.readUsername()
     return username
 }
 function _getUserID(stream: IslandrBitStream) {
-    if (id == "") id = stream.readId()
+    if (!id) id = stream.readId()
     return id
 }
 function _getUserDeathImg(stream: IslandrBitStream) {
-    if (deathImg == "") deathImg = stream.readSkinOrLoadout()
+    if (!deathImg) deathImg = stream.readSkinOrLoadout()
     else deathImg = "default"
     return deathImg
 }

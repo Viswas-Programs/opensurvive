@@ -8,7 +8,7 @@ import Player from "./player";
 
 export default class Ammo extends Item {
 	type = "ammo";
-	hitbox = new RectHitbox(3, 2);
+	hitbox = new RectHitbox(2, 2);
 	amount: number;
 	color: GunColor;
 
@@ -39,8 +39,8 @@ export default class Ammo extends Item {
 		const min = super.minimize();
 		return Object.assign(min, { amount: this.amount, color: this.color });
 	}
-	serialise(stream: IslandrBitStream) {
-		standardEntitySerialiser(this.minimize(), stream)
+	serialise(stream: IslandrBitStream, player: Player) {
+		standardEntitySerialiser(this.minimize(), stream, player)
 		stream.writeInt8(this.amount)
 		stream.writeInt8(this.color)
 	}

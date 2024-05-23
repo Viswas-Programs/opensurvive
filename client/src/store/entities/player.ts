@@ -135,14 +135,18 @@ export default class Player extends Entity {
 		if (!this.despawn) {
 			ctx.rotate(this.direction.angle());
 			if (this.inventory.backpackLevel) {
-				ctx.save()
-				ctx.rotate(90*Math.PI/180)
-				ctx.drawImage(backpackImgs.get(this.inventory.backpackLevel)!, -2 * radius * 0.2 * 2.1, 0, radius*1.7, radius*1.7)
-				ctx.restore()
-				/*ctx.fillStyle = "#675230";
-				ctx.lineWidth = radius / 6;
-				ctx.strokeStyle = "#000000";
-				circleFromCenter(ctx, -radius * 0.2 * (1 + this.inventory.backpackLevel), 0, radius * 0.9, true, true);*/
+				if (getMode() == "classic") {
+					ctx.fillStyle = "#675230";
+					ctx.lineWidth = radius / 6;
+					ctx.strokeStyle = "#000000";
+					circleFromCenter(ctx, -radius * 0.2 * (1 + this.inventory.backpackLevel), 0, radius * 0.9, true, true);
+				}
+				else {
+					ctx.save()
+					ctx.rotate(90 * Math.PI / 180)
+					ctx.drawImage(backpackImgs.get(this.inventory.backpackLevel)!, -2 * radius * 0.2 * 2.1, 0, radius * 1.7, radius * 1.7)
+					ctx.restore()
+				}
 			}
 			if (this.inventory.vestLevel) {
 				ctx.fillStyle = "#675230";
@@ -153,18 +157,23 @@ export default class Player extends Entity {
 			
 			if (this.currentSkinImg.complete) ctx.drawImage(this.currentSkinImg, -radius, -radius, radius * 2, radius * 2);
 			if (this.inventory.helmetLevel) {
-				ctx.save()
-				ctx.rotate(-90*Math.PI/180)
-				ctx.drawImage(helmetImgs.get(this.inventory.helmetLevel)!, -radius + (scale / 2.98), -radius + (scale / 2.98), radius*1.3, radius*1.3)
-				ctx.restore()
-				/*if (this.inventory.helmetLevel == 1) ctx.fillStyle = "#0000FF";
-				else if (this.inventory.helmetLevel == 2) ctx.fillStyle = "#808080";
-				else if (this.inventory.helmetLevel == 3) ctx.fillStyle = "#A9A9A9";
-				else if (this.inventory.helmetLevel == 4) ctx.fillStyle = "#000000";
-				else ctx.fillStyle = "#ff00ff";
-				ctx.lineWidth = 2;
-				ctx.strokeStyle = "#000000";
-				circleFromCenter(ctx, 0, 0, radius * 0.7, true, true);*/
+				if (getMode() == "classic") {
+					if (this.inventory.helmetLevel == 1) ctx.fillStyle = "#0000FF";
+					else if (this.inventory.helmetLevel == 2) ctx.fillStyle = "#808080";
+					else if (this.inventory.helmetLevel == 3) ctx.fillStyle = "#A9A9A9";
+					else if (this.inventory.helmetLevel == 4) ctx.fillStyle = "#000000";
+					else ctx.fillStyle = "#ff00ff";
+					ctx.lineWidth = 2;
+					ctx.strokeStyle = "#000000";
+					circleFromCenter(ctx, 0, 0, radius * 0.7, true, true);
+				}
+				else {
+					ctx.save()
+					ctx.rotate(-90 * Math.PI / 180)
+					ctx.drawImage(helmetImgs.get(this.inventory.helmetLevel)!, -radius + (scale / 2.98), -radius + (scale / 2.98), radius * 1.3, radius * 1.3)
+					ctx.restore()
+				}
+				/**/
 			}
 			// We will leave the transform for the weapon
 			// If player is holding nothing, render fist

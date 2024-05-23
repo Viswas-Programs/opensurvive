@@ -18,7 +18,7 @@ import { Obstacle } from "./types/obstacle";
 import { getMode } from "./homepage";
 import { IslandrBitStream } from "./packets";
 import { MinTerrain, MinVec2 } from "./types/minimized";
-import { deserialiseDiscardables, deserialiseMinEntities, deserialiseMinObstacles, deserialiseMinParticles, deserialisePlayer } from "./deserialisers";
+import { deserialiseDiscardables, deserialiseMinEntities, deserialiseMinObstacles, deserialiseMinParticles, deserialisePlayer, setUsrnameIdDeathImg } from "./deserialisers";
 import { inflate } from "pako";
 //handle users that tried to go to old domain name, or direct ip
 var urlargs = new URLSearchParams(window.location.search);
@@ -171,7 +171,7 @@ async function init(address: string) {
 						const playerSrvr = deserialisePlayer(stream as IslandrBitStream)
 						if (!player) player = new FullPlayer(playerSrvr);
 						else player.copy(playerSrvr);
-						const usableGunAmmoNames = ["9mm", "12 gauge", "7.62mm", "5.56mm", "5.7mm", ".308 subsonic"];
+						const usableGunAmmoNames = ["9mm", "12 gauge", "7.62mm", "5.56mm", ".308 subsonic"];
 						const usableGunAmmos = [
 							player.inventory.ammos[GunColor.YELLOW],
 							player.inventory.ammos[GunColor.RED],
@@ -268,6 +268,7 @@ async function init(address: string) {
 			tps = 1;
 			username = null;
 			player = null;
+			setUsrnameIdDeathImg([null, null, null])
 			res(undefined);
 			for (const element of document.getElementsByClassName("healing-panel")) {
 				element.classList.remove("enabled");

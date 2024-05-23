@@ -1,10 +1,19 @@
 import { IslandrBitStream } from "./packets";
 import Player from "./store/entities/player";
 import { Roof } from "./store/obstacles";
-import { MinEntity, MinObstacle, MinParticle} from "./types/minimized";
+import { MinEntity, MinHitbox, MinObstacle, MinParticle} from "./types/minimized";
 import { Obstacle } from "./types/obstacle";
 import { GunWeapon } from "./types/weapon";
-
+function writeHitboxes(hitbox: MinHitbox, stream: IslandrBitStream) {
+	if (hitbox.type == "circle") {
+		stream.writeInt8(1);
+		stream.writeFloat64(hitbox.radius)
+	}
+	else if (hitbox.type == "rect") {
+		if (hitbox.width == hitbox.height) { stream.writeInt8(3); stream.writeFloat64(hitbox.height) }
+		else { stream.writeInt8(2); stream.writeFloat64(hitbox.width); stream.writeFloat64(hitbox.height) }
+	}
+}
 export function serialiseMinParticles(particleArray: MinParticle[], stream: IslandrBitStream) {
     stream.writeInt8(particleArray.length)
     particleArray.forEach((particle: MinParticle) => {
@@ -19,8 +28,10 @@ export function calculateAllocBytesForObs(obstacleArray: Obstacle[]): number {
 	let allocBytes = 1;
 	obstacleArray.forEach(obstacle => {
 		allocBytes += 59
-		if (obstacle.hitbox.type == "circle") allocBytes += 8;
-		else allocBytes += 16;
+		const hitbox = obstacle.hitbox.minimize()
+		if (hitbox.type == "circle") allocBytes += 8;
+		else if (hitbox.width == hitbox.height) allocBytes += 8;
+		else allocBytes += 16
 		obstacle.animations.forEach(animation => { allocBytes += animation.length })
 		if (obstacle.type == "roof") {
 			allocBytes += 31;
@@ -37,8 +48,7 @@ export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: Isla
         stream.writeASCIIString(obstacle.type);
 		stream.writeFloat64(obstacle.position.x); stream.writeFloat64(obstacle.position.y);
 		stream.writeFloat64(obstacle.direction.x); stream.writeFloat64(obstacle.direction.y);
-		if (obstacle.hitbox.type == "circle") { stream.writeBoolean(true); stream.writeFloat64(obstacle.hitbox.radius); }
-		else { stream.writeBoolean(false); stream.writeFloat64(obstacle.hitbox.width); stream.writeFloat64(obstacle.hitbox.height); }
+		writeHitboxes(obstacle.hitbox, stream)
         stream.writeBoolean(obstacle.despawn);
         stream.writeInt8(obstacle.animations.length)
         obstacle.animations.forEach((animation: string) => {
@@ -60,7 +70,7 @@ export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: Isla
 		else {stream.writeBoolean(false) }
     })
 }
-export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitStream) {
+export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitStream, player: Player) {
 	stream.writeASCIIString(entity.type)
 	stream.writeId(entity.id)
 	//write the type
@@ -70,10 +80,7 @@ export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitSt
 	//write direction
 	stream.writeFloat64(entity.direction.x)
 	stream.writeFloat64(entity.direction.y)
-	//write hitbox type
-	const hitbox = entity.hitbox;
-	if (hitbox.type == "circle") { stream.writeBoolean(true); stream.writeFloat64(hitbox.radius) }
-	else { stream.writeBoolean(false); stream.writeFloat64(hitbox.height); stream.writeFloat64(hitbox.width) }
+	writeHitboxes(entity.hitbox, stream)
 	//write the hitbox configuration
 	//despawn configs
 	stream.writeBoolean(entity.despawn);
@@ -83,8 +90,8 @@ export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitSt
 
 
 export function calculateAllocBytesForTickPkt(player: Player): number {
-	let allocBytes = 69;
-	if (!player.usernamesAndIDsSent) allocBytes += 46
+	let allocBytes = 75;
+	if (!player.usernamesAndIDsSent) allocBytes += player.username.length + 12+10
 	if (player.currentHealItem) allocBytes += player.currentHealItem.length
 	if (player.interactMessage) allocBytes += player.interactMessage.length
 	player.animations.forEach((animation) => allocBytes += animation.length)

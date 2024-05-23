@@ -1,3 +1,4 @@
+import { Player } from ".";
 import { GLOBAL_UNIT_MULTIPLIER } from "../../constants";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
@@ -70,8 +71,8 @@ export default class Bullet extends Entity {
 		const min = super.minimize();
 		return Object.assign(min, { tracer: this.data });
 	}
-	serialise(stream: IslandrBitStream) {
-		standardEntitySerialiser(this.minimize(), stream)
+	serialise(stream: IslandrBitStream, player: Player) {
+		standardEntitySerialiser(this.minimize(), stream, player)
 		stream.writeASCIIString(this.data.type, 11);
 		stream.writeFloat64(this.data.length);
 		stream.writeFloat64(this.data.width);

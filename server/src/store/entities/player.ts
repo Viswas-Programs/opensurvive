@@ -135,21 +135,25 @@ export default class Player extends Entity {
 		let breaked = false;
 		for (const entity of entities) {
 			if (!entity.interactable) continue;
-			if (entity.hitbox.inside(this.position, entity.position, entity.direction) || this.collided(entity) ){
+			const scaleAllVal = 1.5;
+			//if (entity.hitbox.type == "rect") scaleAllVal = 2
+			if (entity.hitbox.scaleAll(scaleAllVal).inside(this.position, entity.position, entity.direction) ){
+			//if (this.collided(entity)) {
+			if (entity.hitbox.type == "rect") console.log(entity, entity.hitbox)
 				this.canInteract = true;
-				this.interactMessage = entity.interactionKey();
-				// Only interact when trying
-				if (this.tryInteracting || this.isMobile) {
-					this.canInteract = false;
-					entity.interact(this);
-				}
-				breaked = true;
-				break;
+					this.interactMessage = entity.interactionKey();
+					// Only interact when trying
+					if (this.tryInteracting || this.isMobile) {
+						this.canInteract = false;
+						entity.interact(this);
+					}
+					breaked = true;
+					break;
 			}
 		}
 		for (const obstacle of obstacles) {
 			if (!obstacle.interactable) continue;
-			if (obstacle.hitbox.scaleAll(1.25).collideCircle(obstacle.position, obstacle.direction, this.hitbox, this.position, this.direction)) {
+			if (obstacle.hitbox.scaleAll(1.5).collideCircle(obstacle.position, obstacle.direction, this.hitbox, this.position, this.direction)) {
 				this.canInteract = true;
 				this.interactMessage = obstacle.interactionKey();
 				// Only interact when trying
@@ -239,13 +243,13 @@ export default class Player extends Entity {
 		if (this.inventory.selectedScope != this._scope) this._scope = this.inventory.selectedScope;
 
 		// Check red zone
-		if (!world.safeZone.hitbox.inside(this.position, world.safeZone.position, Vec2.UNIT_X)) {
+		/*if (!world.safeZone.hitbox.inside(this.position, world.safeZone.position, Vec2.UNIT_X)) {
 			this.zoneDamageTicks--;
 			if (!this.zoneDamageTicks) {
 				this.zoneDamageTicks = 2 * TICKS_PER_SECOND;
 				this.damage(world.zoneDamage);
 			}
-		}
+		}*/
 	}
 
 	damage(dmg: number, damager?: string) {
@@ -334,9 +338,9 @@ export default class Player extends Entity {
 		const min = super.minimize();
 		return Object.assign(min, { username: this.username, inventory: this.inventory.minimize(), skin: this.skin, deathImg: this.deathImg })
 	}
-	serialise(stream: IslandrBitStream) {
+	serialise(stream: IslandrBitStream, player: Player) {
 		const minPlayer = this.minimize()
-		standardEntitySerialiser(minPlayer, stream)
+		standardEntitySerialiser(minPlayer, stream, player)
 		stream.writeASCIIString(minPlayer.username)
 		stream.writeInt8(minPlayer.inventory.backpackLevel) //inventory's backpackLevel 
 		stream.writeInt8(minPlayer.inventory.helmetLevel) //inventory's helmetLevel

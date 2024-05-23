@@ -45,8 +45,8 @@ export default class Helmet extends Item {
 	minimize() {
 		return Object.assign(super.minimize(), { level: this.level });
 	}
-	serialise(stream: IslandrBitStream) {
-		standardEntitySerialiser(this.minimize(), stream)
+	serialise(stream: IslandrBitStream, player: Player) {
+		standardEntitySerialiser(this.minimize(), stream, player)
 		stream.writeInt8(this.level)
 	}
 }

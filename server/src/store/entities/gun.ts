@@ -58,9 +58,9 @@ export default class Gun extends Item {
 		const min = super.minimize();
 		return Object.assign(min, { nameId: this.nameId, color: this.color });
 	}
-	serialise(stream: IslandrBitStream) {
-		standardEntitySerialiser(this.minimize(), stream)
-		stream.writeASCIIString(this.nameId, 13);
+	serialise(stream: IslandrBitStream, player: Player) {
+		standardEntitySerialiser(this.minimize(), stream, player)
+		stream.writeASCIIString(this.nameId);
 		stream.writeInt8(this.color)
 	}
 }

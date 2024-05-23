@@ -45,8 +45,8 @@ export default class Grenade extends Item {
 		const min = super.minimize();
 		return Object.assign(min, { nameId: this.nameId });
 	}
-	serialise(stream: IslandrBitStream) {
-		standardEntitySerialiser(this.minimize(), stream)
+	serialise(stream: IslandrBitStream, player: Player) {
+		standardEntitySerialiser(this.minimize(), stream, player)
 		stream.writeId(this.nameId)
 	}
 }

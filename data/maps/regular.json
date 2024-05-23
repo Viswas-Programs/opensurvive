@@ -18,9 +18,18 @@
 		{
 			"id": "outhouse",
 			"includeTerrains": [ "plain" ],
-			"amount": 12
+			"amount": 2
 		},
-		{ "id": "small_building", "includeTerrains": ["plain"], "amount": 3 }
+		{
+			"id": "small_building",
+			"includeTerrains": [ "plain" ],
+			"amount": 1
+		},
+		{
+			"id": "warehouse",
+			"includeTerrains": [ "plain" ],
+			"amount":  10
+		}
 	],
 	"obstacles": [
 		{ "type": "tree", "amount": 100 },

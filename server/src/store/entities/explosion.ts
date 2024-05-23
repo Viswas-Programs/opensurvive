@@ -1,3 +1,4 @@
+import { Player } from ".";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
 import { Entity } from "../../types/entity";
@@ -54,8 +55,8 @@ export default class Explosion extends Entity {
 	minimize() {
 		return Object.assign(super.minimize(), { health: this.health, maxHealth: this.maxHealth });
 	}
-	serialise(stream: IslandrBitStream) {
-		standardEntitySerialiser(this.minimize(), stream)
+	serialise(stream: IslandrBitStream, player: Player) {
+		standardEntitySerialiser(this.minimize(), stream, player)
 		stream.writeInt8(this.health)
 		stream.writeInt8(this.maxHealth)
 	}

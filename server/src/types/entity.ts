@@ -222,7 +222,7 @@ export class Entity {
 		}
 		return a
 	}
-	serialise(stream: IslandrBitStream) { }
+	serialise(stream: IslandrBitStream, player: Player) { }
 	protected handleCircleCircleCollision(obstacle: Obstacle) {
 		const relative = this.position.addVec(obstacle.position.inverse());
 		this.position = obstacle.position.addVec(relative.scaleAll((obstacle.hitbox.comparable + this.hitbox.comparable) / relative.magnitude()));

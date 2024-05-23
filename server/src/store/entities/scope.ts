@@ -30,8 +30,8 @@ export default class Scope extends Item {
 	minimize() {
 		return Object.assign(super.minimize(), { zoom: this.zoom });
 	}
-	serialise(stream: IslandrBitStream) {
-		standardEntitySerialiser(this.minimize(), stream)
+	serialise(stream: IslandrBitStream, player: Player) {
+		standardEntitySerialiser(this.minimize(), stream, player)
 		stream.writeInt8(this.zoom)
 	}
 }

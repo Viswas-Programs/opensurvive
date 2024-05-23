@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 52.45 36.86">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-1, .cls-2 {
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        fill: #53cd00;
+      }
+
+      .cls-3 {
+        isolation: isolate;
+      }
+
+      .cls-4 {
+        fill: #fff;
+        font-family: BioSans-Bold, 'Bio Sans';
+        font-size: 19.85px;
+        font-weight: 700;
+        letter-spacing: -.05em;
+        mix-blend-mode: soft-light;
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="5.31" y1="-2.48" x2="47.14" y2="39.35" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#53cd00"/>
+      <stop offset="1" stop-color="#005e00"/>
+    </linearGradient>
+  </defs>
+  <g class="cls-3">
+    <g id="Layer_1" data-name="Layer 1">
+      <g>
+        <path class="cls-1" d="M2.83,2.84v31.19h46.79V2.84H2.83ZM21.26,19.85c0,.78-.64,1.42-1.42,1.42H7.09c-.78,0-1.42-.64-1.42-1.42V7.09c0-.78.64-1.42,1.42-1.42h12.75c.78,0,1.42.64,1.42,1.42v12.76Z"/>
+        <path class="cls-2" d="M51.03,0H1.42C.63,0,0,.64,0,1.42v34.03c0,.78.63,1.41,1.42,1.41h49.61c.79,0,1.42-.63,1.42-1.41V1.42c0-.78-.63-1.42-1.42-1.42ZM49.62,34.03H2.83V2.84h46.79v31.19Z"/>
+        <rect class="cls-2" x="5.67" y="5.67" width="15.59" height="15.59" rx="1.42" ry="1.42"/>
+        <text class="cls-4" transform="translate(7.06 27.06)"><tspan x="0" y="0">5.56</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg>

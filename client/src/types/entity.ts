@@ -73,8 +73,8 @@ export abstract class Entity implements Renderable {
 	zIndex = 0;
 	oldPos!: Vec2;
 	oldDir!: Vec2;
-	_lastDirectionChng = Date.now()
-	_lastPosChange = Date.now()
+	_lastDirectionChng = Date.now();
+	_lastPosChange = Date.now();
 
 	constructor(minEntity: MinEntity) {
 		this.copy(minEntity);
