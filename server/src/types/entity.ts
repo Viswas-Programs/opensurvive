@@ -116,14 +116,15 @@ export class Entity {
 	damageParticle?: string;
 	isMobile = false;
 	allocBytes = 98;
-
+	goodOldPos = Vec2.ZERO;
 	constructor() {
 		this.id = ID();
 		// Currently selects a random position to spawn. Will change in the future.
-		this.position = world.size.scale(Math.random(), Math.random());
+		this.position = this.goodOldPos = world.size.scale(Math.random(), Math.random());
 	}
 
 	tick(_entities: Entity[], _obstacles: Obstacle[]) {
+		if (!Number.isNaN(this.position.x) ) this.goodOldPos = this.position
 		const lastPosition = this.position;
 		// Add the velocity to the position, and cap it at map size.
 		if (this.airborne)

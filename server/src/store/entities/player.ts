@@ -11,6 +11,7 @@ import { GunWeapon, Weapon, WeaponType } from "../../types/weapon";
 import { addKillCounts, changeCurrency, spawnAmmo, spawnGun } from "../../utils";
 import { Roof } from "../obstacles";
 import { Pond, River, Sea } from "../terrains";
+import Ammo from "./ammo";
 import Backpack from "./backpack";
 import Healing from "./healing";
 import Helmet from "./helmet";
@@ -134,12 +135,15 @@ export default class Player extends Entity {
 		// Check for entity hitbox intersection
 		let breaked = false;
 		for (const entity of entities) {
+			if (entity.type == "ammo" && (Number.isNaN(entity.position.x) || Number.isNaN(entity.position.y))) {
+				//entity.position = this.position.addVec(Vec2.fromArray([1, 1])); entity.setVelocity(Vec2.fromArray([0.0007, 0.0007]))
+				entity.position = entity.goodOldPos
+			}
 			if (!entity.interactable) continue;
 			const scaleAllVal = 1.5;
 			//if (entity.hitbox.type == "rect") scaleAllVal = 2
 			if (entity.hitbox.scaleAll(scaleAllVal).inside(this.position, entity.position, entity.direction) ){
 			//if (this.collided(entity)) {
-			if (entity.hitbox.type == "rect") console.log(entity, entity.hitbox)
 				this.canInteract = true;
 					this.interactMessage = entity.interactionKey();
 					// Only interact when trying
