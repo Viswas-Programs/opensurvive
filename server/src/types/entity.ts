@@ -117,6 +117,7 @@ export class Entity {
 	isMobile = false;
 	allocBytes = 98;
 	goodOldPos = Vec2.ZERO;
+	goodOldDirection = Vec2.ZERO;
 	constructor() {
 		this.id = ID();
 		// Currently selects a random position to spawn. Will change in the future.
@@ -124,7 +125,8 @@ export class Entity {
 	}
 
 	tick(_entities: Entity[], _obstacles: Obstacle[]) {
-		if (!Number.isNaN(this.position.x) ) this.goodOldPos = this.position
+		if (!Number.isNaN(this.position.x)) this.goodOldPos = this.position
+		if (!Number.isNaN(this.direction.x)) this.goodOldDirection = this.direction
 		const lastPosition = this.position;
 		// Add the velocity to the position, and cap it at map size.
 		if (this.airborne)

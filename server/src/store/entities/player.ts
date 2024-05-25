@@ -135,9 +135,11 @@ export default class Player extends Entity {
 		// Check for entity hitbox intersection
 		let breaked = false;
 		for (const entity of entities) {
-			if (entity.type == "ammo" && (Number.isNaN(entity.position.x) || Number.isNaN(entity.position.y))) {
+			if (entity.type == "ammo" && (Number.isNaN(entity.position.x) || Number.isNaN(entity.velocity.x))) {
 				//entity.position = this.position.addVec(Vec2.fromArray([1, 1])); entity.setVelocity(Vec2.fromArray([0.0007, 0.0007]))
 				entity.position = entity.goodOldPos
+				//entity.setDirection(entity.goodOldDirection)
+				//entity.setVelocity(Vec2.fromArray([0.0005, 0.0005]))
 			}
 			if (!entity.interactable) continue;
 			const scaleAllVal = 1.5;
