@@ -14,6 +14,8 @@ export default class Scope extends Item {
 		super();
 		this.zoom = zoom;
 		this.allocBytes++;
+		this.allocBytes += this.type.length;
+		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
 
 	picked(player: Player) {

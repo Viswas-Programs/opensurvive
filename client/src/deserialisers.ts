@@ -151,7 +151,7 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
         const id = stream.readId()
         const position: MinVec2 = { x: stream.readFloat64(), y: stream.readFloat64() }
         const direction: MinVec2 = { x: stream.readFloat64(), y: stream.readFloat64() }
-        const hitbox = _getHitboxes(stream)
+        //const hitbox = _getHitboxes(stream)
         const despawn = stream.readBoolean()
         const animations = _getAnimations(stream)
         const baseMinEntity = {
@@ -159,37 +159,63 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
             type: type,
             position: position,
             direction: direction,
-            hitbox: hitbox,
             despawn: despawn,
             animations: animations,
         }
         if (["vest", "helmet", "backpack"].includes(type)) {
-            const minEntity = Object.assign(baseMinEntity, { level: stream.readInt8() })
+            const minEntity = Object.assign(baseMinEntity, {
+                level: stream.readInt8(),
+                hitbox: <MinHitbox>{
+                    type:"circle", radius:1}
+                }
+            )
             entities.push(minEntity);
         }
         else if (type == "scope") {
-            const minEntity = Object.assign(baseMinEntity, { zoom: stream.readInt8() })
+            const minEntity = Object.assign(baseMinEntity, {
+                zoom: stream.readInt8(),
+                hitbox: <MinHitbox>{
+                    type: "circle", radius: 1
+                }            })
             entities.push(minEntity);
         }
         else if (type == "ammo") {
-            const minEntity = Object.assign(baseMinEntity, { amount: stream.readInt8(), color: stream.readInt8() })
+            const minEntity = Object.assign(baseMinEntity, {
+                amount: stream.readInt8(), color: stream.readInt8(),
+                hitbox: <MinHitbox>{
+                    type: "rect", width: 2, height: 2,
+                } })
             console.log(minEntity)
             entities.push(minEntity)
         }
         else if (type == "bullet") {
-            const minEntity = Object.assign(baseMinEntity, { tracer: <TracerData>{ type: stream.readASCIIString(11), length: stream.readFloat64(), width: stream.readFloat64() } })
+            const minEntity = Object.assign(baseMinEntity, {
+                tracer: <TracerData>{
+                    type: stream.readASCIIString(11), length: stream.readFloat64(), width: stream.readFloat64(),
+                    hitbox: _getHitboxes(stream)
+                }
+            })
             entities.push(minEntity)
         }
         else if (type == "explosion") {
-            const minEntity = Object.assign(baseMinEntity, { health: stream.readInt8(), maxHealth: stream.readInt8() })
+            const minEntity = Object.assign(baseMinEntity, { health: stream.readInt8(), maxHealth: stream.readInt8(), hitbox: _getHitboxes(stream) })
             entities.push(minEntity)
         }
         else if (["grenade", "healing"].includes(type)) {
-            const minEntity = Object.assign(baseMinEntity, { nameId: stream.readId() })
+            const minEntity = Object.assign(baseMinEntity, {
+                nameId: stream.readId(),
+                hitbox: <MinHitbox>{
+                    type: "circle", radius: 1
+                }
+})
             entities.push(minEntity)
         }
         else if (type == "gun") {
-            const minEntity = Object.assign(baseMinEntity, { nameId: stream.readASCIIString(), color: stream.readInt8() })
+            const minEntity = Object.assign(baseMinEntity, {
+                nameId: stream.readASCIIString(), color: stream.readInt8(),
+                hitbox: <MinHitbox>{
+                    type: "circle", radius: 2
+                } })
             entities.push(minEntity)
         }
         else {
@@ -202,7 +228,10 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
                     holding: castCorrectWeapon(<MinWeapon>{nameId: stream.readId()})
                 },
                 skin: stream.readSkinOrLoadout(),
-                deathImg: stream.readSkinOrLoadout()
+                deathImg: stream.readSkinOrLoadout(),
+                hitbox: <MinHitbox>{
+                    type: "circle", radius: 1
+                }
             })
             entities.push(player)
         }

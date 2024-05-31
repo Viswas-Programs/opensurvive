@@ -4,7 +4,7 @@ import { Roof } from "./store/obstacles";
 import { MinEntity, MinHitbox, MinObstacle, MinParticle} from "./types/minimized";
 import { Obstacle } from "./types/obstacle";
 import { GunWeapon } from "./types/weapon";
-function writeHitboxes(hitbox: MinHitbox, stream: IslandrBitStream) {
+export function writeHitboxes(hitbox: MinHitbox, stream: IslandrBitStream) {
 	if (hitbox.type == "circle") {
 		stream.writeInt8(1);
 		stream.writeFloat64(hitbox.radius)
@@ -27,7 +27,8 @@ export function serialiseMinParticles(particleArray: MinParticle[], stream: Isla
 export function calculateAllocBytesForObs(obstacleArray: Obstacle[]): number {
 	let allocBytes = 1;
 	obstacleArray.forEach(obstacle => {
-		allocBytes += 59
+		allocBytes += 50
+		allocBytes += obstacle.type.length
 		const hitbox = obstacle.hitbox.minimize()
 		if (hitbox.type == "circle") allocBytes += 8;
 		else if (hitbox.width == hitbox.height) allocBytes += 8;
@@ -80,8 +81,6 @@ export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitSt
 	//write direction
 	stream.writeFloat64(entity.direction.x)
 	stream.writeFloat64(entity.direction.y)
-	writeHitboxes(entity.hitbox, stream)
-	//write the hitbox configuration
 	//despawn configs
 	stream.writeBoolean(entity.despawn);
 	stream.writeInt8(entity.animations.length)

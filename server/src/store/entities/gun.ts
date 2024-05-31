@@ -22,6 +22,8 @@ export default class Gun extends Item {
 		this.nameId = nameId;
 		this.color = color;
 		this.allocBytes += 14
+		this.allocBytes += this.type.length;
+		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
 
 	picked(player: Player) {

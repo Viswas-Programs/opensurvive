@@ -1,7 +1,7 @@
 import { Player } from ".";
 import { GLOBAL_UNIT_MULTIPLIER } from "../../constants";
 import { IslandrBitStream } from "../../packets";
-import { standardEntitySerialiser } from "../../serialisers";
+import { standardEntitySerialiser, writeHitboxes } from "../../serialisers";
 import { TracerData } from "../../types/data";
 import { Entity } from "../../types/entity";
 import { CircleHitbox, Line, Vec2 } from "../../types/math";
@@ -28,7 +28,9 @@ export default class Bullet extends Entity {
 		this.discardable = true;
 		this.vulnerable = false;
 		this.falloff = falloff;
-		this.allocBytes += 27;
+		this.allocBytes += 44;
+		this.allocBytes += this.type.length;
+		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
 
 	tick(entities: Entity[], obstacles: Obstacle[]) {
@@ -76,5 +78,7 @@ export default class Bullet extends Entity {
 		stream.writeASCIIString(this.data.type, 11);
 		stream.writeFloat64(this.data.length);
 		stream.writeFloat64(this.data.width);
+		writeHitboxes(this.hitbox.minimize(), stream)
+	//write the hitbox configuration
 	}
 }

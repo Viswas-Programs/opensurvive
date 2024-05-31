@@ -21,6 +21,8 @@ export default class Vest extends Item {
 		super();
 		this.level = level;
 		this.allocBytes++;
+		this.allocBytes += this.type.length;
+		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
 
 	picked(player: Player) {

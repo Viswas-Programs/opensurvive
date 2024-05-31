@@ -1,6 +1,6 @@
 import { Player } from ".";
 import { IslandrBitStream } from "../../packets";
-import { standardEntitySerialiser } from "../../serialisers";
+import { standardEntitySerialiser, writeHitboxes } from "../../serialisers";
 import { Entity } from "../../types/entity";
 import { CircleHitbox, Vec2 } from "../../types/math";
 import { Obstacle } from "../../types/obstacle";
@@ -28,7 +28,7 @@ export default class Explosion extends Entity {
 		this.discardable = true;
 		this.noCollision = true;
 		this.vulnerable = false;
-		this.allocBytes += 2;
+		this.allocBytes += 11;
 	}
 
 	tick(entities: Entity[], obstacles: Obstacle[]) {
@@ -59,5 +59,7 @@ export default class Explosion extends Entity {
 		standardEntitySerialiser(this.minimize(), stream, player)
 		stream.writeInt8(this.health)
 		stream.writeInt8(this.maxHealth)
+		writeHitboxes(this.hitbox.minimize(), stream)
+	//write the hitbox configuration
 	}
 }

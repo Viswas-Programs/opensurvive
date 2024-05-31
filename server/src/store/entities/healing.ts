@@ -20,6 +20,8 @@ export default class Healing extends Item {
 		this.nameId = nameId;
 		this.amount = amount;
 		this.allocBytes += 12
+		this.allocBytes += this.type.length;
+		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
 
 	static {

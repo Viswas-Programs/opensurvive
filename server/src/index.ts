@@ -9,7 +9,7 @@ import { CommonAngles, Vec2 } from "./types/math";
 import { Ammo, Gun, Player } from "./store/entities";
 import { World } from "./types/world";
 import { Plain, castMapTerrain } from "./store/terrains";
-import { castMapObstacle } from "./store/obstacles";
+import { castMapObstacle, Crate } from "./store/obstacles";
 import { castBuilding } from "./store/buildings";
 import { MapData } from "./types/data";
 import { IslandrBitStream } from "./packets"
@@ -130,9 +130,12 @@ server.on("connection", async socket => {
 	playerInitialPacketsSent.set(socket, true);
 	// Send the player music
 
-	const i = new Ammo(50,  GunColor.GREEN)
+	const i = new Ammo(50, GunColor.GREEN)
+	const HHH = new Crate("normal")
+	HHH.position = player.position.addVec(Vec2.fromArray([1, 1]))
 	i.position = player.position
 	world.entities.push(i)
+	world.obstacles.push(HHH)
 	for (const sound of world.joinSounds) sendBitstream(socket, new SoundPacket(sound.path, sound.position));
 	sendBitstream(socket, new PlayerTickPkt(player));
 	// If the client doesn't ping for 30 seconds, we assume it is a disconnection.
