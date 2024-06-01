@@ -36,16 +36,33 @@
       "position": [ 7, -19.75 ],
       "color": 1566399999
     }
-
-
-
   ],
-  "mapColor": 1566399999,
   "zones": [
     {
-      "size": [ 14, 39.5 ],
+      "size": [ 16, 39.5 ],
+      "position": [ 0, 0 ]
+    }
+  ],
+  "mapColor": 1566399999,
+  "floors": [
+    {
+      "type": "floor",
+      "size": [ 16, 39.5 ],
       "position": [ 0, 0 ],
-      "map": true
+      "texture": {
+        "path": "fixed/floor_warehouse.svg"
+      }
+    }
+  ],
+  "roofs": [
+    {
+      "type": "roof",
+      "hitbox": [ 16, 39.5 ],
+      "position": [ 0, 0 ],
+      "color": 1566999999,
+      "texture": {
+        "path": "fixed/roof_warehouse.svg"
+      }
     }
   ]
 }

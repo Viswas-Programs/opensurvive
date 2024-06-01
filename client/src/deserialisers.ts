@@ -185,16 +185,16 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
                 hitbox: <MinHitbox>{
                     type: "rect", width: 2, height: 2,
                 } })
-            console.log(minEntity)
             entities.push(minEntity)
         }
         else if (type == "bullet") {
             const minEntity = Object.assign(baseMinEntity, {
                 tracer: <TracerData>{
-                    type: stream.readASCIIString(11), length: stream.readFloat64(), width: stream.readFloat64(),
+                    type: stream.readASCIIString(), length: stream.readFloat64(), width: stream.readFloat64()
+                },
                     hitbox: _getHitboxes(stream)
-                }
-            })
+                    })
+            console.log(minEntity)
             entities.push(minEntity)
         }
         else if (type == "explosion") {
@@ -278,6 +278,7 @@ export function deserialisePlayer(stream: IslandrBitStream) {
         currentHealItem: _getCurrentHealItem(stream),
         interactMessage: _getInteractMessage(stream),
         hitbox: <MinCircleHitbox>{
+            type: "circle",
             radius: 1
         }, // hitbox radius
         id: _getUserID(stream), // id of player
@@ -331,9 +332,12 @@ export function deserialisePlayer(stream: IslandrBitStream) {
 export function deserialiseDiscardables(stream: IslandrBitStream): string[] {
     const discardables: string[] = []
     const size = stream.readInt8()
+    console.log(size)
+    if (size == 0 ) return []
     for (let ii = 0; ii < size; ii++) {
         const discardable = stream.readASCIIString();
         discardables.push(discardable)
     }
+    console.log(discardables)
     return discardables
 }

@@ -56,6 +56,7 @@ export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: Isla
             stream.writeASCIIString(animation)
 		})
 		if (obstacle.type == "roof") {
+			console.log(obstacle)
 			stream.writeInt8((<any>obstacle).roofless.length);
 			for (let ii = 0; ii < (<any>obstacle).roofless.length; ii++) {
 				stream.writeId((<any>obstacle).roofless[ii])

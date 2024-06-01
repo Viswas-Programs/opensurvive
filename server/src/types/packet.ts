@@ -200,25 +200,19 @@ export class GamePacket extends IPacketSERVER {
 		this.allocBytes += calculateAllocBytesForObs(obstacles)
 		this.alivecount = alivecount;
 		this.player = player;
-		if (discardEntities.length) { this.discardEntities = discardEntities; this.discardEntities.forEach(discardable => this.allocBytes += discardable.length); this.anyDiscardEntities = true }
-		if (discardObstacles.length) { this.discardObstacles = discardObstacles; this.discardObstacles.forEach(discardable => this.allocBytes += discardable.length); this.anyDiscardObstacles=true }
+		if (discardEntities.length) { this.discardEntities = discardEntities; this.discardEntities.forEach(discardable => this.allocBytes += (discardable.length+1)); this.anyDiscardEntities = true }
+		if (discardObstacles.length) { this.discardObstacles = discardObstacles; this.discardObstacles.forEach(discardable => this.allocBytes += (discardable.length + 1)); this.anyDiscardObstacles=true }
 	}
 	serialise() {
 		super.serialise();
-		this.stream.writeInt8(this.entities.length)
-		console.log('wrote entities length')
-		this.entities.forEach(entity => { entity.serialise(this.stream, this.player) })
-		console.log('wrote entities')
-		serialiseMinObstacles(this.obstacles, this.stream)
-		console.log('serialise min obstacles')
-		this.stream.writeInt8(this.alivecount)
-		console.log('aliveCount')
+		this.stream.writeInt8(this.entities.length);
+		this.entities.forEach(entity => { entity.serialise(this.stream, this.player) });
+		serialiseMinObstacles(this.obstacles, this.stream);
+		this.stream.writeInt8(this.alivecount);
 		if (this.anyDiscardEntities) serialiseDiscardables(this.discardEntities as string[], this.stream);
-		else { this.stream.writeInt8(0) }
-		console.log("discardable Entities")
+		else { this.stream.writeInt8(0); }
 		if (this.anyDiscardObstacles) serialiseDiscardables(this.discardObstacles as string[], this.stream);
-		else { this.stream.writeInt8(0) }
-		console.log("discardable Obs")
+		else { this.stream.writeInt8(0); }
 	}
 }
 
