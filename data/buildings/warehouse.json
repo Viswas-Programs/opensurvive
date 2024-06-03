@@ -15,9 +15,9 @@
 		},
 		{
 			"type": "wall",
-			"hitbox": [ 14, 0.5 ],
+			"hitbox": [ 13, 0.5 ],
 			"color": 1566399999,
-			"position": [ -2, 19.25 ]
+			"position": [ -2.5, 19.25 ]
 
 		},
 		{
@@ -40,6 +40,10 @@
 			"color": 1566399999,
 			"position": [ 7, -19.25 ]
 
+		},
+		{
+			"type": "box",
+			"position": [-3, 16]
 		}
 	],
 	"zones": [
