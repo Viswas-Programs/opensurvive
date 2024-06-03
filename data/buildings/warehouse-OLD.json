@@ -1,0 +1,69 @@
+{
+  "obstacles": [
+    {
+      "type": "wall",
+      "hitbox": [ 0.5, 40 ],
+      "position": [ -9, 0 ],
+      "color": 1566399999
+    },
+    {
+      "type": "wall",
+      "hitbox": [ 0.5, 40 ],
+      "position": [ 9, 0 ],
+      "color": 1566399999
+    },
+    {
+      "type": "wall",
+      "hitbox": [ 4, 0.5 ],
+      "position": [ -7, 19.75 ],
+      "color": 1566399999
+    },
+    {
+      "type": "wall",
+      "hitbox": [ 4, 0.5 ],
+      "position": [ 7, 19.75 ],
+      "color": 1566399999
+    },
+    {
+      "type": "wall",
+      "hitbox": [ 4, 0.5 ],
+      "position": [ -7, -19.75 ],
+      "color": 1566399999
+    },
+    {
+      "type": "wall",
+      "hitbox": [ 4, 0.5 ],
+      "position": [ 7, -19.75 ],
+      "color": 1566399999
+    }
+  ],
+  "zones": [
+    {
+      "size": [ 18, 39.5 ],
+      "position": [ 0, 0 ]
+    }
+  ],
+  "mapColor": 1566399999,
+  "floors": [
+    {
+
+      "type": "floor",
+      "size": [ 18, 39.5 ],
+      "position": [ 0, 0 ],
+      "texture": {
+        "path": "fixed/floor_warehouse.svg"
+      }
+    }
+  ],
+  "roofs": [
+    {
+      "type": "roof",
+      "hitbox": [ 18, 39.5 ],
+      "position": [ 0, 0 ],
+      "color": 1566999999,
+      "texture": {
+        "path": "fixed/roof_warehouse.svg"
+      }
+    }
+  ]
+}

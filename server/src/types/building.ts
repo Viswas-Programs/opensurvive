@@ -48,7 +48,7 @@ export default class Building {
 		}
 		for (const zone of this.zones) zone.position = zone.origPos.addAngle(this.direction.angle());
 		for (const fl of this.floors) {
-			fl.terrain.setDirection(this.direction);
+			fl.terrain.setDirection(this.direction.scaleAll(-1));
 			fl.terrain.setPosition(this.position.addVec(fl.position.addAngle(delta)));
 		}
 	}

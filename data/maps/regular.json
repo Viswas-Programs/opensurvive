@@ -16,19 +16,16 @@
 	"buildings": [
 		{ "id": "cross", "includeTerrains": ["beach"], "direction": [1, 0], "amount": 5 },
 		{
-			"id": "outhouse",
+			"id": "warehouse",
 			"includeTerrains": [ "plain" ],
-			"amount": 2
-		},
-		{
-			"id": "small_building",
-			"includeTerrains": [ "plain" ],
-			"amount": 1
+			"amount": 2,
+			"direction": [ 1, 0 ]
 		},
 		{
 			"id": "warehouse",
 			"includeTerrains": [ "plain" ],
-			"amount":  10
+			"amount": 2,
+			"direction": [ 0, 1 ]
 		}
 	],
 	"obstacles": [
