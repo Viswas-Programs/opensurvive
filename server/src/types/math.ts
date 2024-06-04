@@ -55,7 +55,9 @@ export class Vec2 {
 		if (this.y > 0) return angle;
 		else return -angle;
 	}
-
+	inverseAngle() {
+		return -this.angle()
+	}
 	addAngle(radian: number) {
 		const angle = this.angle();
 		if (isNaN(angle)) return new Vec2(this.x, this.y);
@@ -106,6 +108,12 @@ export class Vec2 {
 
 	minimize() {
 		return <MinVec2>{ x: this.x, y: this.y };
+	}
+
+	invert() {
+		const oldX = this.x
+		const oldY = this.y
+		return new Vec2(this.y, this.x)
 	}
 }
 

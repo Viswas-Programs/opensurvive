@@ -200,8 +200,8 @@ export class GamePacket extends IPacketSERVER {
 		this.allocBytes += calculateAllocBytesForObs(obstacles)
 		this.alivecount = alivecount;
 		this.player = player;
-		if (discardEntities.length) { this.discardEntities = discardEntities; this.discardEntities.forEach(discardable => this.allocBytes += (discardable.length+1)); this.anyDiscardEntities = true }
-		if (discardObstacles.length) { this.discardObstacles = discardObstacles; this.discardObstacles.forEach(discardable => this.allocBytes += (discardable.length + 1)); this.anyDiscardObstacles=true }
+		if (discardEntities.length) { this.discardEntities = discardEntities; this.discardEntities.forEach(discardable => this.allocBytes += (discardable.length+2)); this.anyDiscardEntities = true }
+		if (discardObstacles.length) { this.discardObstacles = discardObstacles; this.discardObstacles.forEach(discardable => this.allocBytes += (discardable.length + 2)); this.anyDiscardObstacles=true }
 	}
 	serialise() {
 		super.serialise();

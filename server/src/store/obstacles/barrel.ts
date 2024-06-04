@@ -21,10 +21,12 @@ class BarrelMapSupplier extends MapObstacleSupplier {
 export default class Barrel extends Obstacle {
 	static readonly TYPE = "barrel";
 	type = Barrel.TYPE;
+	surface = "metal"
 
 	constructor() {
 		const salt = randomBetween(0.9, 1.1);
 		super(world, new CircleHitbox(2).scaleAll(salt), new CircleHitbox(1.5).scaleAll(salt), 250, 250);
+		this.surface = "metal"
 	}
 
 	static {

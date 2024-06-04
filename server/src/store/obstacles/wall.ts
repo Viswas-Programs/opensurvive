@@ -7,7 +7,7 @@ import { ObstacleSupplier } from "../../types/supplier";
 
 class WallSupplier extends ObstacleSupplier {
 	make(data: ObstacleData) {
-		return new Wall(RectHitbox.fromArray(data.hitbox), data.health || 1, !!data.health || false, data.color);
+		return new Wall(RectHitbox.fromArray(data.hitbox), data.health || 1, !!data.health || false, data.color, data.surface);
 	}
 }
 
@@ -17,12 +17,14 @@ export default class Wall extends Obstacle {
 	// 32-bit RGBA (example: 0xff000077 is red with 0.5 opacity)
 	color: number;
 	damageParticle = "wood";
+	surface = "normal"
 
-	constructor(hitbox: RectHitbox, health: number, vulnerable: boolean, color: number) {
+	constructor(hitbox: RectHitbox, health: number, vulnerable: boolean, color: number, surface = "normal") {
 		super(world, hitbox, hitbox, health, health);
 		this.direction = Vec2.UNIT_X;
 		this.vulnerable = vulnerable;
 		this.color = color;
+		this.surface = surface
 	}
 
 	static {

@@ -118,6 +118,8 @@ export class Entity {
 	allocBytes = 47;
 	goodOldPos = Vec2.ZERO;
 	goodOldDirection = Vec2.ZERO;
+	surface = "normal";
+	readonly actualType = "entity";
 	constructor() {
 		this.id = ID();
 		// Currently selects a random position to spawn. Will change in the future.

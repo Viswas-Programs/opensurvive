@@ -25,9 +25,9 @@ export function serialiseMinParticles(particleArray: MinParticle[], stream: Isla
 }
 
 export function calculateAllocBytesForObs(obstacleArray: Obstacle[]): number {
-	let allocBytes = 1;
+	let allocBytes = 2;
 	obstacleArray.forEach(obstacle => {
-		allocBytes += 50
+		allocBytes += 51
 		allocBytes += obstacle.type.length
 		const hitbox = obstacle.hitbox.minimize()
 		if (hitbox.type == "circle") allocBytes += 8;
