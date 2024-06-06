@@ -1,22 +1,22 @@
 {
-	"name": "SIG MPX",
+	"name": "MK18 CQBR",
 	"color": 3,
-	"ammo": 90,
+	"ammo": 120,
 	"dual": false,
 	"auto": true,
-	"length": 2.75,
+	"length": 2.25,
 	"droppable": true,
 	"normal": {
-		"capacity": 35,
+		"capacity": 30,
 		"reload": {
-			"time": 3000
+			"time": 2400
 		},
 		"delay": {
-			"switch": 600,
-			"firing": 50
+			"switch": 700,
+			"firing": 70
 		},
 		"spread": {
-			"still": 3,
+			"still": 10,
 			"move": 12
 		},
 		"bullets": 1,
@@ -24,12 +24,12 @@
 			"equip": 13,
 			"attack": 7
 		},
-		"headshot": 1.5,
+		"headshot": 2,
 		"bullet": {
-			"damage": 8,
-			"falloff": 1,
-			"speed": 110,
-			"range": [200, 200],
+			"damage": 11,
+			"falloff": 0.85,
+			"speed": 95,
+			"range": [150, 150],
 			"suppressed": false
 		}
 	},
@@ -39,7 +39,8 @@
 			"width": 0.1,
 			"length": 0.9
 		},
-		"animations": [ "medium_recoil" ]
+		"animations": [ "medium_recoil" ],
+		"hasBarrelImage": true
 	},
-	"fistPositions":  [0.1, 0.38]
+	"fistPositions": [ 0.1, 0.38 ]
 }

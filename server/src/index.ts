@@ -130,7 +130,7 @@ server.on("connection", async socket => {
 	playerInitialPacketsSent.set(socket, true);
 	// Send the player music
 
-	const i = new Ammo(50, GunColor.GREEN)
+	const i = new Gun("m18", GunColor.YELLOW)
 	const HHH = new Crate("normal")
 	HHH.position = player.position.addVec(Vec2.fromArray([1, 1]))
 	i.position = player.position

@@ -1,22 +1,22 @@
 {
-	"name": "JM9",
+	"name": "M18 CQBP",
 	"color": 0,
-	"ammo": 45,
+	"ammo": 120,
 	"dual": true,
 	"length": 2.2,
 	"droppable": true,
 	"normal": {
-		"capacity": 15,
+		"capacity": 17,
 		"reload": {
 			"time": 1600
 		},
 		"delay": {
 			"switch": 250,
-			"firing": 120
+			"firing": 130
 		},
 		"spread": {
-			"still": 8,
-			"move": 16
+			"still": 3,
+			"move": 10
 		},
 		"bullets": 1,
 		"speed": {
@@ -25,10 +25,10 @@
 		},
 		"headshot": 2,
 		"bullet": {
-			"damage": 12,
+			"damage": 16,
 			"falloff": 0.7,
-			"speed": 85,
-			"range": [100, 100],
+			"speed": 80,
+			"range": [ 100, 100 ],
 			"suppressed": false
 		}
 	},
@@ -38,6 +38,7 @@
 			"width": 0.1,
 			"length": 0.7
 		},
-		"animations": ["small_recoil"]
+		"animations": [ "small_recoil" ],
+		"hasBarrelImage": true
 	}
 }

@@ -1,23 +1,23 @@
 {
-	"name": "M960",
+	"name": "STF 12",
 	"color": 1,
-	"ammo": 10,
+	"ammo": 16,
 	"dual": false,
-	"length": 3.15,
+	"length": 2.7,
 	"droppable": true,
 	"normal": {
-		"capacity": 5,
+		"capacity": 6,
 		"reload": {
 			"bullets": 1,
-			"time": 750
+			"time": 600
 		},
 		"delay": {
-			"switch": 900,
-			"firing": 500
+			"switch": 500,
+			"firing": 780
 		},
 		"spread": {
-			"still": 10,
-			"move": 12
+			"still": 6,
+			"move": 8
 		},
 		"bullets": 9,
 		"speed": {
@@ -27,9 +27,9 @@
 		"headshot": 1.5,
 		"bullet": {
 			"damage": 12.5,
-			"falloff": 0.3,
-			"speed": 66,
-			"range": [27, 27],
+			"falloff": 0,
+			"speed": 80,
+			"range": [65, 65],
 			"suppressed": false
 		}
 	},
@@ -39,7 +39,8 @@
 			"width": 0.1,
 			"length": 0.8
 		},
-		"animations": [ "large_recoil" ]
+		"animations": [ "large_recoil" ],
+		"hasBarrelImage": true
 	},
-	"fistPositions":  [0.2, 0.5]
+	"fistPositions":  [0.4, 0.7]
 }

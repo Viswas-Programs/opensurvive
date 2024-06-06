@@ -1,36 +1,35 @@
 {
-	"name": "Mosin Nagant",
+	"name": "SVD-M",
 	"color": 2,
-	"ammo": 20,
+	"ammo": 30,
 	"dual": false,
-	"length": 3.75,
+	"length": 3.25,
 	"droppable": true,
 	"normal": {
-		"capacity": 5,
+		"capacity": 10,
 		"reload": {
-			"bullets": 1,
-			"time": 900
+			"time": 2700
 		},
 		"delay": {
-			"switch": 1000,
-			"firing": 1750
+			"switch": 700,
+			"firing": 350
 		},
 		"spread": {
 			"still": 1,
-			"move": 4
+			"move": 3
 		},
 		"bullets": 1,
 		"speed": {
 			"equip": 12,
 			"attack": 6
 		},
-		"headshot": 1.5,
+		"headshot": 2,
 		"bullet": {
-			"damage": 72,
+			"damage": 48,
 			"objDamage": 108,
-			"falloff": 0.95,
+			"falloff": 0,
 			"speed": 125,
-			"range": [500, 500],
+			"range": [300, 300],
 			"suppressed": false
 		}
 	},
@@ -40,7 +39,8 @@
 			"width": 0.16,
 			"length": 1
 		},
-		"animations": [ "large_recoil" ]
+		"animations": [ "large_recoil" ],
+		"hasBarrelImage": true
 	},
 	"fistPositions": [0.1, 0.5]
 }
