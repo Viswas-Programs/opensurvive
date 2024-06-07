@@ -110,7 +110,7 @@ export class GunWeapon extends Weapon {
 			roundRect(ctx, player.hitbox.comparable * scale, -0.15 * scale, this.length * scale, 0.3 * scale, 0.15 * scale, true, true);
 		else {
 			ctx.save()
-			ctx.rotate(90 * Math.PI / 180)
+			ctx.rotate(-90 * Math.PI / 180)
 			const img = GunWeapon.barrelImages.get(this.nameId);
 			if (!img?.complete) {
 				if (!img) {
@@ -121,7 +121,7 @@ export class GunWeapon extends Weapon {
 				roundRect(ctx, player.hitbox.comparable * scale, -0.15 * scale, this.length * scale, 0.3 * scale, 0.15 * scale, true, true);
 			} else {
 				
-				ctx.drawImage(img, -(player.hitbox as CircleHitbox).radius*scale/2.6, -(player.hitbox as CircleHitbox).radius*scale*3, this.length/4.5 * scale, this.length * scale);
+				ctx.drawImage(img, -(player.hitbox as CircleHitbox).radius*scale/3, (player.hitbox as CircleHitbox).radius*scale, this.length/4.5 * scale, this.length * scale);
 		}
 			ctx.restore();
 		}
