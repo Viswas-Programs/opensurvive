@@ -121,7 +121,7 @@ export class GunWeapon extends Weapon {
 				roundRect(ctx, player.hitbox.comparable * scale, -0.15 * scale, this.length * scale, 0.3 * scale, 0.15 * scale, true, true);
 			} else {
 				
-				ctx.drawImage(img, -(player.hitbox as CircleHitbox).radius*scale/3, (player.hitbox as CircleHitbox).radius*scale, this.length/4.5 * scale, this.length * scale);
+				ctx.drawImage(img, -(player.hitbox as CircleHitbox).radius*scale/3, (player.hitbox as CircleHitbox).radius*scale, this.length/4.5 * scale, img.naturalHeight/this.length);
 		}
 			ctx.restore();
 		}

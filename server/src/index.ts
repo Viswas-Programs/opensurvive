@@ -5,19 +5,20 @@ import * as ws from "ws";
 import { ID, receive, send, wait, sendBitstream} from "./utils";
 import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ScopeUpdatePacket, ServerSideScopeUpdate, PlayerTickPkt } from "./types/packet";
 import { DIRECTION_VEC, TICKS_PER_SECOND } from "./constants";
-import { CommonAngles, Vec2 } from "./types/math";
+import { CommonAngles, RectHitbox, Vec2 } from "./types/math";
 import { Ammo, Gun, Player } from "./store/entities";
 import { World } from "./types/world";
 import { Plain, castMapTerrain } from "./store/terrains";
 import { castMapObstacle, Crate } from "./store/obstacles";
 import { castBuilding } from "./store/buildings";
-import { MapData } from "./types/data";
+import { BuildingData, MapBuildingData, MapData } from "./types/data";
 import { IslandrBitStream } from "./packets"
 import { Socket } from "net";
 import Backpack from "./store/entities/backpack";
 import Scope from "./store/entities/scope";
 import Helmet from "./store/entities/helmet";
 import { GunColor } from "./types/misc";
+import Building from "./types/building";
 
 export var ticksElapsed = 0;
 
@@ -44,7 +45,22 @@ export function reset(map = "regular") {
 			world.terrains.push(terrain);
 		}
 	}
-	
+	function __checkBuildingOverlapOtherTerrains(data: MapBuildingData, position: Vec2, building: Building) {
+		if (data.id == "cross") { return data.includeTerrains!.includes(world.terrainAtPos(position).id) }
+		else {
+			return (
+				data.includeTerrains!.includes(world.terrainAtPos(position).id) &&
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([(building!.zones[0].hitbox as RectHitbox).height, (building!.zones[0].hitbox as RectHitbox).width]))).id) &&
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([-(building!.zones[0].hitbox as RectHitbox).height, -(building!.zones[0].hitbox as RectHitbox).width]))).id) &&
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([-(building!.zones[0].hitbox as RectHitbox).height, (building!.zones[0].hitbox as RectHitbox).width]))).id) &&
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([(building!.zones[0].hitbox as RectHitbox).height, -(building!.zones[0].hitbox as RectHitbox).width]))).id) &&
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([(building!.zones[0].hitbox as RectHitbox).height + 2, (building!.zones[0].hitbox as RectHitbox).width + 2]))).id) &&
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([-(building!.zones[0].hitbox as RectHitbox).height - 2, -(building!.zones[0].hitbox as RectHitbox).width - 2]))).id) &&
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([-(building!.zones[0].hitbox as RectHitbox).height - 2, (building!.zones[0].hitbox as RectHitbox).width + 2]))).id) &&
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([(building!.zones[0].hitbox as RectHitbox).height + 2, -(building!.zones[0].hitbox as RectHitbox).width - 2]))).id)
+			)
+		}
+	}
 	// Add buildings
 	for (const data of mapData.buildings) {
 		for (ii = 0; ii < (data.amount || 1); ii++) {
@@ -53,7 +69,7 @@ export function reset(map = "regular") {
 			let position = world.size.scale(Math.random(), Math.random());
 			if (data.position) position = Vec2.fromArray(data.position);
 			else if (data.includeTerrains)
-				while (!data.includeTerrains.includes(world.terrainAtPos(position).id))
+				while (!__checkBuildingOverlapOtherTerrains(data, position, building))
 					position = world.size.scale(Math.random(), Math.random());
 			building.setPosition(position);
 			if (data.direction) building.setDirection(Vec2.fromArray(data.direction));

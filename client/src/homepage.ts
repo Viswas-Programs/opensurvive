@@ -6,7 +6,6 @@ import "./loadout";
 import { getToken, setToken, setUsername } from "./states";
 import { wait } from "./utils";
 let mode = "normal"
-console.log("homepage ts called")
 wait(10000).then(() => {
 	if (document.readyState.toLowerCase() != "complete") { document.getElementsByClassName("loading-text")[0]!.textContent = "Error in loading page, reloading in 5"; wait(5000).then(() => window.location.reload()) }
 })
@@ -90,10 +89,8 @@ if (!window.location.href!.includes("/loadout")) {
 }
 const modes = ["normal", "suroi_collab", "classic"]
 modes.forEach(md => {
-	console.log(document.getElementsByClassName("box-selectable")[0].children[modes.indexOf(md)].querySelector("div"))
-	document.getElementsByClassName("box-selectable")[0].children[modes.indexOf(md)].querySelector("div")?.addEventListener("click", () => { setMode(md); console.log("DONE:)") })
+	document.getElementsByClassName("box-selectable")[0].children[modes.indexOf(md)].querySelector("div")?.addEventListener("click", () => { setMode(md); })
 })
-console.log(getMode())
 	function showAds() {
 		document.querySelectorAll('.ads').forEach(ad => { (<HTMLElement>ad).style.visibility = "visible"; });
 	}
@@ -164,11 +161,9 @@ console.log(getMode())
 
 		document.getElementById("button-signup")!.onclick = () => {
 			if (signupWorking) return;
-			console.log("signing up");
 			signupWorking = true;
 			const username = (<HTMLInputElement>document.getElementById("login_username")).value;
 			const password = (<HTMLInputElement>document.getElementById("password")).value;
-			console.log(username, password);
 			if (!username || !password) return signupWorking = false;
 			const hashed = createHash("sha1").update(password).digest("hex");
 			fetch("/api/signup", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password: hashed.slice(0, 16) }) })

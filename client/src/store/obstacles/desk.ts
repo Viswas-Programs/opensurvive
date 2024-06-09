@@ -44,6 +44,6 @@ export default class Desk extends Obstacle {
 	}
 
 	renderMap(_canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scale: number) {
-		console.log("")
+
 	}
 }

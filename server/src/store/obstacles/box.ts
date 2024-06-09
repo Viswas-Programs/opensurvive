@@ -24,7 +24,7 @@ export default class Box extends Obstacle {
 	damageParticle = "wood";
 
 	constructor() {
-		var hitbox = new RectHitbox(1, 2);
+		var hitbox = new RectHitbox(1, 4);
 		var health = 80;
 		super(world, hitbox, hitbox.scaleAll(0.75), health, health, Vec2.UNIT_X);
 	}

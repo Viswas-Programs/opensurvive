@@ -194,7 +194,6 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
                 },
                     hitbox: _getHitboxes(stream)
                     })
-            console.log(minEntity)
             entities.push(minEntity)
         }
         else if (type == "explosion") {
@@ -332,12 +331,10 @@ export function deserialisePlayer(stream: IslandrBitStream) {
 export function deserialiseDiscardables(stream: IslandrBitStream): string[] {
     const discardables: string[] = []
     const size = stream.readInt8()
-    console.log(size)
     if (size == 0 ) return []
     for (let ii = 0; ii < size; ii++) {
         const discardable = stream.readASCIIString();
         discardables.push(discardable)
     }
-    console.log(discardables)
     return discardables
 }

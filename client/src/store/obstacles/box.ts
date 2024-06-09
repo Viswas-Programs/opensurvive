@@ -44,6 +44,5 @@ export default class Box extends Obstacle {
 	}
 
 	renderMap(_canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scale: number) {
-		console.log("")
 	}
 }
