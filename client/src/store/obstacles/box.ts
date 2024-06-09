@@ -1,7 +1,7 @@
 import { OBSTACLE_SUPPLIERS } from ".";
 import { getMode } from "../../homepage";
 import { RectHitbox } from "../../types/math";
-import { MinObstacle } from "../../types/minimized";
+import { MinObstacle, MinRectHitbox } from "../../types/minimized";
 import { Obstacle } from "../../types/obstacle";
 import { ObstacleSupplier } from "../../types/supplier";
 import { Player } from "../entities";
@@ -28,6 +28,11 @@ export default class Box extends Obstacle {
 	}
 
 	copy(minObstacle: MinObstacle) {
+		minObstacle.hitbox= <MinRectHitbox>{
+			type: "rect",
+			width: (minObstacle.hitbox as MinRectHitbox).height,
+			height: (minObstacle.hitbox as MinRectHitbox).width*2
+		}
 		super.copy(minObstacle);
 	}
 

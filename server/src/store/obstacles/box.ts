@@ -24,7 +24,7 @@ export default class Box extends Obstacle {
 	damageParticle = "wood";
 
 	constructor() {
-		var hitbox = new RectHitbox(1, 4);
+		var hitbox = new RectHitbox(2, 0.5);
 		var health = 80;
 		super(world, hitbox, hitbox.scaleAll(0.75), health, health, Vec2.UNIT_X);
 	}
@@ -36,7 +36,7 @@ export default class Box extends Obstacle {
 
 	damage(dmg: number) {
 		super.damage(dmg);
-		world.onceSounds.push({ path: `obstacles/crate_hit.mp3`, position: this.position });
+		//world.onceSounds.push({ path: `obstacles/crate_hit.mp3`, position: this.position });
 	}
 
 	die() {

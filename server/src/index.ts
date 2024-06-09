@@ -57,7 +57,16 @@ export function reset(map = "regular") {
 				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([(building!.zones[0].hitbox as RectHitbox).height + 2, (building!.zones[0].hitbox as RectHitbox).width + 2]))).id) &&
 				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([-(building!.zones[0].hitbox as RectHitbox).height - 2, -(building!.zones[0].hitbox as RectHitbox).width - 2]))).id) &&
 				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([-(building!.zones[0].hitbox as RectHitbox).height - 2, (building!.zones[0].hitbox as RectHitbox).width + 2]))).id) &&
-				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([(building!.zones[0].hitbox as RectHitbox).height + 2, -(building!.zones[0].hitbox as RectHitbox).width - 2]))).id)
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([(building!.zones[0].hitbox as RectHitbox).height + 2, -(building!.zones[0].hitbox as RectHitbox).width - 2]))).id) &&
+
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([(building!.zones[0].hitbox as RectHitbox).width, (building!.zones[0].hitbox as RectHitbox).height]))).id) &&
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([-(building!.zones[0].hitbox as RectHitbox).width, -(building!.zones[0].hitbox as RectHitbox).height]))).id) &&
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([-(building!.zones[0].hitbox as RectHitbox).width, (building!.zones[0].hitbox as RectHitbox).height]))).id) &&
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([(building!.zones[0].hitbox as RectHitbox).width, -(building!.zones[0].hitbox as RectHitbox).height]))).id) &&
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([(building!.zones[0].hitbox as RectHitbox).width + 2, (building!.zones[0].hitbox as RectHitbox).height + 2]))).id) &&
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([-(building!.zones[0].hitbox as RectHitbox).width - 2, -(building!.zones[0].hitbox as RectHitbox).height - 2]))).id) &&
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([-(building!.zones[0].hitbox as RectHitbox).width - 2, (building!.zones[0].hitbox as RectHitbox).height + 2]))).id) &&
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([(building!.zones[0].hitbox as RectHitbox).width + 2, -(building!.zones[0].hitbox as RectHitbox).height - 2]))).id)
 			)
 		}
 	}
