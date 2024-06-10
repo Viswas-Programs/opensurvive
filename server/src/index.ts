@@ -5,7 +5,7 @@ import * as ws from "ws";
 import { ID, receive, send, wait, sendBitstream} from "./utils";
 import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ScopeUpdatePacket, ServerSideScopeUpdate, PlayerTickPkt } from "./types/packet";
 import { DIRECTION_VEC, TICKS_PER_SECOND } from "./constants";
-import { CommonAngles, RectHitbox, Vec2 } from "./types/math";
+import { CircleHitbox, CommonAngles, RectHitbox, Vec2 } from "./types/math";
 import { Ammo, Gun, Player } from "./store/entities";
 import { World } from "./types/world";
 import { Plain, castMapTerrain } from "./store/terrains";
@@ -48,6 +48,9 @@ export function reset(map = "regular") {
 	function __checkBuildingOverlapOtherTerrains(data: MapBuildingData, position: Vec2, building: Building) {
 		if (data.id == "cross") { return data.includeTerrains!.includes(world.terrainAtPos(position).id) }
 		else {
+			for (let ii = 0; ii < world.buildings.length; ii++) {
+				if (world.buildings[ii].zoneHitbox!.inside(position, world.buildings[ii].position, world.buildings[ii].direction)) { return false }
+			}
 			return (
 				data.includeTerrains!.includes(world.terrainAtPos(position).id) &&
 				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([(building!.zones[0].hitbox as RectHitbox).height, (building!.zones[0].hitbox as RectHitbox).width]))).id) &&
@@ -66,7 +69,7 @@ export function reset(map = "regular") {
 				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([(building!.zones[0].hitbox as RectHitbox).width + 2, (building!.zones[0].hitbox as RectHitbox).height + 2]))).id) &&
 				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([-(building!.zones[0].hitbox as RectHitbox).width - 2, -(building!.zones[0].hitbox as RectHitbox).height - 2]))).id) &&
 				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([-(building!.zones[0].hitbox as RectHitbox).width - 2, (building!.zones[0].hitbox as RectHitbox).height + 2]))).id) &&
-				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([(building!.zones[0].hitbox as RectHitbox).width + 2, -(building!.zones[0].hitbox as RectHitbox).height - 2]))).id)
+				data.includeTerrains!.includes(world.terrainAtPos(position.addVec(Vec2.fromArray([(building!.zones[0].hitbox as RectHitbox).width + 2, -(building!.zones[0].hitbox as RectHitbox).height - 2]))).id) 
 			)
 		}
 	}
