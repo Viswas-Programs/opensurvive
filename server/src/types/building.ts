@@ -1,5 +1,5 @@
 import { ID } from "../utils";
-import { CircleHitbox, Hitbox, Vec2 } from "./math";
+import { CircleHitbox, Hitbox, RectHitbox, Vec2 } from "./math";
 import { MinBuilding } from "./minimized";
 import { Obstacle } from "./obstacle";
 import { Terrain } from "./terrain";
@@ -36,9 +36,19 @@ export default class Building {
 		this.position = position;
 		for (const ob of this.obstacles)
 			ob.obstacle.position = this.position.addVec(ob.position);
-		for (const fl of this.floors)
+		for (const fl of this.floors) {
 			fl.terrain.setPosition(this.position.addVec(fl.position));
-		this.zoneHitbox = new CircleHitbox(30)
+		}
+		let radiusForZoneHitbox = 15;
+		this.zones.forEach(zone => {
+			if ((zone.hitbox as RectHitbox).width > (zone.hitbox as RectHitbox).height) {
+				radiusForZoneHitbox += (zone.hitbox as RectHitbox).width
+			}
+			else {
+				radiusForZoneHitbox += (zone.hitbox as RectHitbox).height
+			}
+})
+		this.zoneHitbox = new CircleHitbox(radiusForZoneHitbox)
 	}
 
 	setDirection(direction: Vec2) {

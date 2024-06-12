@@ -23,10 +23,10 @@ class TreeMapSupplier extends MapObstacleSupplier {
 export default class Tree extends Obstacle {
 	static readonly TYPE = "tree";
 	type = Tree.TYPE;
-	special: "normal" | "mosin";
+	special: string;
 	damageParticle = "wood";
 
-	constructor(special: "normal" | "mosin" = "normal") {
+	constructor(special=  "normal") {
 		const salt = randomBetween(0.9, 1.1);
 		super(world, new CircleHitbox(1.5).scaleAll(salt), new CircleHitbox(0.8).scaleAll(salt), 180, 180);
 		this.special = special;

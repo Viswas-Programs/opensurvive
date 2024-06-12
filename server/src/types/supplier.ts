@@ -21,6 +21,7 @@ export abstract class ObstacleSupplier implements Supplier<Obstacle> {
 		if (!data.direction) obstacle.direction = Vec2.UNIT_X;
 		else if (Array.isArray(data.direction)) obstacle.direction = Vec2.fromArray(data.direction);
 		else obstacle.direction = Vec2.UNIT_X.addAngle(Math.random() * CommonAngles.TWO_PI);
+		if (data.special && obstacle.type == "crate") (<Crate>obstacle).special = data.special
 		return obstacle;
 	}
 }
@@ -53,7 +54,7 @@ export abstract class MapObstacleSupplier implements Supplier<Obstacle> {
 
 // This must be put below MapTerrainSupplier
 import { castTerrain } from "../store/terrains";
-import { Roof, castObstacle } from "../store/obstacles";
+import { Roof, castObstacle, Crate } from "../store/obstacles";
 export class BuildingSupplier implements Supplier<Building> {
 	id: string;
 	data: BuildingData;

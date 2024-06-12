@@ -5,8 +5,6 @@ import { LOOT_TABLES } from "../../types/loot_table";
 import { MapObstacleSupplier, ObstacleSupplier } from "../../types/supplier";
 import { MapObstacleData, ObstacleData } from "../../types/data";
 import { MAP_OBSTACLE_SUPPLIERS, OBSTACLE_SUPPLIERS } from ".";
-import { spawnGun } from "../../utils";
-import { GunColor } from "../../types/misc";
 
 class CrateSupplier extends ObstacleSupplier {
 	make(data: ObstacleData) {
@@ -21,12 +19,12 @@ class CrateMapObstacleSupplier extends MapObstacleSupplier {
 }
 
 export default class Crate extends Obstacle {
-	static readonly TYPE = "crate";
+	static TYPE = "crate";
 	type = Crate.TYPE;
-	special: "normal" | "grenade" | "soviet" | "awc";
+	special: string;
 	damageParticle = "wood";
 
-	constructor(special: "normal" | "grenade" | "soviet" | "awc" = "normal") {
+	constructor(special = "normal") {
 		var hitbox: RectHitbox;
 		var health: number;
 		switch (special) {
@@ -54,7 +52,7 @@ export default class Crate extends Obstacle {
 
 	damage(dmg: number) {
 		super.damage(dmg);
-		world.onceSounds.push({ path: `obstacles/crate_hit.mp3`, position: this.position });
+		//world.onceSounds.push({ path: `obstacles/crate_hit.mp3`, position: this.position });
 	}
 
 	die() {
@@ -66,9 +64,6 @@ export default class Crate extends Obstacle {
 				break;
 			case "soviet":
 				lootTable = "crate_more";
-				break;
-			case "awc":
-				lootTable = "crate_rare";
 				break;
 			default:
 				lootTable = "crate";

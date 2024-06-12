@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </meta>
+
+    <audio loop autoplay>
+        <source src="https://github.com/North-West-Wind/islandr.io/blob/main/client/public/menu.wav?raw=true" type="audio/wav">
+    </audio>
+
+    <title>Islandr - 2D Battle Royale</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-image: url('https://i.ibb.co/LS1JxDX/surviv-splash2.png');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo {
+            width: 400px;
+            height: auto;
+            margin-top: 20px;
+        }
+
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .button {
+            width: 250px;
+            height: 50px;
+            background-color: rgba(0, 0, 0, 0.35);
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 10px;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            border: 2px solid #c9c1bb;
+            padding: 10px;
+        }
+
+            .button:before {
+                content: url(xxx.png);
+                width: 20px;
+                height: auto;
+                float:;
+                margin-right: 5px;
+                margin-top: -2px;
+            }
+
+            .button:hover {
+                background-color: rgba(0, 0, 0, 0.6);
+                color: #ffbc01;
+            }
+
+        .floating-holder {
+            position: absolute;
+            width: 100px;
+            height: 100%;
+            z-index: 0;
+            backdrop-filter: blur(5px);
+        }
+
+        .left-floating-holder {
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .right-floating-holder {
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+
+        .text-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #fff;
+            text-align: right;
+            z-index: 1;
+        }
+
+
+        .logo {
+            max-height: 400px;
+            max-width: 400px;
+            heigth: 100%;
+            width: 100%;
+            margin: 0 auto;
+            margin-bottom: 50px;
+        }
+
+            .logo img {
+                height: 100%;
+                width: 100%;
+                display: inline-block;
+            }
+
+        .panel-container {
+            display: flex;
+            gap: 2px;
+        }
+
+        .panel {
+            min-height: 300px;
+            min-width: 300px;
+            heigth: 100%;
+            width: 100%;
+            border-radius: 10px;
+        }
+
+            .panel.empty {
+                background: black;
+                opacity: 35%;
+            }
+
+            .panel.buttons {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+
+                .panel .buttons button {
+                    max-width: 300px;
+                }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo">
+            <img src="https://i.ibb.co/fxLNbMy/ilndr-logo.png" alt="Game Logo">
+
+        </div>
+
+        <div class="panel-container">
+            <div class="panel empty">Panel 1    </div>
+
+            <div class="panel buttons">
+                <button class="button">Find Match</button>
+                <button class="button">Loadout</button>
+            </div>
+            <div class="panel empty">
+                Panel 2
+            </div>
+            <div>
+
+                <div class="text-container">
+                    <p>Version: 0.0.1 Alpha</p>
+                    <p>Server Region: US West</p>
+                </div>
+            </div>
+
+</body>
+</html>

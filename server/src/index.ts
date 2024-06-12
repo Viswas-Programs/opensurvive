@@ -49,7 +49,13 @@ export function reset(map = "regular") {
 		if (data.id == "cross") { return data.includeTerrains!.includes(world.terrainAtPos(position).id) }
 		else {
 			for (let ii = 0; ii < world.buildings.length; ii++) {
-				if (world.buildings[ii].zoneHitbox!.inside(position, world.buildings[ii].position, world.buildings[ii].direction)) { return false }
+				if (
+					world.buildings[ii].zoneHitbox!.inside(position, world.buildings[ii].position, world.buildings[ii].direction) ||
+					world.buildings[ii].zoneHitbox!.inside(position.addVec(Vec2.fromArray([(building!.zones[0].hitbox as RectHitbox).height, (building!.zones[0].hitbox as RectHitbox).width])), world.buildings[ii].position, world.buildings[ii].direction) ||
+					world.buildings[ii].zoneHitbox!.inside(position.addVec(Vec2.fromArray([-(building!.zones[0].hitbox as RectHitbox).height, -(building!.zones[0].hitbox as RectHitbox).width])), world.buildings[ii].position, world.buildings[ii].direction) ||
+					world.buildings[ii].zoneHitbox!.inside(position.addVec(Vec2.fromArray([-(building!.zones[0].hitbox as RectHitbox).height, (building!.zones[0].hitbox as RectHitbox).width])), world.buildings[ii].position, world.buildings[ii].direction) ||
+					world.buildings[ii].zoneHitbox!.inside(position.addVec(Vec2.fromArray([(building!.zones[0].hitbox as RectHitbox).height, -(building!.zones[0].hitbox as RectHitbox).width])), world.buildings[ii].position, world.buildings[ii].direction)
+				) { return false }
 			}
 			return (
 				data.includeTerrains!.includes(world.terrainAtPos(position).id) &&

@@ -136,6 +136,7 @@ export type ObstacleData = {
 	type: string;
 	direction?: number[] | number;
 	position: number[];
+	special?: string;
 	[key: string]: any;
 }
 

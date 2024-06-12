@@ -23,9 +23,9 @@ class StoneMapSupplier extends MapObstacleSupplier {
 export default class Stone extends Obstacle {
 	static readonly TYPE = "stone";
 	type = Stone.TYPE;
-	special: "normal" | "ak47";
+	special: string;
 
-	constructor(special: "normal" | "ak47" = "normal") {
+	constructor(special= "normal") {
 		const salt = randomBetween(0.9, 1.1);
 		super(world, new CircleHitbox(2).scaleAll(salt), new CircleHitbox(1.5).scaleAll(salt), 250, 250);
 		this.special = special;
