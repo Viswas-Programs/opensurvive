@@ -6,7 +6,7 @@
 			"color": 1566399999,
 			"__color": "(comment) 1566399999 is 0xad6218ff",
 			"position": [ 9, 0 ],
-			"surface":  "metal"
+			"surface": "metal"
 		},
 		{
 			"type": "wall",
@@ -58,7 +58,17 @@
 		{
 			"type": "crate",
 			"position": [ 0, -5 ],
-			"special":  "plus"
+			"special": "plus"
+		},
+		{
+			"type": "stone",
+			"position": [ 5, -9.5 ],
+			"special": "pillar"
+		},
+		{
+			"type": "stone",
+			"position": [ -5, -9.5 ],
+			"special": "pillar"
 		}
 	],
 	"zones": [

@@ -22,7 +22,7 @@ export default class Bush extends Obstacle {
 	noCollision = true;
 
 	constructor() {
-		const hitbox = new CircleHitbox(2.5);
+		const hitbox = new CircleHitbox(1.6);
 		super(world, hitbox, hitbox, 100, 100);
 	}
 

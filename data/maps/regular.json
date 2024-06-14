@@ -30,9 +30,7 @@
 	],
 	"obstacles": [
 		{ "type": "tree", "amount": 100 },
-		{ "type": "tree", "args": ["mosin"], "amount": 4 },
 		{ "type": "stone", "amount": 100 },
-		{ "type": "stone", "args": ["ak47"], "amount": 2 },
 		{ "type": "crate", "amount": 100 },
 		{ "type": "crate", "amount": 25, "args": ["soviet"] },
 		{ "type": "bush", "amount": 50 },

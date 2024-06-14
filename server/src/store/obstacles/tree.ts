@@ -27,8 +27,7 @@ export default class Tree extends Obstacle {
 	damageParticle = "wood";
 
 	constructor(special=  "normal") {
-		const salt = randomBetween(0.9, 1.1);
-		super(world, new CircleHitbox(1.5).scaleAll(salt), new CircleHitbox(0.8).scaleAll(salt), 180, 180);
+		super(world, new CircleHitbox(1.2), new CircleHitbox(0.6), 180, 180);
 		this.special = special;
 	}
 

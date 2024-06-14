@@ -7,7 +7,7 @@ import { circleFromCenter } from "../../utils";
 import { Player } from "../entities";
 
 interface AdditionObstacle {
-	special: "normal" | "ak47";
+	special: "normal" | "pillar";
 }
 
 class StoneSupplier implements ObstacleSupplier {
@@ -19,16 +19,16 @@ class StoneSupplier implements ObstacleSupplier {
 export default class Stone extends Obstacle {
 	static readonly TYPE = "stone";
 	type = Stone.TYPE;
-	special!: "normal" | "ak47";
+	special!: "normal" | "pillar";
 	static stoneImg = new Image();
-	static ak47stoneImg = new Image();
+	static pillarImg = new Image();
 
 	static {
 		OBSTACLE_SUPPLIERS.set(Stone.TYPE, new StoneSupplier());
 	}
 	static updateAssets() {
 		this.stoneImg.src = "assets/" + getMode() + "/images/game/objects/stone.svg";
-		this.ak47stoneImg.src = "assets/" + getMode() + "/images/game/objects/ak47_stone.svg";
+		this.pillarImg.src = "assets/" + getMode() + "/images/game/objects/pillar.svg";
 	}
 
 	copy(minObstacle: MinObstacle & AdditionObstacle) {
@@ -39,8 +39,8 @@ export default class Stone extends Obstacle {
 	render(you: Player, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scale: number) {
 		var img: HTMLImageElement;
 		switch (this.special) {
-			case "ak47":
-				img = Stone.ak47stoneImg;
+			case "pillar":
+				img = Stone.pillarImg;
 				break;
 			default:
 				img = Stone.stoneImg;

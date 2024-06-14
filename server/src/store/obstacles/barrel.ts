@@ -24,8 +24,7 @@ export default class Barrel extends Obstacle {
 	surface = "metal"
 
 	constructor() {
-		const salt = randomBetween(0.9, 1.1);
-		super(world, new CircleHitbox(2).scaleAll(salt), new CircleHitbox(1.5).scaleAll(salt), 250, 250);
+		super(world, new CircleHitbox(1.5), new CircleHitbox(0.75), 140, 140);
 		this.surface = "metal"
 	}
 
