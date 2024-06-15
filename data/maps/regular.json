@@ -26,6 +26,11 @@
 			"includeTerrains": [ "plain" ],
 			"amount": 2,
 			"direction": [ 0, 1 ]
+		},
+		{
+			"id": "conExBox",
+			"includeTerrains": [ "plain" ],
+			"amount": 10
 		}
 	],
 	"obstacles": [
@@ -34,6 +39,7 @@
 		{ "type": "crate", "amount": 100 },
 		{ "type": "crate", "amount": 25, "args": ["soviet"] },
 		{ "type": "bush", "amount": 50 },
-		{ "type": "barrel", "amount": 50 }
+		{ "type": "barrel", "amount": 50 },
+		{ "type":  "spawner", "amount":  25}
 	]
 }

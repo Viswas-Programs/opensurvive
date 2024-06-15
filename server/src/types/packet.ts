@@ -181,7 +181,7 @@ export class AckPacket extends IPacketSERVER {
 
 export class GamePacket extends IPacketSERVER {
 	type = "game";
-	allocBytes = 5 + 5;
+	allocBytes = 5 + 7;
 	entities: Entity[];
 	obstacles: MinObstacle[];
 	alivecount: number;

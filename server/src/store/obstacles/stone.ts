@@ -1,7 +1,7 @@
 import { MAP_OBSTACLE_SUPPLIERS, OBSTACLE_SUPPLIERS } from ".";
 import { world } from "../..";
 import { MapObstacleData, ObstacleData } from "../../types/data";
-import { CircleHitbox, Hitbox } from "../../types/math";
+import { CircleHitbox, Hitbox, RectHitbox } from "../../types/math";
 import { Obstacle } from "../../types/obstacle";
 import { MapObstacleSupplier, ObstacleSupplier } from "../../types/supplier";
 
@@ -10,7 +10,7 @@ _HealthForVariant.set("normal", 200);
 _HealthForVariant.set("pillar", 10000000000000000)
 const _HitboxForVariant = new Map<string, Array<Hitbox>>();
 _HitboxForVariant.set("normal", [new CircleHitbox(1.5), new CircleHitbox(0.75)])
-_HitboxForVariant.set("pillar", [new CircleHitbox(1), new CircleHitbox(1)])
+_HitboxForVariant.set("pillar", [new CircleHitbox(0.888), new CircleHitbox(0.888)])
 class StoneSupplier extends ObstacleSupplier {
 	make(data: ObstacleData) {
 		return new Stone(data.special || "normal")
@@ -41,7 +41,7 @@ export default class Stone extends Obstacle {
 
 	damage(dmg: number) {
 		super.damage(dmg);
-		world.onceSounds.push({ path: `obstacles/stone_hit.mp3`, position: this.position });
+		//world.onceSounds.push({ path: `obstacles/stone_hit.mp3`, position: this.position });
 	}
 
 	die() {
@@ -53,7 +53,7 @@ export default class Stone extends Obstacle {
 					spawnGun(ak47.nameId, ak47.color, this.position, ak47.ammo);
 			}
 		}*/
-		world.onceSounds.push({ path: `obstacles/stone_break.mp3`, position: this.position });
+		//world.onceSounds.push({ path: `obstacles/stone_break.mp3`, position: this.position });
 	}
 
 	minimize() {

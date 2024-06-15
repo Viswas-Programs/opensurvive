@@ -33,12 +33,12 @@ export function calculateAllocBytesForObs(obstacleArray: Obstacle[]): number {
 		if (hitbox.type == "circle") allocBytes += 8;
 		else if (hitbox.width == hitbox.height) allocBytes += 8;
 		else allocBytes += 16
-		obstacle.animations.forEach(animation => { allocBytes += animation.length })
+		obstacle.animations.forEach(animation => { allocBytes += animation.length  + 1})
 		if (obstacle.type == "roof") {
 			allocBytes += 31;
 			(<Roof>obstacle).roofless.forEach(id => allocBytes += 12);
 		}
-		if ((obstacle as any).special) {allocBytes +=(<any>obstacle).special.length }
+		if ((obstacle as any).special) {allocBytes +=(<any>obstacle).special.length+1 }
 	})
 	return allocBytes
 }
@@ -56,7 +56,6 @@ export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: Isla
             stream.writeASCIIString(animation)
 		})
 		if (obstacle.type == "roof") {
-			console.log(obstacle)
 			stream.writeInt8((<any>obstacle).roofless.length);
 			for (let ii = 0; ii < (<any>obstacle).roofless.length; ii++) {
 				stream.writeId((<any>obstacle).roofless[ii])

@@ -139,6 +139,7 @@ export function deserialiseMinObstacles(stream: IslandrBitStream): MinObstacle[]
         const specialOrNot = stream.readBoolean()
         if (specialOrNot) obstacle.special = stream.readASCIIString()
         obstacles.push(<MinObstacle>obstacle)
+        if (obstacle.type == "barrel") console.log(obstacle)
     }
     return obstacles
 }

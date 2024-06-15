@@ -12,7 +12,7 @@ awcCrateImg.onload = () => awcCrateImg.loaded = true;
 */
 
 export interface AdditionalObstacle {
-	special: "normal" | "grenade" | "soviet" | "plus";
+	special: "normal" | "grenade" | "soviet" ;
 }
 
 export class CrateSupplier implements ObstacleSupplier {
@@ -24,7 +24,7 @@ export class CrateSupplier implements ObstacleSupplier {
 export default class Crate extends Obstacle {
 	static readonly TYPE = "crate";
 	type = Crate.TYPE;
-	special!: "normal" | "grenade" | "soviet" | "plus";
+	special!: "normal" | "grenade" | "soviet";
 	static crateImg = new Image();
 	static crateResidueImg = new Image();
 	static grenadeCrateImg = new Image();
@@ -40,8 +40,7 @@ export default class Crate extends Obstacle {
 		this.crateResidueImg.src = "assets/" + getMode() + "/images/game/objects/residues/crate.svg";
 		this.cratePlusResidueImg.src = "assets/" + getMode() + "/images/game/objects/residues/crate_plus.svg";
 		this.grenadeCrateImg.src = "assets/" + getMode() + "/images/game/objects/grenade_crate.svg";
-		this.sovietCrateImg.src = "assets/" + getMode() + "/images/game/objects/soviet_crate.svg";
-		this.plusCrateImg.src = "assets/" + getMode() + "/images/game/objects/crate_plus.svg";
+		this.sovietCrateImg.src = "assets/" + getMode() + "/images/game/objects/crate_plus.svg";
 	}
 
 	copy(minObstacle: MinObstacle & AdditionalObstacle) {
@@ -58,9 +57,6 @@ export default class Crate extends Obstacle {
 			case "soviet":
 				img = Crate.sovietCrateImg;
 				break;
-			case "plus":
-				img = Crate.plusCrateImg;
-				break;
 			default:
 				img = Crate.crateImg;
 				break;
@@ -70,7 +66,7 @@ export default class Crate extends Obstacle {
 		const width = scale * (<RectHitbox>this.hitbox).width * (this.despawn ? 0.5 : 1), height = width * Crate.crateImg.naturalWidth / Crate.crateImg.naturalHeight;
 		ctx.translate(canvas.width / 2 + relative.x * scale, canvas.height / 2 + relative.y * scale);
 		ctx.rotate(-this.direction.angle() );
-		if (this.special == "plus") ctx.drawImage(this.despawn ? Crate.cratePlusResidueImg : img, -width / 2, -height / 2, width, height);
+		if (this.special == "soviet") ctx.drawImage(this.despawn ? Crate.cratePlusResidueImg : img, -width / 2, -height / 2, width, height);
 		ctx.drawImage(this.despawn ? Crate.crateResidueImg : img, -width / 2, -height / 2, width, height);
 		ctx.resetTransform();
 	}

@@ -103,9 +103,23 @@ export class GunWeapon extends Weapon {
 		const fistRadius = radius / 3;
 		const fistPositions = [new Vec2(player.hitbox.comparable, 0.1), new Vec2(player.hitbox.comparable + 0.25, -0.1)];
 		var offset = Vec2.ZERO;
+		ctx.lineWidth = fistRadius / 3;
+		ctx.strokeStyle = "#000000";
+		const img = MeleeWeapon.fistImages.get(player.skin!);
+		if (!img) {
+			const newImg = new Image();
+			MeleeWeapon.fistImages.set(player.skin!, newImg);
+			newImg.src = "assets/" + getMode() + "/images/game/fists/" + player.skin + ".svg";
+		} else if (img.complete)
+			for (const pos of fistPositions) {
+				if (this.fistPositions) offset = offset.addVec(Vec2.fromArray([this.fistPositions[fistPositions.indexOf(pos)], 0]))
+				const fist = pos.addVec(offset).scaleAll(scale);
+				ctx.drawImage(img, fist.x - fistRadius, fist.y - fistRadius, fistRadius * 2, fistRadius * 2)
+			}
 		ctx.fillStyle = "#222";
 		ctx.strokeStyle = "#000";
 		ctx.lineWidth = 0.025 * scale;
+
 		if (!this.hasBarrelImage)
 			roundRect(ctx, player.hitbox.comparable * scale, -0.15 * scale, this.length * scale, 0.3 * scale, 0.15 * scale, true, true);
 		else {
@@ -121,23 +135,11 @@ export class GunWeapon extends Weapon {
 				roundRect(ctx, player.hitbox.comparable * scale, -0.15 * scale, this.length * scale, 0.3 * scale, 0.15 * scale, true, true);
 			} else {
 				
-				ctx.drawImage(img, -(player.hitbox as CircleHitbox).radius*scale/3, (player.hitbox as CircleHitbox).radius*scale, this.length/4.5 * scale, img.naturalHeight/this.length);
+				ctx.drawImage(img, -(player.hitbox as CircleHitbox).radius * scale / 3, (player.hitbox as CircleHitbox).radius * scale, this.length / 4.5 * scale, img.naturalHeight / (this.length));
 		}
 			ctx.restore();
 		}
-		ctx.lineWidth = fistRadius / 3;
-		ctx.strokeStyle = "#000000";
-		const img = MeleeWeapon.fistImages.get(player.skin!);
-		if (!img) {
-			const newImg = new Image();
-			MeleeWeapon.fistImages.set(player.skin!, newImg);
-			newImg.src = "assets/" + getMode() + "/images/game/fists/" + player.skin + ".svg";
-		} else if (img.complete)
-			for (const pos of fistPositions) {
-				if (this.fistPositions) offset = offset.addVec(Vec2.fromArray([this.fistPositions[fistPositions.indexOf(pos)], 0]))
-				const fist = pos.addVec(offset).scaleAll(scale);
-				ctx.drawImage(img, fist.x - fistRadius, fist.y - fistRadius, fistRadius *2, fistRadius*2)
-			}
+		
 	}
 }
 

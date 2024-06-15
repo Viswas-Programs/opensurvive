@@ -58,18 +58,39 @@
 		{
 			"type": "crate",
 			"position": [ 0, -5 ],
-			"special": "plus"
+			"special": "warehouse"
 		},
 		{
 			"type": "stone",
-			"position": [ 5, -9.5 ],
+			"position": [ 5.5, -9.5 ],
 			"special": "pillar"
 		},
 		{
 			"type": "stone",
-			"position": [ -5, -9.5 ],
+			"position": [ -5.5, -9.5 ],
 			"special": "pillar"
+		},
+		{
+			"type": "stone",
+			"position": [ 5.5, 9.5 ],
+			"special": "pillar"
+		},
+		{
+			"type": "stone",
+			"position": [ -5.5, 9.5 ],
+			"special": "pillar"
+		},
+		{
+			"type": "barrel",
+			"position": [ -5.5, -7.5 ],
+			"special": "dirty"
+		},
+		{
+			"type": "barrel",
+			"position": [ 5.5, 7.5 ],
+			"special":  "dirty"
 		}
+
 	],
 	"zones": [
 		{

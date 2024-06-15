@@ -42,7 +42,6 @@ export default class Box extends Obstacle {
 		img = Box.BoxImg;
 		if (!img.complete || !Box.BoxResidueImg.complete) return;
 		const relative = this.position.addVec(you.position.inverse());
-		console.log(this.hitbox);
 		//const width = scale * (<RectHitbox>this.hitbox).width * (this.despawn ? 0.5 : 1), height = width * Box.BoxImg.naturalWidth / Box.BoxImg.naturalHeight;
 		const width = scale * (<RectHitbox>this.hitbox).width * (this.despawn ? 0.5 : 1), height = scale * (<RectHitbox>this.hitbox).height * (this.despawn ? 0.5 : 1);
 		ctx.translate(canvas.width / 2 + relative.x * scale, canvas.height / 2 + relative.y * scale);
