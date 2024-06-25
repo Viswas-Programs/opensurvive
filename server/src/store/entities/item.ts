@@ -42,7 +42,7 @@ export default abstract class Item extends Entity {
 			}
 		}
 		if (!colliding) this.setVelocity(this.velocity.scaleAll(1 - this.friction));
-		for (const obstacle of obstacles) {
+		for (const obstacle of obstacles.filter(obs => obs.type != "roof")) {
 			const collisionType = obstacle.collided(this);
 			if (collisionType) {
 				obstacle.onCollision(this);

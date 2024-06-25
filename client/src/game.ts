@@ -49,8 +49,9 @@ var connected = false;
 export function getConnected() { return connected; }
 function setConnected(v: boolean) { connected = v; return connected; }
 enum modeMapColours {
-	normal = 0x80B251,
-	suroi_collab = 0x4823358
+	normal = 0x748838,
+	suroi_collab = 0x49993e,
+	classic = 0x80B251
 }
 const joystick = document.getElementsByClassName('joystick-container')[0];
 const handle = document.getElementsByClassName('joystick-handle')[0];

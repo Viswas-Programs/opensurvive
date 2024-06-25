@@ -1,4 +1,5 @@
 import { ENTITY_SUPPLIERS, Player } from ".";
+import { getMode } from "../../homepage";
 import { getHealingImagePath } from "../../textures";
 import { Entity } from "../../types/entity";
 import { MinEntity } from "../../types/minimized";
@@ -54,11 +55,13 @@ export default class Healing extends Entity {
 		const radius = scale * this.hitbox.comparable;
 		ctx.translate(canvas.width / 2 + relative.x * scale, canvas.height / 2 + relative.y * scale);
 		ctx.rotate(-this.direction.angle());
-		ctx.strokeStyle = "#000";
-		ctx.lineWidth = scale * 0.1;
-		circleFromCenter(ctx, 0, 0, radius, false, true);
-		ctx.fillStyle = "#00000066"; // <- alpha/opacity
-		circleFromCenter(ctx, 0, 0, radius, true, false);
+		if (getMode() == "classic") {
+			ctx.strokeStyle = "#000";
+			ctx.lineWidth = scale * 0.1;
+			circleFromCenter(ctx, 0, 0, radius, false, true);
+			ctx.fillStyle = "#00000066"; // <- alpha/opacity
+			circleFromCenter(ctx, 0, 0, radius, true, false);
+		}
 		const img = Healing.healingImages.get(this.nameId);
 		if (!img?.complete) {
 			if (!img) {

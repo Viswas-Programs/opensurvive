@@ -150,6 +150,11 @@ export type BuildingData = {
 	floors?: TerrainData[];
 	roofs?: ObstacleData[];
 	mapColor?: number;
+	subBuildings?: {
+		id: "string",
+		position: number[],
+		direction: number[]
+	}
 }
 
 export type RedZoneDataEntry = {

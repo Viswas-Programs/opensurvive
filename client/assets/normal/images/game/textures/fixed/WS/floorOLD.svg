@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="Layer_2"
+   data-name="Layer 2"
+   viewBox="0 0 457.37 231.94"
+   version="1.1"
+   sodipodi:docname="floor_woodshack.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview9"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="2.8642019"
+     inkscape:cx="207.03848"
+     inkscape:cy="123.07093"
+     inkscape:window-width="1920"
+     inkscape:window-height="991"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Layer_2" />
+  <defs
+     id="defs4">
+    <style
+       id="style2">
+      .cls-1 {
+        fill: #7f5e25;
+        stroke-width: 0px;
+      }
+    </style>
+  </defs>
+  <polygon
+     class="cls-1"
+     points="58.58,220.92 18.22,216.24 22.03,138.47 4.15,81.86 0,15.22 24.96,0 44.83,5.51 73.54,0 457.37,0 457.37,198.76 388.77,216.22 223.83,215.47 135.39,231.94 "
+     id="polygon6"
+     transform="matrix(-1.0007633,0,0,-1.0005329,458,232.60706)" />
+</svg>

@@ -29,7 +29,6 @@ export default class Stone extends Obstacle {
 	special: string;
 
 	constructor(special = "normal") {
-		console.log(_HitboxForVariant.get(special), special)
 		super(world, _HitboxForVariant.get(special)![0], _HitboxForVariant.get(special)![1], _HealthForVariant.get(special)!, _HealthForVariant.get(special)!);
 		this.special = special;
 	}

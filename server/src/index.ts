@@ -274,6 +274,7 @@ server.on("connection", async socket => {
 				const data = (new ServerSideScopeUpdate());
 				data.deserialise(stream);
 				player.inventory.selectScope(Number(data.scope))
+				player.changedScope = true;
 				break;
 			case "cancelAct":
 				player.healTicks = 0;

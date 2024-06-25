@@ -28,8 +28,7 @@
 	"zones": [
 		{
 			"position": [0, 0],
-			"hitbox": [7, 3.6],
-			"map": true
+			"hitbox": [7, 3.6]
 		}
 	],
 	"mapColor": 6942442751,

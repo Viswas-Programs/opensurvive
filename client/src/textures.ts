@@ -15,6 +15,9 @@ export function getBackpackImagePath(level: number) {
 export function getHelmetImagePath(level: number) {
 	return `assets/${getMode()}/images/game/loots/proc-items/helmet-level-${level}.svg`;
 }
+export function getScopeImagePath(level: number) {
+	return `assets/${getMode()}/images/game/loots/scopes/zoom-${level}x.svg`;
+}
 export function getVestImagePath(level: number) {
 	return `assets/${getMode()}/images/game/loots/proc-items/vest-level-${level}.svg`;
 }

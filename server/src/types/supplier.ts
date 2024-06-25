@@ -21,7 +21,7 @@ export abstract class ObstacleSupplier implements Supplier<Obstacle> {
 		if (!data.direction) obstacle.direction = Vec2.UNIT_X;
 		else if (Array.isArray(data.direction)) obstacle.direction = Vec2.fromArray(data.direction);
 		else obstacle.direction = Vec2.UNIT_X.addAngle(Math.random() * CommonAngles.TWO_PI);
-		if (data.special && obstacle.type == "crate") (<Crate>obstacle).special = data.special
+		if (data.special && Object.keys(obstacle).includes("special")) (<any>obstacle).special = data.special
 		return obstacle;
 	}
 }
@@ -54,7 +54,9 @@ export abstract class MapObstacleSupplier implements Supplier<Obstacle> {
 
 // This must be put below MapTerrainSupplier
 import { castTerrain } from "../store/terrains";
-import { Roof, castObstacle, Crate } from "../store/obstacles";
+import { Roof, castObstacle } from "../store/obstacles";
+import { BUILDING_SUPPLIERS, castBuilding } from "../store/buildings";
+function _supplySubBuildings() { }
 export class BuildingSupplier implements Supplier<Building> {
 	id: string;
 	data: BuildingData;
@@ -77,17 +79,19 @@ export class BuildingSupplier implements Supplier<Building> {
 		if (this.data.zones)
 			for (const zone of zones)
 				building.addZone(zone.position, zone.hitbox, zone.map);
-		if (this.data.roofs)
+		if (this.data.roofs) {
 			for (const ob of this.data.roofs) {
 				const roof = new Roof(Hitbox.fromNumber(ob.hitbox), ob.color, building.id, ob.texture);
 				building.addObstacle(Vec2.fromArray(ob.position).addAngle(angle), roof);
 			}
-		if (this.data.floors)
+		}
+		if (this.data.floors) {
 			for (const floor of this.data.floors) {
 				const terrain = castTerrain(floor);
 				if (!terrain) continue;
 				building.addFloor(Vec2.fromArray(floor.position).addAngle(angle), terrain);
 			}
+		}
 		building.setDirection(direction);
 		building.color = this.data.mapColor;
 		return building;

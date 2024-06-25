@@ -1,4 +1,3 @@
-import { Vec2 } from "./math"
 import { GunColor } from "./misc"
 
 export interface BulletStats {
@@ -152,6 +151,11 @@ export type BuildingData = {
 	floors?: TerrainData[];
 	roofs?: ObstacleData[];
 	mapColor?: number;
+	subBuildings?: {
+		id: "string",
+		position: number[],
+		direction: number[]
+	}
 }
 
 export type RedZoneDataEntry = {
@@ -180,6 +184,11 @@ export type MapBuildingData = {
 	direction?: number[];
 	amount?: number;
 	includeTerrains?: string[];
+	subBuildings?: {
+		id: "string",
+		position: number[],
+		direction: number[]
+}
 }
 
 export type MapObstacleData = {

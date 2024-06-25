@@ -1,3 +1,4 @@
+import { castBuilding } from "../store/buildings";
 import { ID } from "../utils";
 import { CircleHitbox, Hitbox, RectHitbox, Vec2 } from "./math";
 import { MinBuilding } from "./minimized";
@@ -15,6 +16,7 @@ export default class Building {
 	zones: { origPos: Vec2, position: Vec2, hitbox: Hitbox, map: boolean }[] = [];
 	color?: number;
 	zoneHitbox?: CircleHitbox;
+	subBuilding?: Building
 
 	constructor() {
 		this.id = ID();
@@ -47,7 +49,7 @@ export default class Building {
 			else {
 				radiusForZoneHitbox += (zone.hitbox as RectHitbox).height
 			}
-})
+		})
 		this.zoneHitbox = new CircleHitbox(radiusForZoneHitbox)
 	}
 

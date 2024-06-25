@@ -36,6 +36,10 @@ export default class Crate extends Obstacle {
 				hitbox = new RectHitbox(4, 4);
 				health = 125;
 				break;
+			case "woodpile":
+				hitbox = new RectHitbox(3, 3);
+				health = 200;
+				break;
 			default:
 				hitbox = new RectHitbox(4, 4);
 				health = 80;
@@ -57,26 +61,28 @@ export default class Crate extends Obstacle {
 
 	die() {
 		super.die();
-		var lootTable: string;
-		switch (this.special) {
-			case "grenade":
-				lootTable = "crate_grenade";
-				break;
-			case "soviet":
-				lootTable = "crate_more";
-				break;
-			default:
-				lootTable = "crate";
-				break;
+		if (this.special != "woodpile") {
+			var lootTable: string;
+			switch (this.special) {
+				case "grenade":
+					lootTable = "crate_grenade";
+					break;
+				case "soviet":
+					lootTable = "crate_more";
+					break;
+				default:
+					lootTable = "crate";
+					break;
+			}
+			const entities = LOOT_TABLES.get(lootTable)?.roll();
+			if (entities) {
+				world.entities.push(...entities.map(e => {
+					e.position = this.position;
+					return e;
+				}));
+			}
 		}
-		const entities = LOOT_TABLES.get(lootTable)?.roll();
-		if (entities) {
-			world.entities.push(...entities.map(e => {
-				e.position = this.position;
-				return e;
-			}));
-		}
-		world.onceSounds.push({ path: "obstacles/crate_break.mp3", position: this.position });
+		//world.onceSounds.push({ path: "obstacles/crate_break.mp3", position: this.position });
 	}
 
 	minimize() {

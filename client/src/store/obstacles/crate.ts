@@ -12,7 +12,7 @@ awcCrateImg.onload = () => awcCrateImg.loaded = true;
 */
 
 export interface AdditionalObstacle {
-	special: "normal" | "grenade" | "soviet" ;
+	special: "normal" | "grenade" | "soviet" | "woodpile" ;
 }
 
 export class CrateSupplier implements ObstacleSupplier {
@@ -24,13 +24,14 @@ export class CrateSupplier implements ObstacleSupplier {
 export default class Crate extends Obstacle {
 	static readonly TYPE = "crate";
 	type = Crate.TYPE;
-	special!: "normal" | "grenade" | "soviet";
+	special!: "normal" | "grenade" | "soviet" | "woodpile";
 	static crateImg = new Image();
 	static crateResidueImg = new Image();
 	static grenadeCrateImg = new Image();
 	static sovietCrateImg = new Image();
 	static plusCrateImg = new Image();
 	static cratePlusResidueImg = new Image();
+	static woodpileImg = new Image();
 
 	static {
 		OBSTACLE_SUPPLIERS.set(Crate.TYPE, new CrateSupplier());
@@ -41,6 +42,7 @@ export default class Crate extends Obstacle {
 		this.cratePlusResidueImg.src = "assets/" + getMode() + "/images/game/objects/residues/crate_plus.svg";
 		this.grenadeCrateImg.src = "assets/" + getMode() + "/images/game/objects/grenade_crate.svg";
 		this.sovietCrateImg.src = "assets/" + getMode() + "/images/game/objects/crate_plus.svg";
+		this.woodpileImg.src = "assets/" + getMode() + "/images/game/objects/woodpile.svg";
 	}
 
 	copy(minObstacle: MinObstacle & AdditionalObstacle) {
@@ -56,6 +58,9 @@ export default class Crate extends Obstacle {
 				break;
 			case "soviet":
 				img = Crate.sovietCrateImg;
+				break;
+			case "woodpile":
+				img = Crate.woodpileImg;
 				break;
 			default:
 				img = Crate.crateImg;

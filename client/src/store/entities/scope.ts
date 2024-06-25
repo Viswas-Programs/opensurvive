@@ -1,4 +1,6 @@
 import { ENTITY_SUPPLIERS } from ".";
+import { getMode } from "../../homepage";
+import { getScopeImagePath } from "../../textures";
 import { Entity } from "../../types/entity";
 import { MinEntity } from "../../types/minimized";
 import { EntitySupplier } from "../../types/supplier";
@@ -16,6 +18,7 @@ class ScopeSupplier implements EntitySupplier {
 }
 
 export default class Scope extends Entity {
+	static readonly helmetImages: HTMLImageElement[] = Array(15).fill(undefined);
 	static readonly TYPE = "scope";
 	type = Scope.TYPE;
 	zoom!: number;
@@ -40,16 +43,35 @@ export default class Scope extends Entity {
 		const radius = scale * this.hitbox.comparable;
 		ctx.translate(canvas.width / 2 + relative.x * scale, canvas.height / 2 + relative.y * scale);
 		ctx.rotate(-this.direction.angle());
-		ctx.strokeStyle = "#000";
-		ctx.lineWidth = scale * 0.1;
-		circleFromCenter(ctx, 0, 0, radius, false, true);
-		ctx.fillStyle = "#00000066"; // <- alpha/opacity
-		circleFromCenter(ctx, 0, 0, radius, true, false);
-		ctx.textAlign = "center";
-		ctx.textBaseline = "middle";
-		ctx.fillStyle = "#fff";
-		ctx.font = `${canvas.height / 54}px Arial`;
-		ctx.fillText(`${this.zoom}x`, 0, 0);
-		ctx.resetTransform();
+		if (getMode() == "classic") {
+			ctx.strokeStyle = "#000";
+			ctx.lineWidth = scale * 0.1;
+			circleFromCenter(ctx, 0, 0, radius, false, true);
+			ctx.fillStyle = "#00000066"; // <- alpha/opacity
+			circleFromCenter(ctx, 0, 0, radius, true, false);
+			ctx.textAlign = "center";
+			ctx.textBaseline = "middle";
+			ctx.fillStyle = "#fff";
+			ctx.font = `${canvas.height / 54}px Arial`;
+			ctx.fillText(`${this.zoom}x`, 0, 0);
+			ctx.resetTransform();
+		}
+		else {
+			const img = Scope.helmetImages[this.zoom -1];
+			if (!img?.complete) {
+				if (!img) {
+					const image = new Image();
+					image.src = getScopeImagePath(this.zoom);
+					Scope.helmetImages[this.zoom - 1] = image;
+				}
+				ctx.textAlign = "center";
+				ctx.textBaseline = "middle";
+				ctx.fillStyle = "#fff";
+				ctx.font = `${canvas.height / 54}px Arial`;
+				ctx.fillText(`${this.zoom}x`, 0, 0);
+			} else
+				ctx.drawImage(img, -0.6 * radius, -0.6 * radius, 1.2 * radius, 1.2 * radius);
+			ctx.resetTransform();
+		}
 	}
 }

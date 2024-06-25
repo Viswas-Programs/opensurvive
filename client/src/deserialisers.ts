@@ -167,7 +167,7 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
             const minEntity = Object.assign(baseMinEntity, {
                 level: stream.readInt8(),
                 hitbox: <MinHitbox>{
-                    type:"circle", radius:1}
+                    type:"circle", radius:1.5}
                 }
             )
             entities.push(minEntity);
@@ -176,7 +176,7 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
             const minEntity = Object.assign(baseMinEntity, {
                 zoom: stream.readInt8(),
                 hitbox: <MinHitbox>{
-                    type: "circle", radius: 1
+                    type: "circle", radius: 1.5
                 }            })
             entities.push(minEntity);
         }

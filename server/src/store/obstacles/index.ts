@@ -18,6 +18,7 @@ export { default as ToiletMore } from "./toilet_more";
 export { default as Table } from "./table";
 export { default as Desk } from "./desk";
 export { default as Box } from "./box";
+export { default as Log } from  "./log"
 export function castObstacle(data: ObstacleData) {
 	return OBSTACLE_SUPPLIERS.get(data.type)?.create(data);
 }
