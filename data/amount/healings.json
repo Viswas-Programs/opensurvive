@@ -1,26 +1,26 @@
 [
 	{
 		"swiss_roll": 5,
-		"pie": 1,
-		"coffee": 2,
+		"medkit": 1,
+		"energy_drink": 2,
 		"chocolate": 1
 	},
 	{
 		"swiss_roll": 10,
-		"pie": 2,
-		"coffee": 5,
+		"medkit": 2,
+		"energy_drink": 5,
 		"chocolate": 2
 	},
 	{
 		"swiss_roll": 15,
-		"pie": 3,
-		"coffee": 10,
+		"medkit": 3,
+		"energy_drink": 10,
 		"chocolate": 3
 	},
 	{
 		"swiss_roll": 30,
-		"pie": 4,
-		"coffee": 15,
+		"medkit": 4,
+		"energy_drink": 15,
 		"chocolate": 4
 	}
 ]

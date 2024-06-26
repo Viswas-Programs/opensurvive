@@ -4,12 +4,12 @@
 		"weight": 10,
 		"amount": 5
 	},
-	"pie": {
+	"medkit": {
 		"rarity": 2,
 		"weight": 4,
 		"amount": 1
 	},
-	"coffee": {
+	"energy_drink": {
 		"rarity": 1,
 		"weight": 8,
 		"amount": 1
