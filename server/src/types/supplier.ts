@@ -55,8 +55,6 @@ export abstract class MapObstacleSupplier implements Supplier<Obstacle> {
 // This must be put below MapTerrainSupplier
 import { castTerrain } from "../store/terrains";
 import { Roof, castObstacle } from "../store/obstacles";
-import { BUILDING_SUPPLIERS, castBuilding } from "../store/buildings";
-function _supplySubBuildings() { }
 export class BuildingSupplier implements Supplier<Building> {
 	id: string;
 	data: BuildingData;

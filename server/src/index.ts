@@ -20,6 +20,7 @@ import Helmet from "./store/entities/helmet";
 import { GunColor } from "./types/misc";
 import Building from "./types/building";
 import Healing from "./store/entities/healing";
+import Vest from "./store/entities/vest";
 
 export var ticksElapsed = 0;
 
@@ -163,12 +164,6 @@ server.on("connection", async socket => {
 	// Send the player initial objects
 	send(socket, new GamePacket(world.entities, world.obstacles.concat(...world.buildings.map(b => b.obstacles.map(o => o.obstacle))), player, world.playerCount, true));
 	playerInitialPacketsSent.set(socket, true);
-	// Send the player music
-
-	const HHH = new Healing("energy_drink", 1)
-	HHH.position = player.position.addVec(Vec2.fromArray([1, 1]))
-	world.entities.push(HHH)
-	for (const sound of world.joinSounds) sendBitstream(socket, new SoundPacket(sound.path, sound.position));
 	sendBitstream(socket, new PlayerTickPkt(player));
 	// If the client doesn't ping for 30 seconds, we assume it is a disconnection.
 	const timeout = setTimeout(() => {

@@ -7,6 +7,13 @@ import { MinMinObstacle, MinObstacle } from "./minimized";
 import { CollisionType } from "./misc";
 import { World } from "./world";
 
+function checkForObsZONEOBSCollision(world: World, position: Vec2): boolean {
+	let OBSCollided = false;
+	world.buildings.forEach(building => {
+		if (building.zoneHitboxForObstacles!.inside(position, building.position, building.direction)) OBSCollided = true;
+	})
+	return OBSCollided
+}
 export class Obstacle {
 	id: string;
 	type = "";
@@ -40,7 +47,11 @@ export class Obstacle {
 		this.maxHealth = maxHealth;
 		do {
 			this.position = world.size.scale(Math.random(), Math.random());
-		} while (world.terrainAtPos(this.position).id != world.defaultTerrain.id || world.obstacles.find(obstacle => obstacle.collided(this)) || world.buildings.some(b => b.obstacles.find(o => o.obstacle.type === Roof.ID)?.obstacle.collided(this)));
+		} while (world.terrainAtPos(this.position).id != world.defaultTerrain.id ||
+			world.obstacles.find(obstacle => obstacle.collided(this)) ||
+			world.buildings.some(b => b.obstacles.find(o => o.obstacle.type === Roof.ID)?.obstacle.collided(this)) || 
+			checkForObsZONEOBSCollision(world, this.position)
+		);
 	}
 
 	damage(dmg: number, damager?: string) {
