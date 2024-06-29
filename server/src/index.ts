@@ -6,7 +6,7 @@ import { ID, receive, send, wait, sendBitstream} from "./utils";
 import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ScopeUpdatePacket, ServerSideScopeUpdate, PlayerTickPkt } from "./types/packet";
 import { DIRECTION_VEC, TICKS_PER_SECOND } from "./constants";
 import { CircleHitbox, CommonAngles, RectHitbox, Vec2 } from "./types/math";
-import { Ammo, Gun, Player } from "./store/entities";
+import { Ammo, Bullet, Gun, Player } from "./store/entities";
 import { World } from "./types/world";
 import { Plain, castMapTerrain } from "./store/terrains";
 import { castMapObstacle, Crate } from "./store/obstacles";
@@ -21,6 +21,7 @@ import { GunColor } from "./types/misc";
 import Building from "./types/building";
 import Healing from "./store/entities/healing";
 import Vest from "./store/entities/vest";
+import { Obstacle } from "./types/obstacle";
 
 export var ticksElapsed = 0;
 
@@ -275,7 +276,11 @@ server.on("connection", async socket => {
 		}
 	});
 });
-
+setInterval(() => {
+	world.entities.forEach(entity => {
+		if (entity.type == "bullet") (entity as Bullet).collisionCheck(world.entities, world.obstacles)
+	})
+}, 5)
 setInterval(() => {
 	world.tick();
 	// Filter players from entities and send them packets

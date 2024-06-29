@@ -32,12 +32,7 @@ export default class Bullet extends Entity {
 		this.allocBytes += this.type.length;
 		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
-
-	tick(entities: Entity[], obstacles: Obstacle[]) {
-		const lastPos = this.position;
-		super.tick(entities, obstacles);
-		this.distanceSqr += this.position.addVec(lastPos.inverse()).magnitudeSqr();
-		if (this.distanceSqr >= 10000) this.dmg *= this.falloff;
+	collisionCheck(entities: Entity[], obstacles: Obstacle[]) {
 		var combined: (Entity | Obstacle)[] = [];
 		combined = combined.concat(entities, obstacles);
 		if (!this.despawn)
@@ -49,6 +44,13 @@ export default class Bullet extends Entity {
 					break;
 				}
 			}
+	}
+	tick(entities: Entity[], obstacles: Obstacle[]) {
+		const lastPos = this.position;
+		super.tick(entities, obstacles);
+		this.distanceSqr += this.position.addVec(lastPos.inverse()).magnitudeSqr();
+		if (this.distanceSqr >= 10000) this.dmg *= this.falloff;
+		this.collisionCheck(entities, obstacles);
 		// In case the bullet is moving too fast, check for hitbox intersection
 		/*if (!this.despawn)
 			for (const thing of combined) {

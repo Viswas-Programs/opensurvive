@@ -136,8 +136,8 @@ export class World {
 		// Remove all discardable obstacles
 		for (ii = removable.length - 1; ii >= 0; ii--) this.obstacles.splice(removable[ii], 1);
 
-		// Tick red zone
-		if (this.zoneActive) {
+		// Tick red zone [DISABLED]
+		/*if (this.zoneActive) {
 			this.zoneTick--;
 			if (!this.zoneTick) {
 				this.zoneMoving = !this.zoneMoving;
@@ -165,7 +165,7 @@ export class World {
 				this.safeZone.position = this.safeZone.oPosition.addVec(vec.scaleAll((this.zoneData[this.zoneStep].move * TICKS_PER_SECOND - this.zoneTick) / (this.zoneData[this.zoneStep].move * TICKS_PER_SECOND)));
 				this.safeZone.hitbox = new CircleHitbox((this.safeZone.oHitbox.radius - this.nextSafeZone.hitbox.radius) * this.zoneTick / (this.zoneData[this.zoneStep].move * TICKS_PER_SECOND) + this.nextSafeZone.hitbox.radius);
 			}
-		}
+		}*/
 	}
 
 	// Called after data are sent to clients
