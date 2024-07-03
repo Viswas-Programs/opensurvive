@@ -211,7 +211,7 @@ export class ReloadWeaponPacket extends IPacketCLIENT {
 //notify to cancel any actions going on 
 export class CancelActionsPacket extends IPacketCLIENT {
 	type = "cancelAct";
-	allocBytes = 2 + 25;
+	allocBytes = 12;
 }
 
 // Packet to notify healing item usage

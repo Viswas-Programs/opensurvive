@@ -9,7 +9,7 @@ import { FullPlayer, Healing } from "./store/entities";
 import { castObstacle, castMinObstacle, Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table, Box } from "./store/obstacles";
 import { castTerrain } from "./store/terrains";
 import { Vec2 } from "./types/math";
-import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta, ScopeUpdatePacket, ServerScopeUpdatePacket, ServerPacketResolvable } from "./types/packet";
+import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta, ScopeUpdatePacket, ServerScopeUpdatePacket, ServerPacketResolvable, CancelActionsPacket } from "./types/packet";
 import { World } from "./types/world";
 import { receive, send } from "./utils";
 import Building from "./types/building";
@@ -498,6 +498,8 @@ window.onkeydown = (event) => {
 			send(ws, new InteractPacket());
 		else if (event.key == KeyBind.RELOAD)
 			send(ws, new ReloadWeaponPacket());
+		else if (event.key == KeyBind.CANCEL)
+			send(ws, new CancelActionsPacket())
 		else if (!isNaN(parseInt(event.key)))
 			send(ws, new SwitchWeaponPacket(parseInt(event.key) - 1, true));
 	}
