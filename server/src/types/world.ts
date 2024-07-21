@@ -85,7 +85,7 @@ export class World {
 		// Loop from last to first
 		for (let ii = this.terrains.length - 1; ii >= 0; ii--) {
 			const terrain = this.terrains[ii];
-			if (terrain.inside(position)) return terrain;
+			if (terrain.inside(position, false)) return terrain;
 		}
 		return this.defaultTerrain;
 	}

@@ -17,7 +17,7 @@ export default class Building {
 	color?: number;
 	zoneHitbox?: CircleHitbox;
 	subBuilding?: Building
-	zoneHitboxForObstacles?: CircleHitbox
+	zoneHitboxForObstacles?: RectHitbox
 
 	constructor() {
 		this.id = ID();
@@ -43,19 +43,17 @@ export default class Building {
 			fl.terrain.setPosition(this.position.addVec(fl.position));
 		}
 		let radiusForZoneHitbox = 15;
-		let radiusForZoneObsHitbox = 2;
 		this.zones.forEach(zone => {
 			if ((zone.hitbox as RectHitbox).width > (zone.hitbox as RectHitbox).height) {
 				radiusForZoneHitbox += (zone.hitbox as RectHitbox).width
-				radiusForZoneObsHitbox += (zone.hitbox as RectHitbox).width
 			}
 			else {
 				radiusForZoneHitbox += (zone.hitbox as RectHitbox).height
-				radiusForZoneObsHitbox += (zone.hitbox as RectHitbox).height
 			}
 		})
+		const combinedZoneHitboxForObs = new RectHitbox(0, 0)
 		this.zoneHitbox = new CircleHitbox(radiusForZoneHitbox)
-		this.zoneHitboxForObstacles = new CircleHitbox(radiusForZoneObsHitbox)
+		this.zoneHitboxForObstacles = combinedZoneHitboxForObs
 	}
 
 	setDirection(direction: Vec2) {

@@ -10,7 +10,9 @@ import { World } from "./world";
 function checkForObsZONEOBSCollision(world: World, position: Vec2): boolean {
 	let OBSCollided = false;
 	world.buildings.forEach(building => {
-		if (building.zoneHitboxForObstacles!.inside(position, building.position, building.direction)) OBSCollided = true;
+		building.floors.forEach(floor => {
+			if (floor.terrain.inside(position, true )) OBSCollided = true
+		})
 	})
 	return OBSCollided
 }
