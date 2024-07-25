@@ -2,27 +2,19 @@
 import "dotenv/config";
 import { readFileSync } from "fs";
 import * as ws from "ws";
-import { ID, receive, send, wait, sendBitstream} from "./utils";
+import { ID, send, wait, sendBitstream, spawnGun} from "./utils";
 import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ScopeUpdatePacket, ServerSideScopeUpdate, PlayerTickPkt } from "./types/packet";
 import { DIRECTION_VEC, TICKS_PER_SECOND } from "./constants";
-import { CircleHitbox, CommonAngles, RectHitbox, Vec2 } from "./types/math";
-import { Ammo, Bullet, Gun, Player } from "./store/entities";
+import {  CommonAngles, RectHitbox, Vec2 } from "./types/math";
+import { Bullet, Player } from "./store/entities";
 import { World } from "./types/world";
 import { Plain, castMapTerrain } from "./store/terrains";
-import { castMapObstacle, Crate } from "./store/obstacles";
+import { castMapObstacle } from "./store/obstacles";
 import { castBuilding } from "./store/buildings";
-import { BuildingData, MapBuildingData, MapData } from "./types/data";
+import { MapBuildingData, MapData } from "./types/data";
 import { IslandrBitStream } from "./packets"
-import { Socket } from "net";
-import Backpack from "./store/entities/backpack";
-import Scope from "./store/entities/scope";
-import Helmet from "./store/entities/helmet";
 import { GunColor } from "./types/misc";
 import Building from "./types/building";
-import Healing from "./store/entities/healing";
-import Vest from "./store/entities/vest";
-import { Obstacle } from "./types/obstacle";
-
 export var ticksElapsed = 0;
 
 const server = new ws.Server({ port: 8080 });
@@ -161,6 +153,7 @@ server.on("connection", async socket => {
 	const player = new Player(id, username, skin, deathImg, accessToken, isMobile);
 	world.addPlayer(player);
 	// Send the player the entire map
+	const gun = spawnGun("m18", GunColor.YELLOW, player.position, 80)
 	send(socket, new MapPacket(world.obstacles, world.buildings, world.terrains.concat(...world.buildings.map(b => b.floors.map(fl => fl.terrain)))));
 	// Send the player initial objects
 	send(socket, new GamePacket(world.entities, world.obstacles.concat(...world.buildings.map(b => b.obstacles.map(o => o.obstacle))), player, world.playerCount, true));

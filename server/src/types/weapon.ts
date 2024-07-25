@@ -106,7 +106,7 @@ export class GunWeapon extends Weapon {
 	reloadTicks: number;
 	reloadBullets: number;
 	capacity: number;
-
+	particleToDisplay: string
 	// Actual variables
 	magazine = 0;
 
@@ -123,6 +123,7 @@ export class GunWeapon extends Weapon {
 		this.reloadTicks = ((data.normal.reload.time / 1000) * (60))/1.5;
 		this.reloadBullets = data.normal.reload.bullets || data.normal.capacity;
 		this.capacity = data.normal.capacity;
+		this.particleToDisplay = data.visuals.particleToDisplay
 	}
 
 	attack(attacker: Entity, _entities: Entity[], _obstacles: Obstacle[]) {
@@ -133,12 +134,18 @@ export class GunWeapon extends Weapon {
 	shoot(attacker: Entity) {
 		if (!attacker.despawn && this.magazine > 0) {
 			this.magazine--;
+			let angles = attacker.direction.angle() + toRadians((Math.random() - 0.5) * (attacker.velocity.magnitudeSqr() != 0 ? this.moveSpread : this.spread));
+			let position = attacker.position.addVec(this.offset.addAngle(attacker.direction.angle()));
+			world.particles.push(new Particle(this.particleToDisplay, position, 0.25))
+			console.log(world.particles)
 			for (let ii = 0; ii < this.bullets; ii++) {
-				var angles = attacker.direction.angle() + toRadians((Math.random() - 0.5) * (attacker.velocity.magnitudeSqr() != 0 ? this.moveSpread : this.spread));
-				const position = attacker.position.addVec(this.offset.addAngle(attacker.direction.angle()));
+				angles = attacker.direction.angle() + toRadians((Math.random() - 0.5) * (attacker.velocity.magnitudeSqr() != 0 ? this.moveSpread : this.spread));
+				position = attacker.position.addVec(this.offset.addAngle(attacker.direction.angle()));
 				const bullet = new Bullet(attacker, this.bullet.damage, Vec2.UNIT_X.addAngle(angles).scaleAll(this.bullet.speed / TICKS_PER_SECOND), randomBetween(this.bullet.range[0], this.bullet.range[1]) / (this.bullet.speed / TICKS_PER_SECOND), this.bullet.falloff, this.tracer);
+				
 				bullet.position = position;
 				world.entities.push(bullet);
+				
 			}
 		}
 	}

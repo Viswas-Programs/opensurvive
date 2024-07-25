@@ -56,6 +56,7 @@ export type GunData = {
 		tracer: TracerData
 		animations: string[]
 		hasBarrelImage: boolean
+		particleToDisplay: string
 	}
 	fistPositions?: Array<number>
 }

@@ -40,7 +40,8 @@
 			"length": 0.3
 		},
 		"animations": [ "medium_recoil" ],
-		"hasBarrelImage": true
+		"hasBarrelImage": true,
+		"particleToDisplay": "case_small"
 	},
 	"fistPositions": [0, 0.2]
 }

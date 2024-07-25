@@ -7,11 +7,10 @@ import { CircleHitbox, Vec2 } from "../../types/math";
 import { CollisionType, GunColor } from "../../types/misc";
 import { Obstacle } from "../../types/obstacle";
 import { Particle } from "../../types/particle";
-import { GunWeapon, Weapon, WeaponType } from "../../types/weapon";
+import { GunWeapon, WeaponType } from "../../types/weapon";
 import { addKillCounts, changeCurrency, spawnAmmo, spawnGun } from "../../utils";
 import { Roof } from "../obstacles";
 import { Pond, River, Sea } from "../terrains";
-import Ammo from "./ammo";
 import Backpack from "./backpack";
 import Healing from "./healing";
 import Helmet from "./helmet";
@@ -171,12 +170,18 @@ export default class Player extends Entity {
 		if (!breaked) this.canInteract = false;
 		// Only attack when trying + not attacking + there's a weapon
 		if (this.tryAttacking && this.attackLock <= 0 && weapon) {
-			weapon.attack(this, entities, obstacles);
-			this.attackLock = weapon.lock;
-			this.maxReloadTicks = this.reloadTicks = 0;
-			this.maxHealTicks = this.healTicks = 0;
-			if (!weapon.auto) this.tryAttacking = false;
-			this.markDirty();
+			function _attack(playerInstance: Player) {
+				if (weapon.type == WeaponType.GUN && (<GunWeapon>weapon).magazine == 0) return;
+				weapon.attack(playerInstance, entities, obstacles);
+				playerInstance.attackLock = weapon.lock;
+				playerInstance.maxReloadTicks = playerInstance.reloadTicks = 0;
+				playerInstance.maxHealTicks = playerInstance.healTicks = 0;
+				if (!weapon.auto) playerInstance.tryAttacking = false;
+				playerInstance.markDirty();
+			}
+			_attack(this)
+			
+			
 		}
 		// Building collision handling
 		const rooflessAdd = new Set<string>();
