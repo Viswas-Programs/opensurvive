@@ -238,13 +238,17 @@ async function init(address: string) {
 							scope: (stream as IslandrBitStream).readInt8()
 						}
 						const scopeChangePkt = <ScopeUpdatePacket>data;
-						const scopeElement = (scopes?.children.item(scopeList.indexOf(scopeChangePkt.scope)) as HTMLElement);
+						for (let ii = 0; ii < scopes!.children.length; ii++) {
+							(<HTMLElement>scopes?.children.item(ii)).style.background = "rgba(55, 55, 55, 0.5)";
+						}
+						const scopeElement = (scopes?.children.item(scopeList.indexOf(Number(scopeChangePkt.scope))) as HTMLElement);
+						console.log(scopeElement)
 						scopeElement.style.display = "block";
 						scopeElement.style.background = "rgba(55, 55, 55, 1.5)"
+						
 						scopeElement.addEventListener("click", () => {
-							if (scopeElement.textContent!.includes(String(_selectedScope))) return;
 							_selectedScope = scopeChangePkt.scope
-							send(ws, new ServerScopeUpdatePacket((scopeElement.textContent?.replace("x", "") as unknown) as number))
+							send(ws, new ServerScopeUpdatePacket(Number(scopeElement.textContent?.replace("x", "") as unknown)))
 							for (let ii = 0; ii < scopeList.length; ii++) {
 								if (_selectedScope == scopeList[ii]) {
 									(scopes?.children.item(ii) as HTMLElement).style.background = "rgba(55, 55, 55, 1.5)"
@@ -271,11 +275,7 @@ async function init(address: string) {
 			player = null;
 			setUsrnameIdDeathImg([null, null, null])
 			res(undefined);
-			for (const element of document.getElementsByClassName("healing-panel")) {
-				element.classList.remove("enabled");
-				element.classList.add("disabled");
-				element.textContent = "0";
-			}
+			Healing.setupHud()
 			for (const ammoElement of document.getElementsByClassName("ammos")) {
 				ammoElement.textContent = "";
 			}

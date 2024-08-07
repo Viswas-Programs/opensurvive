@@ -1,7 +1,7 @@
 import { ENTITY_SUPPLIERS, Healing } from ".";
 import { LANG } from "../../constants";
 import { translate } from "../../languages";
-import { getWeaponImagePath } from "../../textures";
+import { getWeaponHUDImagePath } from "../../textures";
 import { Entity, Inventory, PartialInventory } from "../../types/entity";
 import { MinEntity, MinInventory } from "../../types/minimized";
 import { EntitySupplier } from "../../types/supplier";
@@ -99,7 +99,7 @@ export default class Player extends Entity {
 				if (ii == inventory.holding) weaponPanelDivs[ii].classList.add("selected");
 				else weaponPanelDivs[ii].classList.remove("selected");
 				weaponNameDivs[ii].innerHTML = inventory.weapons[ii]?.nameId ? translate(LANG, `hud.weapon.${inventory.weapons[ii]?.nameId}`) : "&nbsp;";
-				const path = getWeaponImagePath(inventory.weapons[ii]?.nameId);
+				const path = getWeaponHUDImagePath(inventory.weapons[ii]?.nameId);
 				if (weaponImages[ii].path != path) {
 					weaponImages[ii].path = path;
 					weaponImages[ii].src = path;

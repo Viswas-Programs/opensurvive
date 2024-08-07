@@ -15,6 +15,7 @@ import { MapBuildingData, MapData } from "./types/data";
 import { IslandrBitStream } from "./packets"
 import { GunColor } from "./types/misc";
 import Building from "./types/building";
+import Scope from "./store/entities/scope";
 export var ticksElapsed = 0;
 
 const server = new ws.Server({ port: 8080 });
@@ -153,7 +154,9 @@ server.on("connection", async socket => {
 	const player = new Player(id, username, skin, deathImg, accessToken, isMobile);
 	world.addPlayer(player);
 	// Send the player the entire map
-	const gun = spawnGun("m18", GunColor.YELLOW, player.position, 80)
+	const scope = new Scope(4)
+	scope.position = player.position
+	world.entities.push(scope)
 	send(socket, new MapPacket(world.obstacles, world.buildings, world.terrains.concat(...world.buildings.map(b => b.floors.map(fl => fl.terrain)))));
 	// Send the player initial objects
 	send(socket, new GamePacket(world.entities, world.obstacles.concat(...world.buildings.map(b => b.obstacles.map(o => o.obstacle))), player, world.playerCount, true));
@@ -262,6 +265,7 @@ server.on("connection", async socket => {
 				data.deserialise(stream);
 				player.inventory.selectScope(Number(data.scope))
 				player.changedScope = true;
+				sendBitstream(socket, new ScopeUpdatePacket(Number(data.scope)))
 				break;
 			case "cancelAct":
 				player.healTicks = 0;
@@ -288,7 +292,7 @@ setInterval(() => {
 		//for (const sound of world.onceSounds) sendBitstream(socket, new SoundPacket(sound.path, sound.position));
 		for (const killFeed of world.killFeeds) sendBitstream(socket, new AnnouncePacket(killFeed.killFeed, killFeed.killer))
 		if (player.changedScope) {
-			setTimeout(() => { sendBitstream(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false; }, 40) }
+			sendBitstream(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false; }
 	});
 	world.postTick();
 }, 1000 / TICKS_PER_SECOND);

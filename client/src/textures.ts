@@ -5,6 +5,11 @@ export function getWeaponImagePath(id: string) {
 	return id ? `assets/${getMode()}/images/game/loots/weapons/${id}.svg` : "";
 }
 
+export function getWeaponHUDImagePath(id: string) {
+	return id ? `assets/${getMode()}/images/game/HUD/guns/ghi_${id}.svg` : "";
+}
+
+
 export function getBarrelImagePath(id: string) {
 	return `assets/${getMode()}/images/game/guns/${id}.svg`;
 }
@@ -24,6 +29,10 @@ export function getVestImagePath(level: number) {
 
 export function getHealingImagePath(id: string) {
 	return `assets/${getMode()}/images/game/loots/healings/${id}.svg`;
+}
+
+export function getHealingHUDImagePath(id: string) {
+	return `assets/${getMode()}/images/game/HUD/healings/${id}.svg`;
 }
 
 export function getParticleImagePath(id: string) {
