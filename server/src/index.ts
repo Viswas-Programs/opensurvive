@@ -4,7 +4,7 @@ import { readFileSync } from "fs";
 import * as ws from "ws";
 import { ID, send, wait, sendBitstream, spawnGun} from "./utils";
 import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ScopeUpdatePacket, ServerSideScopeUpdate, PlayerTickPkt } from "./types/packet";
-import { DIRECTION_VEC, TICKS_PER_SECOND } from "./constants";
+import { DIRECTION_VEC, RecvPacketTypes, TICKS_PER_SECOND } from "./constants";
 import {  CommonAngles, RectHitbox, Vec2 } from "./types/math";
 import { Bullet, Player } from "./store/entities";
 import { World } from "./types/world";
@@ -175,23 +175,23 @@ server.on("connection", async socket => {
 		const stream = new IslandrBitStream(msg)
 		const type = stream.readPacketType()
 		switch (type) {
-			case "ping":
+			case RecvPacketTypes.PING:
 				timeout.refresh();
 				break;
-			case "movementReset":
+			case RecvPacketTypes.MOV_RESET:
 				player.setVelocity(Vec2.ZERO)
 				break;
-			case "playerRotation":
+			case RecvPacketTypes.PL_ROATION:
 				const RotationPacket = new PlayerRotationDelta()
 				RotationPacket.deserialise(stream)
 				player.setDirection(new Vec2(Math.cos(RotationPacket.angle) * 1.45, Math.sin(RotationPacket.angle) * 1.45))
 				break;
-			case "mobilemovement":
+			case RecvPacketTypes.MOBILE_MOV:
 				const MMvPacket = new MobileMovementPacket()
 				MMvPacket.deserialise(stream)
 				player.setVelocity(new Vec2(Math.cos(MMvPacket.direction) * 1.45, Math.sin(MMvPacket.direction) * 1.45))
 				break;
-			case "movementpress":
+			case RecvPacketTypes.MOV_PRESS:
 				// Make the direction true
 				const mvPPacket = new MovementPressPacket()
 				mvPPacket.deserialise(stream)
@@ -201,7 +201,7 @@ server.on("connection", async socket => {
 				for (let ii = 0; ii < movements.length; ii++) if (movements[ii]) angleVec = angleVec.addVec(DIRECTION_VEC[ii]);
 				player.setVelocity(angleVec.unit());
 				break;
-			case "movementrelease":
+			case RecvPacketTypes.MOV_REL:
 				// Make the direction false
 				const mvRPacket = new MovementReleasePacket();
 				mvRPacket.deserialise(stream)
@@ -212,28 +212,28 @@ server.on("connection", async socket => {
 				player.setVelocity(angleVec.unit());
 				break;
 			// Very not-done. Will probably change to "attack" and "use" tracking.
-			case "mousepress":
+			case RecvPacketTypes.MOS_PRESS:
 				const msPresspkt = new MousePressPacket()
 				msPresspkt.deserialise(stream)
 				buttons.set((msPresspkt).button, true);
 				if (buttons.get(0)) player.tryAttacking = true;
 				break;
-			case "mouserelease":
+			case RecvPacketTypes.MOS_REL:
 				const msReleasePkt = new MouseReleasePacket()
 				msReleasePkt.deserialise(stream);
 				buttons.set(msReleasePkt.button, false);
 				if (!buttons.get(0)) player.tryAttacking = false;
 				break;
-			case "mousemove":
+			case RecvPacketTypes.MOUSEMOVE:
 				const mMvPacket = new MouseMovePacket();
 				mMvPacket.deserialise(stream);
 				// { x, y } will be x and y offset of the client from the centre of the screen.
 				player.setDirection(new Vec2(mMvPacket.x, mMvPacket.y));
 				break;
-			case "interact":
+			case RecvPacketTypes.INTERACT:
 				player.tryInteracting = true;
 				break;
-			case "switchweapon":
+			case RecvPacketTypes.SW_WEAPON:
 				const swPacket = new SwitchWeaponPacket();
 				swPacket.deserialise(stream)
 				if (swPacket.setMode) {
@@ -252,22 +252,22 @@ server.on("connection", async socket => {
 					player.inventory.holding = holding;
 				}
 				break;
-			case "reloadweapon":
+			case RecvPacketTypes.REL_WEAPON:
 				player.reload();
 				break;
-			case "usehealing":
+			case RecvPacketTypes.HEAL:
 				const healPkt = new UseHealingPacket()
 				healPkt.deserialise(stream);
 				player.heal((healPkt).item);
 				break;
-			case "srvrScopeUpd":
+			case RecvPacketTypes.SR_SCOPE_UPD:
 				const data = (new ServerSideScopeUpdate());
 				data.deserialise(stream);
 				player.inventory.selectScope(Number(data.scope))
 				player.changedScope = true;
 				sendBitstream(socket, new ScopeUpdatePacket(Number(data.scope)))
 				break;
-			case "cancelAct":
+			case RecvPacketTypes.CANCEL_ACT:
 				player.healTicks = 0;
 				player.reloadTicks = 0;
 		}

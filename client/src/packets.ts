@@ -7,8 +7,8 @@ export class IslandrBitStream extends BitStream {
     static alloc(buffer_length: number) {
         return new IslandrBitStream(new ArrayBuffer(buffer_length))
     }
-    writePacketType(type: string) {
-        this.writeASCIIString(type)
+    writePacketType(type: number) {
+        this.writeInt8(type)
     }
     writeNumber(size: number) {
         this.writeInt32(size)
@@ -53,7 +53,7 @@ export class IslandrBitStream extends BitStream {
         return this.readASCIIString()
     }
     readPacketType() {
-        return this.readASCIIString()
+        return this.readInt8()
     }
     readNumber() {
         return this.readInt32()

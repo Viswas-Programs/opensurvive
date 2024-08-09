@@ -1,14 +1,15 @@
+import { OutPacketTypes, RecvPacketTypes } from "../constants";
 import { IslandrBitStream } from "../packets";
 import { Player } from "../store/entities";
 import { MinEntity, MinObstacle, MinMinObstacle, MinTerrain, MinVec2, MinBuilding, MinCircleHitbox, MinParticle } from "./minimized";
 import { MovementDirection } from "./misc";
 
 export interface IPacket {
-	type: string;
+	type: number;
 }
 
 export class IPacketCLIENT {
-	type!: string;
+	type!: number;
 	allocBytes!: number;
 	stream!: IslandrBitStream
 	serialise() {
@@ -23,8 +24,8 @@ export class IPacketCLIENT {
 
 // Packet to respond the server Ack
 export class ResponsePacket extends IPacketCLIENT {
-	allocBytes = 2 + 128;
-	type = "response";
+	allocBytes = 65;
+	type = OutPacketTypes.RESPONSE;
 	id: string;
 	username: string;
 	skin: string | null;
@@ -40,6 +41,7 @@ export class ResponsePacket extends IPacketCLIENT {
 		this.deathImg = deathImg;
 		this.accessToken = accessToken;
 		this.isMobile = isMobile
+		this.allocBytes += this.username.length
 	}
 	serialise() {
 		super.serialise()
@@ -56,15 +58,15 @@ export class ResponsePacket extends IPacketCLIENT {
 
 // Packet to ping the server
 export class PingPacket extends IPacketCLIENT {
-	type = "ping";
-	allocBytes = 2 + 25
+	type = OutPacketTypes.PING;
+	allocBytes = 1
 }
 
 // Packet to notify movement key press
 export class MovementPressPacket extends IPacketCLIENT {
-	type = "movementpress";
+	type = OutPacketTypes.MOV_PRESS;
 	direction: MovementDirection;
-	allocBytes = 2 + 27;
+	allocBytes = 2;
 
 	constructor(direction: MovementDirection) {
 		super()
@@ -77,14 +79,14 @@ export class MovementPressPacket extends IPacketCLIENT {
 }
 
 export class MovementResetPacket extends IPacketCLIENT {
-	type = "movementReset";
-	allocBytes = 2 + 25;
+	type = OutPacketTypes.MOV_RESET;
+	allocBytes = 1;
 }
 // Packet to notify movement key release
 export class MovementReleasePacket extends IPacketCLIENT {
-	type = "movementrelease";
+	type = OutPacketTypes.MOV_REL;
 	direction: MovementDirection;
-	allocBytes = 2 + 25;
+	allocBytes = 2;
 
 	constructor(direction: MovementDirection) {
 		super()
@@ -96,8 +98,8 @@ export class MovementReleasePacket extends IPacketCLIENT {
 	}
 }
 export class MovementPacket extends IPacketCLIENT {
-	type = "mobilemovement"
-	allocBytes = 2 + 27;
+	type = OutPacketTypes.MOBILE_MOV;
+	allocBytes = 2;
 	direction: number;
 	constructor(direction: number) {
 		super()
@@ -110,9 +112,9 @@ export class MovementPacket extends IPacketCLIENT {
 }
 
 export class PlayerRotationDelta extends IPacketCLIENT {
-	type = "playerRotation";
+	type = OutPacketTypes.PL_ROATION;
 	angle: number;
-	allocBytes = 2 + 27;
+	allocBytes = 2;
 	constructor(angle: number) { super(); this.angle = angle }
 	serialise() {
 		super.serialise();
@@ -121,9 +123,9 @@ export class PlayerRotationDelta extends IPacketCLIENT {
 }
 // Packet to notify mouse button press
 export class MousePressPacket extends IPacketCLIENT {
-	type = "mousepress";
+	type = OutPacketTypes.MOS_PRESS;
 	button: number;
-	allocBytes = 2 + 27;
+	allocBytes = 2;
 
 	constructor(button: number) {
 		super()
@@ -131,15 +133,15 @@ export class MousePressPacket extends IPacketCLIENT {
 	}
 	serialise() {
 		super.serialise();
-		this.stream.writeInt16(this.button);
+		this.stream.writeInt8(this.button);
 	}
 }
 
 // Packet to notify mouse button release
 export class MouseReleasePacket extends IPacketCLIENT {
-	type = "mouserelease";
+	type = OutPacketTypes.MOS_REL;
 	button: number;
-	allocBytes = 2 + 27;
+	allocBytes = 2;
 
 	constructor(button: number) {
 		super()
@@ -147,16 +149,16 @@ export class MouseReleasePacket extends IPacketCLIENT {
 	}
 	serialise() {
 		super.serialise();
-		this.stream.writeInt16(this.button)
+		this.stream.writeInt8(this.button)
 	}
 }
 
 // Packet to notify mouse movement
 export class MouseMovePacket extends IPacketCLIENT {
-	type = "mousemove";
+	type = OutPacketTypes.MOUSEMOVE;
 	x: number;
 	y: number;
-	allocBytes = 2 + 33;
+	allocBytes = 5;
 
 	constructor(x: number, y: number) {
 		super()
@@ -172,8 +174,8 @@ export class MouseMovePacket extends IPacketCLIENT {
 
 // Packet to notify interaction (e.g. pickup)
 export class InteractPacket extends IPacketCLIENT {
-	type = "interact";
-	allocBytes = 2 + 25;
+	type = OutPacketTypes.INTERACT;
+	allocBytes = 1;
 	serialise() {
 		super.serialise()
 	}
@@ -181,10 +183,10 @@ export class InteractPacket extends IPacketCLIENT {
 
 // Packet to notify weapon switching
 export class SwitchWeaponPacket extends IPacketCLIENT {
-	type = "switchweapon";
+	type = OutPacketTypes.SW_WEAPON;
 	delta: number;
 	setMode: boolean;
-	allocBytes = 2 + 27;
+	allocBytes = 3;
 
 	constructor(delta: number, setMode = false) {
 		super()
@@ -200,8 +202,8 @@ export class SwitchWeaponPacket extends IPacketCLIENT {
 
 // Packet to notify weapon reloading
 export class ReloadWeaponPacket extends IPacketCLIENT {
-	type = "reloadweapon";
-	allocBytes = 2 + 25;
+	type = OutPacketTypes.REL_WEAPON;
+	allocBytes = 1;
 
 	serialise() {
 		super.serialise()
@@ -210,15 +212,15 @@ export class ReloadWeaponPacket extends IPacketCLIENT {
 
 //notify to cancel any actions going on 
 export class CancelActionsPacket extends IPacketCLIENT {
-	type = "cancelAct";
-	allocBytes = 12;
+	type = OutPacketTypes.CANCEL_ACT;
+	allocBytes = 1;
 }
 
 // Packet to notify healing item usage
 export class UseHealingPacket extends IPacketCLIENT {
-	type = "usehealing";
+	type = OutPacketTypes.HEAL;
 	item: string;
-	allocBytes = 2 + 40
+	allocBytes = 16
 
 	constructor(item: string) {
 		super()
@@ -231,9 +233,9 @@ export class UseHealingPacket extends IPacketCLIENT {
 }
 
 export class ServerScopeUpdatePacket extends IPacketCLIENT {
-	type = "srvrScopeUpd";
+	type = OutPacketTypes.SR_SCOPE_UPD;
 	scope!: number;
-	allocBytes = 2 + 27;
+	allocBytes = 2;
 	constructor(scope: number) {
 		super()
 		this.scope = scope
@@ -243,16 +245,9 @@ export class ServerScopeUpdatePacket extends IPacketCLIENT {
 		this.stream.writeInt8(this.scope)
 	}
 }
-// Packet to notify interaction (e.g. pickup)
-
-// Packet to notify weapon switching
-
-// Packet to notify weapon reloading
-
-// Packet to notify healing item usage
 /// Packet from server acknowledgement
 export class AckPacket implements IPacket {
-	type = "ack";
+	type = RecvPacketTypes.ACK;
 	id!: string;
 	tps!: number;
 	size!: number[];
@@ -261,7 +256,7 @@ export class AckPacket implements IPacket {
 
 /// Packet from server containing game data
 export class GamePacket implements IPacket {
-	type = "game";
+	type = RecvPacketTypes.GAME;
 	entities!: MinEntity[];
 	obstacles!: MinObstacle[];
 	player!: any;
@@ -274,7 +269,7 @@ export class GamePacket implements IPacket {
 
 /// Packet from server containing map data
 export class MapPacket implements IPacket {
-	type = "map";
+	type = RecvPacketTypes.MAP;
 	obstacles!: MinMinObstacle[];
 	buildings!: MinBuilding[];
 	terrains!: MinTerrain[];
@@ -282,24 +277,24 @@ export class MapPacket implements IPacket {
 
 /// Packet from server about sound and its location
 export class SoundPacket implements IPacket {
-	type = "sound";
+	type = RecvPacketTypes.SOUND;
 	path!: string;
 	position!: MinVec2;
 }
 
 export class ParticlesPacket implements IPacket {
-	type = "particles";
+	type = RecvPacketTypes.PARTICLES;
 	particles!: MinParticle[];
 }
 
 export class AnnouncementPacket implements IPacket {
-	type = "announce";
+	type = RecvPacketTypes.ANNOUNCE;
 	announcement!: string;
 	killer!: string;
 }
 
 export class ScopeUpdatePacket implements IPacket {
-	type = "scopeUpdate";
+	type = RecvPacketTypes.SCOPEUPD;
 	scope!: number;
 
 }

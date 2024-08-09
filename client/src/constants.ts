@@ -15,7 +15,35 @@ export enum KeyBind {
 	RELOAD = "r",
 	CANCEL = "x"
 }
+export enum RecvPacketTypes {
+	GAME = 0,
+	MAP = 1,
+	PLAYERTICK = 2,
+	SOUND = 3,
+	PARTICLES = 4,
+	ANNOUNCE = 5,
+	SCOPEUPD = 6,
+	ACK = 7
+}
 
+export enum OutPacketTypes {
+	RESPONSE = 0,
+	PING = 1,
+	MOV_PRESS = 2,
+	MOV_REL = 3,
+	MOV_RESET = 4,
+	MOBILE_MOV = 5,
+	MOUSEMOVE = 6,
+	MOS_PRESS = 7,
+	MOS_REL = 8,
+	PL_ROATION = 9,
+	INTERACT = 10,
+	SW_WEAPON = 11,
+	REL_WEAPON = 12,
+	CANCEL_ACT = 13,
+	HEAL = 14,
+	SR_SCOPE_UPD = 15,
+}
 export const movementKeys = [KeyBind.RIGHT, KeyBind.UP, KeyBind.LEFT, KeyBind.DOWN].map(k => <string> k);
 
 export const GRID_INTERVAL = 20;

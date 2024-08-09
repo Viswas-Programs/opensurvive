@@ -1,7 +1,7 @@
 /* eslint-disable no-fallthrough */
 import $ from "jquery"
 import { Howl, Howler } from "howler";
-import { GunColor, KeyBind, movementKeys, TIMEOUT } from "./constants";
+import { GunColor, KeyBind, movementKeys, RecvPacketTypes, TIMEOUT } from "./constants";
 import { start, stop } from "./renderer";
 import { initMap } from "./rendering/map";
 import { addKeyPressed, addMousePressed, getToken, isKeyPressed, isMenuHidden, isMouseDisabled, removeKeyPressed, removeMousePressed, toggleBigMap, toggleHud, toggleMap, toggleMenu, toggleMinimap, toggleMouseDisabled } from "./states";
@@ -20,6 +20,7 @@ import { IslandrBitStream } from "./packets";
 import { MinTerrain, MinVec2 } from "./types/minimized";
 import { deserialiseDiscardables, deserialiseMinEntities, deserialiseMinObstacles, deserialiseMinParticles, deserialisePlayer, setUsrnameIdDeathImg } from "./deserialisers";
 import { inflate } from "pako";
+import { type } from "os";
 //handle users that tried to go to old domain name, or direct ip
 var urlargs = new URLSearchParams(window.location.search);
 if(urlargs.get("from")){
@@ -137,11 +138,11 @@ async function init(address: string) {
 			ws.onmessage = (event) => {
 				let bitstream = true;
 				let stream;
-				let packetType: string;
-				if (receive(event.data) && (receive(event.data)!.type == "game" || receive(event.data)!.type == "map")) { data = receive(event.data); bitstream = false; packetType = receive(event.data)!.type }
+				let packetType: number;
+				if (receive(event.data) && (receive(event.data)!.type == RecvPacketTypes.GAME || receive(event.data)!.type == RecvPacketTypes.MAP)) { data = receive(event.data); bitstream = false; packetType = receive(event.data)!.type }
 				else { stream = new IslandrBitStream(inflate(event.data).buffer); packetType = (stream as IslandrBitStream).readPacketType() } 
 				switch (packetType) {
-					case "map": {
+					case RecvPacketTypes.MAP: {
 						const mapPkt = <MapPacket>data;
 						world.terrains = mapPkt.terrains.map(ter => castTerrain(ter));
 						world.obstacles = <Obstacle[]>mapPkt.obstacles.map(obs => castObstacle(castMinObstacle(obs))).filter(obs => !!obs);
@@ -151,10 +152,10 @@ async function init(address: string) {
 						(document.querySelector("#playercountcontainer") as HTMLInputElement).style.display = "block";
 						break;
 					}
-					case "game": {
+					case RecvPacketTypes.GAME: {
 						if (bitstream) {
 							data = {
-								type: "game",
+								type: packetType,
 								entities: deserialiseMinEntities(stream as IslandrBitStream as IslandrBitStream),
 								obstacles: deserialiseMinObstacles(stream as IslandrBitStream),
 								alivecount: (stream as IslandrBitStream).readInt8(),
@@ -168,7 +169,7 @@ async function init(address: string) {
 						world.updateLiveCount(gamePkt.alivecount);
 						break;
 					}
-					case "playerTick": {
+					case RecvPacketTypes.PLAYERTICK: {
 						const playerSrvr = deserialisePlayer(stream as IslandrBitStream)
 						if (!player) player = new FullPlayer(playerSrvr);
 						else player.copy(playerSrvr);
@@ -185,10 +186,10 @@ async function init(address: string) {
 						}
 						break;
 					}
-					case "sound": {
+					case RecvPacketTypes.SOUND: {
 						if (!player) break;
 						const data = {
-							type: "sound",
+							type: packetType,
 							path: (stream as IslandrBitStream).readASCIIString(50),
 							position: Vec2.fromMinVec2(<MinVec2>{x: (stream as IslandrBitStream).readInt16(), y: (stream as IslandrBitStream).readInt16()})
 						}
@@ -204,18 +205,18 @@ async function init(address: string) {
 						howl.on("end", () => world.sounds.delete(id));
 						break;
 					}
-					case "particles": {
+					case RecvPacketTypes.PARTICLES: {
 						const data = {
-							type: "particles",
+							type: packetType,
 							particles: deserialiseMinParticles(stream as IslandrBitStream)
 						}
 						const partPkt = <ParticlesPacket>data;
 						world.addParticles(partPkt.particles);
 						break;
 					}
-					case "announce": {
+					case RecvPacketTypes.ANNOUNCE: {
 						const data = {
-							type: "announce",
+							type: packetType,
 							announcement: (stream as IslandrBitStream).readASCIIString(65),
 							killer: (stream as IslandrBitStream).readUsername()
 						}
@@ -232,9 +233,9 @@ async function init(address: string) {
 						}, 5000);
 						break;
 					}
-					case "scopeUpdate": {
+					case RecvPacketTypes.SCOPEUPD: {
 						const data = {
-							type:"scopeUpdate",
+							type:packetType,
 							scope: (stream as IslandrBitStream).readInt8()
 						}
 						const scopeChangePkt = <ScopeUpdatePacket>data;

@@ -1,10 +1,10 @@
-import { BASE_RADIUS } from "../constants";
+import { BASE_RADIUS, OutPacketTypes, RecvPacketTypes } from "../constants";
 import { IslandrBitStream } from "../packets";
 import { calculateAllocBytesForObs, calculateAllocBytesForTickPkt, serialiseDiscardables, serialiseMinObstacles, serialiseMinParticles, serialisePlayer } from "../serialisers";
 import { Player } from "../store/entities";
 import Building from "./building";
 import { Entity } from "./entity";
-import { CircleHitbox, Vec2 } from "./math";
+import { Vec2 } from "./math";
 import { MinBuilding, MinCircleHitbox, MinMinObstacle, MinObstacle, MinParticle, MinTerrain, MinVec2 } from "./minimized";
 import { MovementDirection } from "./misc";
 import { Obstacle } from "./obstacle";
@@ -12,7 +12,7 @@ import { Particle } from "./particle";
 import { Terrain } from "./terrain";
 
 export class  IPacketSERVER {
-	type!: string;
+	type!: number;
 	allocBytes!: number;
 	stream!: IslandrBitStream;
 	serialise() {
@@ -24,10 +24,10 @@ export class  IPacketSERVER {
 	}
 }
 export interface IPacket {
-	type: string;
+	type: number;
 }
 export class IPacketCLIENTSERVERCOM {
-	type!: string;
+	type!: number;
 	allocBytes!: number;
 	stream!: IslandrBitStream
 	serialise() {
@@ -40,7 +40,7 @@ export class IPacketCLIENTSERVERCOM {
 	}
 }
 export class ResponsePacket extends IPacketCLIENTSERVERCOM {
-	type = "response";
+	type = RecvPacketTypes.RESPONSE;
 	id!: string;
 	username!: string;
 	skin!: string | null;
@@ -55,30 +55,29 @@ export class ResponsePacket extends IPacketCLIENTSERVERCOM {
 		this.skin = stream.readSkinOrLoadout()
 		this.deathImg = stream.readSkinOrLoadout()
 		this.accessToken = stream.readAccessToken()
-		this.mode = stream.readMode()
 		this.isMobile = stream.readBoolean()
 	}
 }
 
 class PingPacket extends IPacketCLIENTSERVERCOM {
-	type = "ping";
+	type = RecvPacketTypes.PING;
 	deserialise(stream: IslandrBitStream) { this.type = stream.readPacketType() }
 }
 
 class MovementPacket extends IPacketCLIENTSERVERCOM {
-	type!: string;
+	type!: number;
 	direction!: MovementDirection;
 }
 
 export class MovementPressPacket extends MovementPacket {
-	type = "movementpress";
+	type = RecvPacketTypes.MOV_PRESS;
 	direction!: MovementDirection;
 	deserialise(stream: IslandrBitStream) {
 		this.direction = stream.readPlayerDirection()
 	}
 }
 export class MobileMovementPacket extends IPacketCLIENTSERVERCOM {
-	type = "mobilemovement";
+	type = RecvPacketTypes.MOBILE_MOV;
 	direction!: number;
 	deserialise(stream: IslandrBitStream) {
 		this.direction = stream.readPlayerDirection()
@@ -86,51 +85,51 @@ export class MobileMovementPacket extends IPacketCLIENTSERVERCOM {
 
 }
 export class PlayerRotationDelta extends IPacketCLIENTSERVERCOM {
-	type = "playerRotation";
+	type = RecvPacketTypes.PL_ROATION;
 	angle!: number;
 	deserialise(stream: IslandrBitStream) {
 		this.angle = stream.readPlayerDirection()
 	}
 }
 export class MovementResetPacket extends IPacketCLIENTSERVERCOM {
-	type = "movementReset"
+	type = RecvPacketTypes.MOV_RESET
 }
 export class MovementReleasePacket extends MovementPacket {
-	type = "movementrelease";
+	type = RecvPacketTypes.MOV_REL;
 	direction!: MovementDirection;
 	deserialise(stream: IslandrBitStream) { this.direction = stream.readPlayerDirection() }
 }
 
 class MousePacket extends IPacketCLIENTSERVERCOM {
-	type!: string;
+	type!: number;
 	button!: number;
 }
 
 export class MousePressPacket extends MousePacket {
-	type = "mousepress";
+	type = RecvPacketTypes.MOS_PRESS;
 	button!: number;
-	deserialise(stream: IslandrBitStream) { this.button = stream.readInt16() }
+	deserialise(stream: IslandrBitStream) { this.button = stream.readInt8() }
 }
 
 export class MouseReleasePacket extends MousePacket {
-	type = "mouserelease";
+	type = RecvPacketTypes.MOS_REL;
 	button!: number;
-	deserialise(stream: IslandrBitStream) { this.button = stream.readInt16() }
+	deserialise(stream: IslandrBitStream) { this.button = stream.readInt8() }
 }
 
 export class MouseMovePacket extends IPacketCLIENTSERVERCOM {
-	type = "mousemove";
+	type = RecvPacketTypes.MOUSEMOVE;
 	x!: number;
 	y!: number;
 	deserialise(stream: IslandrBitStream) { this.x = stream.readInt16(); this.y = stream.readInt16(); }
 }
 
 export class InteractPacket extends IPacketCLIENTSERVERCOM {
-	type = "interact";
+	type = RecvPacketTypes.INTERACT;
 }
 
 export class SwitchWeaponPacket {
-	type = "switchweapon";
+	type = RecvPacketTypes.SW_WEAPON;
 	delta!: number;
 	setMode!: boolean;
 	deserialise(stream: IslandrBitStream) {
@@ -140,23 +139,30 @@ export class SwitchWeaponPacket {
 }
 
 export class ReloadWeaponPacket {
-	type = "reloadweapon";
+	type = RecvPacketTypes.REL_WEAPON;
 }
 
 export class CancelActionsPacket {
-	type = "cancelAct";
+	type = RecvPacketTypes.CANCEL_ACT;
 }
 export class UseHealingPacket {
-	type = "usehealing";
+	type = RecvPacketTypes.HEAL;
 	item!: string;
 	deserialise(stream: IslandrBitStream) {
 		this.item = stream.readHealingItem()
 	}
 }
+
+export class ServerSideScopeUpdate extends IPacketCLIENTSERVERCOM {
+	type = RecvPacketTypes.SR_SCOPE_UPD;
+	scope!: number
+	deserialise(stream: IslandrBitStream) { this.scope = stream.readInt8() }
+}
+
 export type ClientPacketResolvable = ResponsePacket | PingPacket | MousePressPacket | MouseReleasePacket | MouseMovePacket | MovementPressPacket | MovementReleasePacket | InteractPacket | SwitchWeaponPacket | ReloadWeaponPacket | MovementPacket | MovementResetPacket | ServerSideScopeUpdate;
 
 export class AckPacket extends IPacketSERVER {
-	type = "ack";
+	type = OutPacketTypes.ACK;
 	allocBytes = 36;
 	id: string;
 	tps: number;
@@ -180,8 +186,8 @@ export class AckPacket extends IPacketSERVER {
 }
 
 export class GamePacket extends IPacketSERVER {
-	type = "game";
-	allocBytes = 5 + 7;
+	type = OutPacketTypes.GAME;
+	allocBytes = 7;
 	entities: Entity[];
 	obstacles: MinObstacle[];
 	alivecount: number;
@@ -217,7 +223,7 @@ export class GamePacket extends IPacketSERVER {
 }
 
 export class MapPacket implements IPacket {
-	type = "map";
+	type = OutPacketTypes.MAP;
 	obstacles: MinMinObstacle[];
 	buildings: MinBuilding[];
 	terrains: MinTerrain[]
@@ -229,8 +235,8 @@ export class MapPacket implements IPacket {
 	}
 }
 export class PlayerTickPkt extends IPacketSERVER {
-	type = "playerTick";
-	allocBytes = 11;
+	type = OutPacketTypes.PLAYERTICK;
+	allocBytes = 2;
 	player: Player;
 	constructor(player: Player) {
 		super();
@@ -243,8 +249,8 @@ export class PlayerTickPkt extends IPacketSERVER {
 }
 }
 export class AnnouncePacket extends IPacketSERVER {
-	type = "announce";
-	allocBytes = 94;
+	type = OutPacketTypes.ANNOUNCE;
+	allocBytes = 66;
 	announcement: string;
 	killer: string;
 
@@ -252,6 +258,7 @@ export class AnnouncePacket extends IPacketSERVER {
 		super();
 		this.announcement = announcement;
 		this.killer = killer;
+		this.allocBytes += this.killer.length + 1
 	}
 	serialise() {
 		super.serialise();
@@ -262,8 +269,8 @@ export class AnnouncePacket extends IPacketSERVER {
 
 // Let the client handle particles
 export class ParticlesPacket extends IPacketSERVER {
-	type = "particles";
-	allocBytes = 15;
+	type = OutPacketTypes.PARTICLES;
+	allocBytes = 2;
 	particles: MinParticle[];
 
 	constructor(particles: Particle[], player: Player) {
@@ -278,9 +285,9 @@ export class ParticlesPacket extends IPacketSERVER {
 }
 
 export class ScopeUpdatePacket extends IPacketSERVER {
-	type = "scopeUpdate";
+	type = OutPacketTypes.SCOPEUPD;
 	scope!: number;
-	allocBytes = 12+1
+	allocBytes = 2
 
 	constructor(scope: number) { super(); this.scope = scope }
 	serialise() {
@@ -289,17 +296,12 @@ export class ScopeUpdatePacket extends IPacketSERVER {
 	}
 }
 
-export class ServerSideScopeUpdate extends IPacketCLIENTSERVERCOM {
-	type = "srvrScopeUpd";
-	scope!: number
-	deserialise(stream: IslandrBitStream) {this.scope = stream.readInt8()}
-}
 export class SoundPacket extends IPacketSERVER {
-	type = "sound";
+	type = OutPacketTypes.SOUND;
 	// No need to include "client/assets/sounds"
 	path: string;
 	position: Vec2;
-	allocBytes = 6+50+4
+	allocBytes = 50+4
 
 	constructor(path: string, position: Vec2) {
 		super()
