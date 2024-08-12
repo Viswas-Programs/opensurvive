@@ -24,7 +24,7 @@ export class IPacketCLIENT {
 
 // Packet to respond the server Ack
 export class ResponsePacket extends IPacketCLIENT {
-	allocBytes = 65;
+	allocBytes = 25;
 	type = OutPacketTypes.RESPONSE;
 	id: string;
 	username: string;
@@ -41,7 +41,7 @@ export class ResponsePacket extends IPacketCLIENT {
 		this.deathImg = deathImg;
 		this.accessToken = accessToken;
 		this.isMobile = isMobile
-		this.allocBytes += this.username.length
+		this.allocBytes += this.username.length + this.id.length + (this.accessToken?.length as number)
 	}
 	serialise() {
 		super.serialise()

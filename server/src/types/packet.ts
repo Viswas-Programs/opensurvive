@@ -51,7 +51,9 @@ export class ResponsePacket extends IPacketCLIENTSERVERCOM {
 
 	deserialise(stream: IslandrBitStream) {
 		this.id = stream.readId()
+		console.log(this.id)
 		this.username = stream.readUsername()
+		console.log(this.username)
 		this.skin = stream.readSkinOrLoadout()
 		this.deathImg = stream.readSkinOrLoadout()
 		this.accessToken = stream.readAccessToken()
@@ -163,7 +165,7 @@ export type ClientPacketResolvable = ResponsePacket | PingPacket | MousePressPac
 
 export class AckPacket extends IPacketSERVER {
 	type = OutPacketTypes.ACK;
-	allocBytes = 36;
+	allocBytes = 8;
 	id: string;
 	tps: number;
 	size: number[];
@@ -175,6 +177,8 @@ export class AckPacket extends IPacketSERVER {
 		this.tps = tps;
 		this.size = Object.values(size);
 		this.terrain = terrain.id;
+		this.allocBytes += this.terrain.length + this.id.length
+		console.log(this.id)
 	}
 	serialise() {
 		super.serialise();

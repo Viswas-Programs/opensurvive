@@ -27,8 +27,8 @@ export function serialiseMinParticles(particleArray: MinParticle[], stream: Isla
 export function calculateAllocBytesForObs(obstacleArray: Obstacle[]): number {
 	let allocBytes = 2;
 	obstacleArray.forEach(obstacle => {
-		allocBytes += 51
-		allocBytes += obstacle.type.length
+		allocBytes += 39
+		allocBytes += obstacle.type.length + obstacle.id.length
 		const hitbox = obstacle.hitbox.minimize()
 		if (hitbox.type == "circle") allocBytes += 8;
 		else if (hitbox.width == hitbox.height) allocBytes += 8;
@@ -36,7 +36,7 @@ export function calculateAllocBytesForObs(obstacleArray: Obstacle[]): number {
 		obstacle.animations.forEach(animation => { allocBytes += animation.length  + 1})
 		if (obstacle.type == "roof") {
 			allocBytes += 31;
-			(<Roof>obstacle).roofless.forEach(id => allocBytes += 12);
+			(<Roof>obstacle).roofless.forEach(id => allocBytes += id.length);
 		}
 		if ((obstacle as any).special) {allocBytes +=(<any>obstacle).special.length+1 }
 	})
@@ -90,7 +90,7 @@ export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitSt
 
 export function calculateAllocBytesForTickPkt(player: Player): number {
 	let allocBytes = 75;
-	if (!player.usernamesAndIDsSent) allocBytes += player.username.length + 12+10
+	if (!player.usernamesAndIDsSent) allocBytes += player.username.length + player.id.length+10
 	if (player.currentHealItem) allocBytes += player.currentHealItem.length
 	if (player.interactMessage) allocBytes += player.interactMessage.length
 	player.animations.forEach((animation) => allocBytes += animation.length)

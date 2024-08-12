@@ -83,6 +83,7 @@ async function init(address: string) {
 				size:[stream.readInt16(),stream.readInt16()],
 				terrain: <MinTerrain>{ id:stream.readId() }
 			}
+			console.log(dataA)
 			id = dataA.id;
 			tps = dataA.tps;
 			world = new World(new Vec2(dataA.size[0], dataA.size[1]), castTerrain(dataA.terrain).setColour((modeMapColours[getMode() as modeMapColourType])));

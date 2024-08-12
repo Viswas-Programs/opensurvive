@@ -16,7 +16,7 @@ export class IslandrBitStream extends BitStream {
         this.writeASCIIString(data)
     }
     writeId(id: string) {
-        this.writeASCIIString(id, 12)
+        this.writeASCIIString(id)
     }
     writeSkinOrLoadout(skin: string) {
         this.writeASCIIString(skin, 10)
@@ -40,13 +40,13 @@ export class IslandrBitStream extends BitStream {
         return this.readASCIIString(15)
     }
     readAccessToken() {
-        return this.readASCIIString(30)
+        return this.readASCIIString()
     }
     readSkinOrLoadout() {
         return this.readASCIIString(10)
     }
     readId() {
-        return this.readASCIIString(12)
+        return this.readASCIIString()
     }
     readUsername() {
         return this.readASCIIString()

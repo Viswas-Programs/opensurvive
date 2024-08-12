@@ -1,8 +1,10 @@
 import * as crypto from "crypto";
 
 // ID generator
+let IDCount = -1
 export function ID() {
-    return crypto.randomBytes(6).toString("hex");
+    IDCount ++
+    return String(IDCount);
 }
 
 // Promisified setTimeout
