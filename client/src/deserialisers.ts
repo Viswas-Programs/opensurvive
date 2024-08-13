@@ -149,7 +149,7 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
     const size = stream.readInt8()
     for (let ii = 0; ii < size; ii++) {
         const type = stream.readASCIIString()
-        const id = stream.readId()
+        const id = String(stream.readInt16())
         const position: MinVec2 = { x: stream.readFloat64(), y: stream.readFloat64() }
         const direction: MinVec2 = { x: stream.readFloat64(), y: stream.readFloat64() }
         //const hitbox = _getHitboxes(stream)

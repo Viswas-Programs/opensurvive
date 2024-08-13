@@ -115,7 +115,7 @@ export class Entity {
 	// Particle type to emit when damaged
 	damageParticle?: string;
 	isMobile = false;
-	allocBytes = 35;
+	allocBytes = 37;
 	goodOldPos = Vec2.ZERO;
 	goodOldDirection = Vec2.ZERO;
 	surface = "normal";
@@ -124,7 +124,6 @@ export class Entity {
 		this.id = ID();
 		// Currently selects a random position to spawn. Will change in the future.
 		this.position = this.goodOldPos = world.size.scale(Math.random(), Math.random());
-		this.allocBytes += this.id.length
 	}
 
 	tick(_entities: Entity[], _obstacles: Obstacle[]) {

@@ -73,7 +73,7 @@ export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: Isla
 }
 export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitStream, player: Player) {
 	stream.writeASCIIString(entity.type)
-	stream.writeId(entity.id)
+	stream.writeInt16(Number(entity.id))
 	//write the type
 	//write position
 	stream.writeFloat64(entity.position.x)
