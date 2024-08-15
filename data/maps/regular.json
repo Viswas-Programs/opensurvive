@@ -44,6 +44,6 @@
 		{ "type": "crate", "amount": 25, "args": ["soviet"] },
 		{ "type": "bush", "amount": 40 },
 		{ "type": "barrel", "amount": 40 },
-		{ "type":  "spawner", "amount":  25}
+		{ "type":  "spawner", "amount":  30}
 	]
 }

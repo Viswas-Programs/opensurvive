@@ -1,4 +1,3 @@
-import { castBuilding } from "../store/buildings";
 import { ID } from "../utils";
 import { CircleHitbox, Hitbox, RectHitbox, Vec2 } from "./math";
 import { MinBuilding } from "./minimized";
@@ -28,7 +27,7 @@ export default class Building {
 	}
 
 	addObstacle(position: Vec2, obstacle: Obstacle) {
-		this.obstacles.push({ position, obstacle });
+		this.obstacles.push({ obstacle, position });
 	}
 
 	addFloor(position: Vec2, terrain: Terrain) {
@@ -43,7 +42,11 @@ export default class Building {
 			fl.terrain.setPosition(this.position.addVec(fl.position));
 		}
 		let radiusForZoneHitbox = 15;
+		const zoneWidthSizes: number[] = [0]
+		const zoneHeightSizes: number[] = [0]
 		this.zones.forEach(zone => {
+			zoneWidthSizes.push((zone.hitbox as RectHitbox).width)
+			zoneHeightSizes.push((zone.hitbox as RectHitbox).height)
 			if ((zone.hitbox as RectHitbox).width > (zone.hitbox as RectHitbox).height) {
 				radiusForZoneHitbox += (zone.hitbox as RectHitbox).width
 			}
@@ -51,7 +54,7 @@ export default class Building {
 				radiusForZoneHitbox += (zone.hitbox as RectHitbox).height
 			}
 		})
-		const combinedZoneHitboxForObs = new RectHitbox(0, 0)
+		const combinedZoneHitboxForObs = new RectHitbox(Math.max(...zoneWidthSizes), Math.max(...zoneHeightSizes))
 		this.zoneHitbox = new CircleHitbox(radiusForZoneHitbox)
 		this.zoneHitboxForObstacles = combinedZoneHitboxForObs
 	}

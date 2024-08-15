@@ -14,7 +14,7 @@ class SpawnerSupplier extends ObstacleSupplier {
 
 class SpawnerMapSupplier extends MapObstacleSupplier {
 	make(data: MapObstacleData) {
-		return new Spawner(data.args ? data.args[0] : "");
+		return new Spawner(data.args ? data.args[0] : "crate");
 	}
 }
 

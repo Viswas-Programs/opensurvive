@@ -24,7 +24,7 @@
 	"entity.healing.chocolate": "Chocolate (%?)",
 	"entity.healing.energy_drink": "Energy Drink (%?)",
 	"entity.healing.medkit": "Medkit (%?)",
-	"entity.healing.swiss_roll": "Swiss Roll (%?)",
+	"entity.healing.tourniquet": "Tourniquet (%?)",
 	"entity.helmet": "Level %? Helmet",
 	"entity.scope": "%?x Scope",
 	"entity.vest": "Level %? Vest",
@@ -35,7 +35,7 @@
 	"prompt.heal.chocolate": "Chocolate",
 	"prompt.heal.energy_drink": "Energy Drink",
 	"prompt.heal.medkit": "MedKit",
-	"prompt.heal.swiss_roll": "Swiss Roll",
+	"prompt.heal.tourniquet": "Tourniquet",
 	"prompt.interact.door.open": "[%?] Open Door",
 	"prompt.interact.door.close": "[%?] Close Door",
 

@@ -1,24 +1,24 @@
 [
 	{
-		"swiss_roll": 5,
+		"tourniquet": 5,
 		"medkit": 1,
 		"energy_drink": 2,
 		"chocolate": 1
 	},
 	{
-		"swiss_roll": 10,
+		"tourniquet": 10,
 		"medkit": 2,
 		"energy_drink": 5,
 		"chocolate": 2
 	},
 	{
-		"swiss_roll": 15,
+		"tourniquet": 15,
 		"medkit": 3,
 		"energy_drink": 10,
 		"chocolate": 3
 	},
 	{
-		"swiss_roll": 30,
+		"tourniquet": 30,
 		"medkit": 4,
 		"energy_drink": 15,
 		"chocolate": 4
