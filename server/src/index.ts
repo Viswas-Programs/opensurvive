@@ -290,7 +290,7 @@ setInterval(() => {
 		sendBitstream(socket, new PlayerTickPkt(player));
 		if (world.particles.length) sendBitstream(socket, new ParticlesPacket(world.particles, player));
 		//for (const sound of world.onceSounds) sendBitstream(socket, new SoundPacket(sound.path, sound.position));
-		for (const killFeed of world.killFeeds) sendBitstream(socket, new AnnouncePacket(killFeed.killFeed, killFeed.killer))
+		for (const killFeed of world.killFeeds) sendBitstream(socket, new AnnouncePacket(killFeed.weaponUsed, killFeed.killer, killFeed.killed))
 		if (player.changedScope) {
 			sendBitstream(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false; }
 	});

@@ -51,9 +51,7 @@ export class ResponsePacket extends IPacketCLIENTSERVERCOM {
 
 	deserialise(stream: IslandrBitStream) {
 		this.id = stream.readId()
-		console.log(this.id)
 		this.username = stream.readUsername()
-		console.log(this.username)
 		this.skin = stream.readSkinOrLoadout()
 		this.deathImg = stream.readSkinOrLoadout()
 		this.accessToken = stream.readAccessToken()
@@ -254,20 +252,23 @@ export class PlayerTickPkt extends IPacketSERVER {
 }
 export class AnnouncePacket extends IPacketSERVER {
 	type = OutPacketTypes.ANNOUNCE;
-	allocBytes = 66;
-	announcement: string;
+	allocBytes = 1;
+	weaponUsed: string;
 	killer: string;
+	killed: string;
 
-	constructor(announcement: string, killer: string) {
+	constructor(weaponUsed: string, killer: string, killed: string) {
 		super();
-		this.announcement = announcement;
+		this.weaponUsed = weaponUsed;
 		this.killer = killer;
-		this.allocBytes += this.killer.length + 1
+		this.killed = killed
+		this.allocBytes += this.killer.length + 1 + this.killed.length + 1 + this.weaponUsed.length + 1
 	}
 	serialise() {
 		super.serialise();
-		this.stream.writeASCIIString(this.announcement, 65)
-		this.stream.writeUsername(this.killer)
+		this.stream.writeASCIIString(this.weaponUsed)
+		this.stream.writeASCIIString(this.killer)
+		this.stream.writeASCIIString(this.killed)
 	}
 }
 

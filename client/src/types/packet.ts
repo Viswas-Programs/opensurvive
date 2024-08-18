@@ -289,8 +289,9 @@ export class ParticlesPacket implements IPacket {
 
 export class AnnouncementPacket implements IPacket {
 	type = RecvPacketTypes.ANNOUNCE;
-	announcement!: string;
+	weaponUsed!: string;
 	killer!: string;
+	killed!: string;
 }
 
 export class ScopeUpdatePacket implements IPacket {

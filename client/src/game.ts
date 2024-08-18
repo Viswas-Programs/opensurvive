@@ -27,26 +27,26 @@ if(urlargs.get("from")){
 	alert("We have moved from " + urlargs.get("from") + " to islandr.io!")
 }
 
-export var world: World;
+export let world: World;
 
-var id: string | null;
-var tps = 1; // Default should be 1, so even if no TPS detail from server, we will not be dividing by 0
-var username: string | null;
-var address: string | null;
-var skin: string | null = localStorage.getItem("playerSkin");
+let id: string | null;
+let tps = 1; // Default should be 1, so even if no TPS detail from server, we will not be dividing by 0
+let username: string | null;
+let address: string | null;
+let skin: string | null = localStorage.getItem("playerSkin");
 if (!localStorage.getItem("playerDeathImg")) localStorage.setItem("playerDeathImg", "default")
 
-var deathImg: string | null = localStorage.getItem("playerDeathImg");
+let deathImg: string | null = localStorage.getItem("playerDeathImg");
 
 const isMobile = /Android/.test(navigator.userAgent) || /iPhone/.test(navigator.userAgent) || /iPad/.test(navigator.userAgent) || /Tablet/.test(navigator.userAgent)
-var player: FullPlayer | null;
+let player: FullPlayer | null;
 
 export function getId() { return id; }
 export function getPlayer() { return player; }
 export function getTPS() { return tps; }
 
-var ws: WebSocket;
-var connected = false;
+let ws: WebSocket;
+let connected = false;
 export function getConnected() { return connected; }
 function setConnected(v: boolean) { connected = v; return connected; }
 enum modeMapColours {
@@ -63,7 +63,7 @@ let data: any;
 declare type modeMapColourType = keyof typeof modeMapColours
 async function init(address: string) {
 	// Initialize the websocket
-	var protocol = "ws";
+	const protocol = "ws";
 	// if ((<HTMLInputElement>document.getElementById("wss")).checked) protocol += "s";
 	ws = new WebSocket(`${protocol}://${address}`);
 	ws.binaryType = "arraybuffer";
@@ -83,7 +83,6 @@ async function init(address: string) {
 				size:[stream.readInt16(),stream.readInt16()],
 				terrain: <MinTerrain>{ id:stream.readId() }
 			}
-			console.log(dataA)
 			id = dataA.id;
 			tps = dataA.tps;
 			world = new World(new Vec2(dataA.size[0], dataA.size[1]), castTerrain(dataA.terrain).setColour((modeMapColours[getMode() as modeMapColourType])));
@@ -218,8 +217,9 @@ async function init(address: string) {
 					case RecvPacketTypes.ANNOUNCE: {
 						const data = {
 							type: packetType,
-							announcement: (stream as IslandrBitStream).readASCIIString(65),
-							killer: (stream as IslandrBitStream).readUsername()
+							weaponUsed: (stream as IslandrBitStream).readASCIIString(),
+							killer: (stream as IslandrBitStream).readASCIIString(),
+							killed: (stream as IslandrBitStream).readASCIIString()
 						}
 						const announcementPacket = <AnnouncementPacket>data;
 						const killFeeds = document.getElementById("kill-feeds")
@@ -227,7 +227,8 @@ async function init(address: string) {
 						if (killFeeds?.childNodes.length as number > 5) { killFeeds?.childNodes[killFeeds.childNodes.length - 1].remove(); }
 						if (announcementPacket.killer == getPlayer()!.id) { killFeedItem.style.background = "rgba(0, 0, 139, 0.5)" }
 						else { killFeedItem.style.background = "rgba(139, 0, 0, 0.5)" }
-						killFeedItem.prepend(`${announcementPacket.announcement}\n`)
+						const KILLFEED_STRING = `${announcementPacket.killer} killed ${announcementPacket.killed} with ${announcementPacket.weaponUsed}`;
+						killFeedItem.prepend(`${KILLFEED_STRING}\n`)
 						killFeeds?.prepend(killFeedItem);
 						setTimeout(() => {
 							killFeeds?.childNodes[killFeeds.childNodes.length-1].remove();

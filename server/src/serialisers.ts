@@ -79,6 +79,7 @@ export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitSt
 	stream.writeFloat64(entity.position.x)
 	stream.writeFloat64(entity.position.y)
 	//write direction
+	if (entity.type == "player"){console.log(entity.direction)}
 	stream.writeFloat64(entity.direction.x)
 	stream.writeFloat64(entity.direction.y)
 	//despawn configs
