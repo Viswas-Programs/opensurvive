@@ -137,7 +137,6 @@ export class GunWeapon extends Weapon {
 			let angles = attacker.direction.angle() + toRadians((Math.random() - 0.5) * (attacker.velocity.magnitudeSqr() != 0 ? this.moveSpread : this.spread));
 			let position = attacker.position.addVec(this.offset.addAngle(attacker.direction.angle()));
 			world.particles.push(new Particle(this.particleToDisplay, position, 0.25))
-			console.log(world.particles)
 			for (let ii = 0; ii < this.bullets; ii++) {
 				angles = attacker.direction.angle() + toRadians((Math.random() - 0.5) * (attacker.velocity.magnitudeSqr() != 0 ? this.moveSpread : this.spread));
 				position = attacker.position.addVec(this.offset.addAngle(attacker.direction.angle()));

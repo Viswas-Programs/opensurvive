@@ -41,7 +41,7 @@ export interface MinInventory {
 
 export interface MinObstacle {
 	id: string;
-	type: string;
+	type: number;
 	position: MinVec2;
 	direction: MinVec2;
 	hitbox: MinHitbox;
@@ -51,7 +51,7 @@ export interface MinObstacle {
 
 export interface MinMinObstacle {
 	id: string;
-	type: string;
+	type: number;
 	position: MinVec2;
 }
 

@@ -1,4 +1,4 @@
-import { TICKS_PER_SECOND } from "../../constants";
+import { ObstacleTypes, TICKS_PER_SECOND } from "../../constants";
 import { Entity } from "../../types/entity";
 import { CommonAngles, Vec2 } from "../../types/math";
 import { CollisionType } from "../../types/misc";
@@ -42,7 +42,7 @@ export default abstract class Item extends Entity {
 			}
 		}
 		if (!colliding) this.setVelocity(this.velocity.scaleAll(1 - this.friction));
-		for (const obstacle of obstacles.filter(obs => obs.type != "roof")) {
+		for (const obstacle of obstacles.filter(obs => obs.type != ObstacleTypes.ROOF)) {
 			const collisionType = obstacle.collided(this);
 			if (collisionType) {
 				obstacle.onCollision(this);

@@ -1,5 +1,6 @@
 import { MAP_OBSTACLE_SUPPLIERS, OBSTACLE_SUPPLIERS } from ".";
 import { world } from "../..";
+import { ObstacleTypes } from "../../constants";
 import { MapObstacleData, ObstacleData } from "../../types/data";
 import { CircleHitbox } from "../../types/math";
 import { Obstacle } from "../../types/obstacle";
@@ -21,7 +22,7 @@ class TreeMapSupplier extends MapObstacleSupplier {
 }
 
 export default class Tree extends Obstacle {
-	static readonly TYPE = "tree";
+	static readonly TYPE = ObstacleTypes.TREE;
 	type = Tree.TYPE;
 	special: string;
 	damageParticle = "wood";

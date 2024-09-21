@@ -1,4 +1,5 @@
 import { OBSTACLE_SUPPLIERS } from ".";
+import { ObstacleTypes } from "../../constants";
 import { getMode } from "../../homepage";
 import { getTexture } from "../../textures";
 import { TextureData } from "../../types/data";
@@ -22,7 +23,7 @@ class RoofSupplier implements ObstacleSupplier {
 }
 
 export default class Roof extends Obstacle {
-	static readonly ID = "roof";
+	static readonly ID = ObstacleTypes.ROOF;
 	type = Roof.ID;
 	color!: number;
 	roofless!: Set<string>;

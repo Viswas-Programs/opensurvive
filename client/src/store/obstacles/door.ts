@@ -1,4 +1,5 @@
 import { OBSTACLE_SUPPLIERS } from ".";
+import { ObstacleTypes } from "../../constants";
 import { RenderableLayerN1 } from "../../types/extenstions";
 import { RectHitbox } from "../../types/math";
 import { MinObstacle } from "../../types/minimized";
@@ -13,7 +14,7 @@ class DoorSupplier implements ObstacleSupplier {
 }
 
 export default class Door extends Obstacle implements RenderableLayerN1 {
-	static readonly TYPE = "door";
+	static readonly TYPE = ObstacleTypes.DOOR;
 	type = Door.TYPE;
 	
 	static {

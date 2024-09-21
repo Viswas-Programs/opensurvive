@@ -4,6 +4,7 @@ import { Obstacle } from "../../types/obstacle";
 import { MapObstacleSupplier, ObstacleSupplier } from "../../types/supplier";
 import { MapObstacleData, ObstacleData } from "../../types/data";
 import { MAP_OBSTACLE_SUPPLIERS, OBSTACLE_SUPPLIERS } from ".";
+import { ObstacleTypes } from "../../constants";
 
 class TableSupplier extends ObstacleSupplier {
 	make(data: ObstacleData) {
@@ -18,7 +19,7 @@ class TableMapObstacleSupplier extends MapObstacleSupplier {
 }
 
 export default class Table extends Obstacle {
-	static readonly TYPE = "table";
+	static readonly TYPE = ObstacleTypes.TABLE;
 	type = Table.TYPE;
 	damageParticle = "wood";
 	noCollision = true;

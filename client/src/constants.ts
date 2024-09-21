@@ -76,18 +76,19 @@ export enum EntityTypes {
 }
 
 export enum ObstacleTypes {
-	BARREL = 1,
-	BOX = 2,
-	BUSH = 3,
-	CRATE = 4, 
-	DESK = 5, 
-	DOOR = 6,
-	LOG = 7,
-	ROOF = 8,
-	STONE = 9,
-	TABLE = 10,
-	TOILET = 11, 
-	TOILET_MORE = 12,
-	TREE = 13, 
-	WALL = 14
+	BARREL = 21,
+	BOX = 22,
+	BUSH = 23,
+	CRATE = 24,
+	DESK = 25,
+	DOOR = 26,
+	LOG = 27,
+	ROOF = 28,
+	STONE = 29,
+	TABLE = 30,
+	TOILET = 31,
+	TOILET_MORE = 32,
+	TREE = 33,
+	WALL = 34,
+	SPAWNER = 35
 }

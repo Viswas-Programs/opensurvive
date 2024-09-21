@@ -5,6 +5,7 @@ import { LOOT_TABLES } from "../../types/loot_table";
 import { ObstacleSupplier } from "../../types/supplier";
 import { ObstacleData } from "../../types/data"; 
 import { OBSTACLE_SUPPLIERS } from ".";
+import { ObstacleTypes } from "../../constants";
 
 class ToiletSupplier extends ObstacleSupplier {
 	make(data: ObstacleData) {
@@ -12,7 +13,7 @@ class ToiletSupplier extends ObstacleSupplier {
 	}
 }
 export default class Toilet extends Obstacle {
-	static readonly TYPE = "toilet";
+	static readonly TYPE = ObstacleTypes.TOILET;
 	type = Toilet.TYPE;
 
 	constructor() {

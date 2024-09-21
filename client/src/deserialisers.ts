@@ -7,7 +7,7 @@ import { Weapon } from "./types/weapon"
 import { Inventory } from "./types/entity"
 import { TracerData } from "./types/data"
 import { world } from "./game"
-import { EntityTypes } from "./constants"
+import { EntityTypes, ObstacleTypes } from "./constants"
 export function deserialiseMinParticles(stream: IslandrBitStream): MinParticle[]{
     const particles: MinParticle[] = []
     for (let ii = 0; ii < stream.readInt8(); ii++) {
@@ -115,7 +115,7 @@ export function deserialiseMinObstacles(stream: IslandrBitStream): MinObstacle[]
     for (let ii = 0; ii < size; ii++) {
         let obstacle = {
             id: stream.readId(),
-            type: stream.readASCIIString(),
+            type: stream.readInt8(),
             position: <MinVec2>{ x: stream.readFloat64(), y: stream.readFloat64() },
             direction: <MinVec2>{ x: stream.readFloat64(), y: stream.readFloat64() },
             hitbox: <MinHitbox>_getHitboxes(stream),
@@ -124,7 +124,7 @@ export function deserialiseMinObstacles(stream: IslandrBitStream): MinObstacle[]
             roofless: new Set<string>(),
             special: "normal"
         }
-        if (obstacle.type == "roof") {
+        if (obstacle.type == ObstacleTypes.ROOF) {
             const size = stream.readInt8()
             if (size == 0) obstacle.roofless.clear()
             else {
@@ -140,7 +140,6 @@ export function deserialiseMinObstacles(stream: IslandrBitStream): MinObstacle[]
         const specialOrNot = stream.readBoolean()
         if (specialOrNot) obstacle.special = stream.readASCIIString()
         obstacles.push(<MinObstacle>obstacle)
-        if (obstacle.type == "barrel") console.log(obstacle)
     }
     return obstacles
 }
@@ -202,7 +201,7 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
             const minEntity = Object.assign(baseMinEntity, { health: stream.readInt8(), maxHealth: stream.readInt8(), hitbox: _getHitboxes(stream) })
             entities.push(minEntity)
         }
-        else if ([EntityTypes.HEALING].includes(type)) {
+        else if ([EntityTypes.HEALING, EntityTypes.GRENADE].includes(type)) {
             const minEntity = Object.assign(baseMinEntity, {
                 nameId: stream.readId(),
                 hitbox: <MinHitbox>{

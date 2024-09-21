@@ -1,4 +1,5 @@
 import { OBSTACLE_SUPPLIERS } from ".";
+import { ObstacleTypes } from "../../constants";
 import { getMode } from "../../homepage";
 import { MinObstacle } from "../../types/minimized";
 import { Obstacle } from "../../types/obstacle";
@@ -17,7 +18,7 @@ class StoneSupplier implements ObstacleSupplier {
 }
 
 export default class Stone extends Obstacle {
-	static readonly TYPE = "stone";
+	static readonly TYPE = ObstacleTypes.STONE;
 	type = Stone.TYPE;
 	special!: "normal" | "pillar";
 	static stoneImg = new Image();

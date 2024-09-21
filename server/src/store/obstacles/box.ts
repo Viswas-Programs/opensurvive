@@ -5,6 +5,7 @@ import { LOOT_TABLES } from "../../types/loot_table";
 import { MapObstacleSupplier, ObstacleSupplier } from "../../types/supplier";
 import { MapObstacleData, ObstacleData } from "../../types/data";
 import { MAP_OBSTACLE_SUPPLIERS, OBSTACLE_SUPPLIERS } from ".";
+import { ObstacleTypes } from "../../constants";
 
 class BoxSupplier extends ObstacleSupplier {
 	make(data: ObstacleData) {
@@ -19,7 +20,7 @@ class BoxMapObstacleSupplier extends MapObstacleSupplier {
 }
 
 export default class Box extends Obstacle {
-	static readonly TYPE = "box";
+	static readonly TYPE = ObstacleTypes.BOX;
 	type = Box.TYPE;
 	damageParticle = "wood";
 

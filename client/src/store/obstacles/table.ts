@@ -1,4 +1,5 @@
 import { OBSTACLE_SUPPLIERS } from ".";
+import { ObstacleTypes } from "../../constants";
 import { getMode } from "../../homepage";
 import { RectHitbox } from "../../types/math";
 import { MinObstacle } from "../../types/minimized";
@@ -19,7 +20,7 @@ class TableSupplier implements ObstacleSupplier {
 }
 
 export default class Table extends Obstacle {
-	static readonly TYPE = "table";
+	static readonly TYPE = ObstacleTypes.TABLE;
 	type = Table.TYPE;
 	zIndex = 11;
 	static tableImg = new Image();

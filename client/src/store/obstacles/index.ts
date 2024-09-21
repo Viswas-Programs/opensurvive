@@ -3,7 +3,7 @@ import { MinObstacle, MinMinObstacle } from "../../types/minimized";
 import { DummyObstacle } from "../../types/obstacle";
 import { ObstacleSupplier } from "../../types/supplier";
 
-export const OBSTACLE_SUPPLIERS = new Map<string, ObstacleSupplier>();
+export const OBSTACLE_SUPPLIERS = new Map<number, ObstacleSupplier>();
 
 export { default as Tree } from "./tree";
 export { default as Bush } from "./bush";

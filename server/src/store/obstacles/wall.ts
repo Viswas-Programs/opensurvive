@@ -1,5 +1,6 @@
 import { OBSTACLE_SUPPLIERS } from ".";
 import { world } from "../..";
+import { ObstacleTypes } from "../../constants";
 import { ObstacleData } from "../../types/data";
 import { RectHitbox, Vec2 } from "../../types/math";
 import { Obstacle } from "../../types/obstacle";
@@ -12,7 +13,7 @@ class WallSupplier extends ObstacleSupplier {
 }
 
 export default class Wall extends Obstacle {
-	static readonly TYPE = "wall";
+	static readonly TYPE = ObstacleTypes.WALL;
 	type = Wall.TYPE;
 	// 32-bit RGBA (example: 0xff000077 is red with 0.5 opacity)
 	color: number;

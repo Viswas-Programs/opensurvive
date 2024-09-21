@@ -1,5 +1,6 @@
 import { MAP_OBSTACLE_SUPPLIERS, OBSTACLE_SUPPLIERS } from ".";
 import { world } from "../..";
+import { ObstacleTypes } from "../../constants";
 import { MapObstacleData, ObstacleData } from "../../types/data";
 import { CircleHitbox, Hitbox, RectHitbox } from "../../types/math";
 import { Obstacle } from "../../types/obstacle";
@@ -24,7 +25,7 @@ class StoneMapSupplier extends MapObstacleSupplier {
 }
 
 export default class Stone extends Obstacle {
-	static readonly TYPE = "stone";
+	static readonly TYPE = ObstacleTypes.STONE;
 	type = Stone.TYPE;
 	special: string;
 

@@ -16,6 +16,7 @@ import { IslandrBitStream } from "./packets"
 import { GunColor } from "./types/misc";
 import Building from "./types/building";
 import Scope from "./store/entities/scope";
+import Healing from "./store/entities/healing";
 export var ticksElapsed = 0;
 
 const server = new ws.Server({ port: 8080 });
@@ -154,7 +155,7 @@ server.on("connection", async socket => {
 	const player = new Player(id, username, skin, deathImg, accessToken, isMobile);
 	world.addPlayer(player);
 	// Send the player the entire map
-	const scope = new Scope(4)
+	const scope = new Healing("syringe", 1)
 	scope.position = player.position
 	world.entities.push(scope)
 	send(socket, new MapPacket(world.obstacles, world.buildings, world.terrains.concat(...world.buildings.map(b => b.floors.map(fl => fl.terrain)))));

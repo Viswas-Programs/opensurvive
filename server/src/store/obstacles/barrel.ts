@@ -5,6 +5,7 @@ import { Obstacle } from "../../types/obstacle";
 import { MapObstacleSupplier, ObstacleSupplier } from "../../types/supplier";
 import Explosion from "../entities/explosion";
 import { MapObstacleData, ObstacleData } from "../../types/data";
+import { ObstacleTypes } from "../../constants";
 
 const _HitboxForVariant = new Map<string, Array<Hitbox>>();
 _HitboxForVariant.set("normal", [new CircleHitbox(1.5), new CircleHitbox(0.75)])
@@ -23,7 +24,7 @@ class BarrelMapSupplier extends MapObstacleSupplier {
 }
 
 export default class Barrel extends Obstacle {
-	static readonly TYPE = "barrel";
+	static readonly TYPE = ObstacleTypes.BARREL;
 	type = Barrel.TYPE;
 	surface = "metal"
 	special: string;

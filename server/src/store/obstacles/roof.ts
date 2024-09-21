@@ -1,5 +1,6 @@
 import { OBSTACLE_SUPPLIERS } from ".";
 import { world } from "../..";
+import { ObstacleTypes } from "../../constants";
 import { ObstacleData, TextureData } from "../../types/data";
 import { Hitbox, Vec2 } from "../../types/math";
 import { Obstacle } from "../../types/obstacle";
@@ -12,7 +13,7 @@ class RoofSupplier extends ObstacleSupplier {
 }
 
 export default class Roof extends Obstacle {
-	static readonly ID = "roof";
+	static readonly ID = ObstacleTypes.ROOF;
 	type = Roof.ID;
 	color: number;
 	buildingId: string;

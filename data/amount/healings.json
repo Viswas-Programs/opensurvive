@@ -3,24 +3,24 @@
 		"tourniquet": 5,
 		"medkit": 1,
 		"energy_drink": 2,
-		"chocolate": 1
+		"syringe": 1
 	},
 	{
 		"tourniquet": 10,
 		"medkit": 2,
 		"energy_drink": 5,
-		"chocolate": 2
+		"syringe": 2
 	},
 	{
 		"tourniquet": 15,
 		"medkit": 3,
 		"energy_drink": 10,
-		"chocolate": 3
+		"syringe": 3
 	},
 	{
 		"tourniquet": 30,
 		"medkit": 4,
 		"energy_drink": 15,
-		"chocolate": 4
+		"syringe": 4
 	}
 ]

@@ -1,5 +1,6 @@
 import { MAP_OBSTACLE_SUPPLIERS, OBSTACLE_SUPPLIERS } from ".";
 import { world } from "../..";
+import { ObstacleTypes } from "../../constants";
 import { MapObstacleData, ObstacleData } from "../../types/data";
 import { LOOT_TABLES } from "../../types/loot_table";
 import { CircleHitbox } from "../../types/math";
@@ -19,7 +20,7 @@ class SpawnerMapSupplier extends MapObstacleSupplier {
 }
 
 export default class Spawner extends Obstacle {
-	static readonly TYPE = "spawner";
+	static readonly TYPE = ObstacleTypes.SPAWNER;
 	type = Spawner.TYPE;
 	lootTable: string;
 

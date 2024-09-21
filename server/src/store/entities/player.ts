@@ -330,7 +330,7 @@ export default class Player extends Entity {
 		if (this.maxHealTicks) return;
 		if (!this.inventory.healings[item]) return;
 		if (this.health >= this.maxHealth && !Healing.healingData.get(item)?.boost) return;
-		world.onceSounds.push({ path: `items/${item}.mp3`, position: this.position })
+		//world.onceSounds.push({ path: `items/${item}.mp3`, position: this.position })
 		this.maxHealTicks = this.healTicks = Healing.healingData.get(item)!.time * TICKS_PER_SECOND / 1000;
 		this.currentHealItem = item;
 		this.healItem = item;

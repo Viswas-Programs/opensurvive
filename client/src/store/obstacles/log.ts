@@ -1,4 +1,5 @@
 import { OBSTACLE_SUPPLIERS } from ".";
+import { ObstacleTypes } from "../../constants";
 import { getMode } from "../../homepage";
 import { RectHitbox } from "../../types/math";
 import { MinObstacle } from "../../types/minimized";
@@ -22,7 +23,7 @@ export class LogSupplier implements ObstacleSupplier {
 }
 
 export default class Log extends Obstacle {
-	static readonly TYPE = "log";
+	static readonly TYPE = ObstacleTypes.LOG;
 	type = Log.TYPE;
 	special!: "stump" | "1" | "2" | "3" | "4" | "5";
 	static images = new Map<string, HTMLImageElement>();

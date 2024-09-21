@@ -8,7 +8,7 @@ import { Animation } from "./animation";
 // Obstacles inside the game
 export abstract class Obstacle implements Renderable, RenderableMap {
 	id!: string;
-	type!: string;
+	type!: number;
 	position!: Vec2;
 	direction!: Vec2;
 	hitbox!: Hitbox;

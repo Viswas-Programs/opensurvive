@@ -1,4 +1,5 @@
 import { OBSTACLE_SUPPLIERS } from ".";
+import { ObstacleTypes } from "../../constants";
 import { getMode } from "../../homepage";
 import { RectHitbox } from "../../types/math";
 import { MinObstacle } from "../../types/minimized";
@@ -13,7 +14,7 @@ class DeskSupplier implements ObstacleSupplier {
 }
 
 export default class Desk extends Obstacle {
-	static readonly TYPE = "desk";
+	static readonly TYPE = ObstacleTypes.DESK;
 	type = Desk.TYPE;
 	static deskImg = new Image();
 	static deskResidueImg = new Image();

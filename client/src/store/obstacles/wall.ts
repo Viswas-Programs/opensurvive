@@ -1,4 +1,5 @@
 import { OBSTACLE_SUPPLIERS } from ".";
+import { ObstacleTypes } from "../../constants";
 import { RenderableLayerN1 } from "../../types/extenstions";
 import { RectHitbox } from "../../types/math";
 import { MinObstacle } from "../../types/minimized";
@@ -18,7 +19,7 @@ class WallSupplier implements ObstacleSupplier {
 }
 
 export default class Wall extends Obstacle implements RenderableLayerN1 {
-	static readonly TYPE = "wall";
+	static readonly TYPE = ObstacleTypes.WALL;
 	type = Wall.TYPE;
 	color!: number;
 	zIndex = 1;

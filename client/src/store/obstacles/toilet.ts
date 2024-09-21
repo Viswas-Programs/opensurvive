@@ -5,6 +5,7 @@ import { circleFromCenter } from "../../utils";
 import { ObstacleSupplier } from "../../types/supplier";
 import { OBSTACLE_SUPPLIERS } from ".";
 import { getMode } from "../../homepage";
+import { ObstacleTypes } from "../../constants";
 class ToiletSupplier implements ObstacleSupplier {
 	create(minObstacle: MinObstacle) {
 		return new Toilet(minObstacle);
@@ -13,7 +14,7 @@ class ToiletSupplier implements ObstacleSupplier {
 
 // Toilet
 export default class Toilet extends Obstacle {
-	static readonly TYPE = "toilet";
+	static readonly TYPE = ObstacleTypes.TOILET;
 	type = Toilet.TYPE;
 	zIndex = 9;
 	static toiletImg = new Image();

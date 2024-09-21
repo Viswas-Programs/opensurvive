@@ -1,5 +1,6 @@
 import { MAP_OBSTACLE_SUPPLIERS, OBSTACLE_SUPPLIERS } from ".";
 import { world } from "../..";
+import { ObstacleTypes } from "../../constants";
 import { CircleHitbox } from "../../types/math";
 import { Obstacle } from "../../types/obstacle";
 import { MapObstacleSupplier, ObstacleSupplier } from "../../types/supplier";
@@ -17,7 +18,7 @@ class BushMapSupplier extends MapObstacleSupplier {
 }
 
 export default class Bush extends Obstacle {
-	static readonly TYPE = "bush";
+	static readonly TYPE = ObstacleTypes.BUSH;
 	type = Bush.TYPE;
 	noCollision = true;
 

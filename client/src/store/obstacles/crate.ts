@@ -1,4 +1,5 @@
 import { OBSTACLE_SUPPLIERS } from ".";
+import { ObstacleTypes } from "../../constants";
 import { getMode } from "../../homepage";
 import { RectHitbox } from "../../types/math";
 import { MinObstacle } from "../../types/minimized";
@@ -22,7 +23,7 @@ export class CrateSupplier implements ObstacleSupplier {
 }
 
 export default class Crate extends Obstacle {
-	static readonly TYPE = "crate";
+	static readonly TYPE = ObstacleTypes.CRATE;
 	type = Crate.TYPE;
 	special!: "normal" | "grenade" | "soviet" | "woodpile";
 	static crateImg = new Image();

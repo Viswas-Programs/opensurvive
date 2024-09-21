@@ -18,7 +18,7 @@ function checkForObsZONEOBSCollision(world: World, position: Vec2): boolean {
 }
 export class Obstacle {
 	id: string;
-	type = "";
+	type = 19;
 	position: Vec2;
 	direction: Vec2;
 	baseHitbox: Hitbox;
@@ -37,7 +37,7 @@ export class Obstacle {
 	// Particle type to emit when damaged
 	damageParticle?: string;
 	surface = "normal";
-
+	_needToSendAnimations = false;
 	constructor(world: World, baseHitbox: Hitbox, minHitbox: Hitbox, health: number, maxHealth: number, direction?: Vec2) {
 		if (baseHitbox.type !== minHitbox.type) throw new Error("Hitboxes are not the same type!");
 		this.id = ID();
@@ -134,7 +134,8 @@ export class Obstacle {
 			direction: this.direction.minimize(),
 			hitbox: this.hitbox.minimize(),
 			despawn: this.despawn,
-			animations: this.animations
+			animations: this.animations,
+			_needToSendAnimations: this._needToSendAnimations
 		};
 	}
 

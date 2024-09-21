@@ -5,6 +5,7 @@ import { circleFromCenter } from "../../utils";
 import { ObstacleSupplier } from "../../types/supplier";
 import { OBSTACLE_SUPPLIERS } from ".";
 import { getMode } from "../../homepage";
+import { ObstacleTypes } from "../../constants";
 
 interface AdditionalObstacle {
 	special: "normal" | "dirty"
@@ -18,7 +19,7 @@ class BarrelSupplier implements ObstacleSupplier {
 
 // Barrel
 export default class Barrel extends Obstacle {
-	static readonly TYPE = "barrel";
+	static readonly TYPE = ObstacleTypes.BARREL;
 	type = Barrel.TYPE;
 	zIndex = 0;
 	special!: string;
