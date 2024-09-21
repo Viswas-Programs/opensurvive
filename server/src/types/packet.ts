@@ -281,7 +281,7 @@ export class ParticlesPacket extends IPacketSERVER {
 	constructor(particles: Particle[], player: Player) {
 		super()
 		this.particles = particles.filter(particle => particle.position.addVec(player.position.inverse()).magnitudeSqr() < Math.pow(BASE_RADIUS * player.scope, 2)).map(particle => particle.minimize());
-		this.allocBytes += this.particles.length * 35
+		this.particles.forEach(particle => {this.allocBytes += particle.id.length+22 })
 	}
 	serialise() {
 		super.serialise();
