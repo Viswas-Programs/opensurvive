@@ -6,8 +6,16 @@ import { CountableString } from "./types/misc"
 import { Weapon } from "./types/weapon"
 import { Inventory } from "./types/entity"
 import { TracerData } from "./types/data"
-import { world } from "./game"
 import { EntityTypes, ObstacleTypes } from "./constants"
+
+const gunNumToID: Map<number, string> = new Map([
+    [0, "fists"],
+    [1, "cqbr"],
+    [2, "mp9"],
+    [3, "m18"],
+    [4, "stf_12"],
+    [5, "svd-m"]
+])
 export function deserialiseMinParticles(stream: IslandrBitStream): MinParticle[]{
     const particles: MinParticle[] = []
     for (let ii = 0; ii < stream.readInt8(); ii++) {
@@ -52,7 +60,7 @@ function _getWeapons(stream: IslandrBitStream): Weapon[] {
         const weaponExistOrNot = stream.readBoolean()
         if (!weaponExistOrNot) weapons.push(null)
         else {
-            const id = stream.readASCIIString()
+            const id = gunNumToID.get( stream.readInt8())!
             const weapon: MinWeapon = { nameId: id };
 
             if (castCorrectWeapon(weapon).type == "gun") { const mag = stream.readInt8(); weapons.push(castCorrectWeapon(weapon, mag)); }
@@ -61,11 +69,17 @@ function _getWeapons(stream: IslandrBitStream): Weapon[] {
     }
     return <Weapon[]>weapons;
 }
+const healingIDsToNum: Map<number, string> = new Map([
+    [0, "energy_drink"],
+    [1, "medkit"],
+    [2, "syringe"],
+    [3, "tourniquet"]
+])
 function _getHealings(stream: IslandrBitStream): CountableString {
     const healingsJSON: CountableString = {}
     const size = stream.readInt8()
     for (let ii = 0; ii < size; ii++) {
-        const indexer = stream.readHealingItem()
+        const indexer = healingIDsToNum.get( stream.readInt8())!
         const index = stream.readInt8()
         healingsJSON[indexer] = index
     }

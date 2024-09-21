@@ -6,8 +6,9 @@ import "./loadout";
 import { getToken, setToken, setUsername } from "./states";
 import { wait } from "./utils";
 let mode = "normal"
+let pageLoaded = false
 wait(10000).then(() => {
-	if (document.readyState.toLowerCase() != "complete") { document.getElementsByClassName("loading-text")[0]!.textContent = "Error in loading page, reloading in 5"; wait(5000).then(() => window.location.reload()) }
+	if (document.readyState.toLowerCase() != "complete" || !pageLoaded) { document.getElementsByClassName("loading-text")[0]!.textContent = "Error in loading page, reloading in 5"; wait(5000).then(() => window.location.reload()) }
 })
 export function setMode(md: string) {
 	mode = md
@@ -15,7 +16,8 @@ export function setMode(md: string) {
 export function getMode(): string {
 	return mode
 }
-	$(document).ready(function () {
+$(document).ready(function () {
+
 		$('.arrow').click(function () {
 			$('.box-selectable').toggle();
 			$(this).toggleClass('arrow-down');
@@ -51,7 +53,7 @@ if (!window.location.href!.includes("/loadout")) {
 		var volumeIcon = <HTMLDivElement>document.getElementById('volume-icon');
 		var volumeSlider = <HTMLDivElement>document.getElementById('volume-slider');
 		var volumeRange = <HTMLInputElement>document.getElementById('volume-range');
-
+		pageLoaded = true
 		var started = false;
 		if (!started) {
 			audio.play();

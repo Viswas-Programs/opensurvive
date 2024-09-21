@@ -100,16 +100,32 @@ export function calculateAllocBytesForTickPkt(player: Player): number {
 	for (let ii = 0; ii < player.inventory.ammos.length; ii++) {allocBytes++}
 	for (let ii = 0; ii < 4; ii++) {
 		if (player.inventory.getWeapon(ii) != undefined) {
-			allocBytes += player.inventory.getWeapon(ii)!.nameId.length;
+			allocBytes ++;
 			if (ii < 3 && player.inventory.getWeapon(ii)?.type == "gun") {allocBytes++ }}}
 	if (player.inventory.healings) {
-		for (let ii = 0; ii < Object.keys(player.inventory.healings).length; ii++) {allocBytes += 16}}
+		for (let ii = 0; ii < Object.keys(player.inventory.healings).length; ii++) {allocBytes += 2}}
 	for (let ii = 0; ii < player.inventory.scopes.length; ii++) { allocBytes++ }
 	if (player.inventory.utilities) {
 		for (let ii = 0; ii < Object.keys(player.inventory.utilities).length; ii++) { allocBytes += 16 }}
 	for (let ii = 0; ii < player.inventory.ammos.length; ii++) { allocBytes++ }
 	return allocBytes;
 }
+
+const gunIDsToNum: Map<string, number> = new Map([
+	["fists", 0],
+	["cqbr", 1],
+	["mp9", 2],
+	["m18", 3],
+	["stf_12", 4],
+	["svd-m", 5]
+])
+
+const healingIDsToNum: Map<string, number> = new Map([
+	["energy_drink", 0],
+	["medkit", 1],
+	["syringe", 2],
+	["tourniquet", 3]
+])
 export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 	// heal items
 	stream.writeBoolean(!!player.currentHealItem)
@@ -130,14 +146,14 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 		if (player.inventory.getWeapon(ii) == undefined) stream.writeBoolean(false);
 		else {
 			stream.writeBoolean(true)
-			stream.writeASCIIString(player.inventory.getWeapon(ii)!.minimize().nameId)
+			stream.writeInt8(gunIDsToNum.get( player.inventory.getWeapon(ii)!.minimize().nameId)!)
 			if (ii < 3 && player.inventory.getWeapon(ii)?.type == "gun") { stream.writeInt8((player.inventory.getWeapon(ii)! as GunWeapon).magazine) }
 		}
 	}
 	if (player.inventory.healings) {
 		stream.writeInt8(Object.keys(player.inventory.healings).length)
 		for (let ii = 0; ii < Object.keys(player.inventory.healings).length; ii++) {
-			stream.writeHealingItem(Object.keys(player.inventory.healings)[ii])
+			stream.writeInt8(healingIDsToNum.get(Object.keys(player.inventory.healings)[ii])!)
 			stream.writeInt8(Number(Object.values(player.inventory.healings)[ii]))
 		}
 	}
