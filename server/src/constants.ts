@@ -12,6 +12,8 @@ export const PUSH_THRESHOLD = 1e-16;
 // Translate original surviv.io game units to suit this one
 export const GLOBAL_UNIT_MULTIPLIER = 1;
 export const PLAYER_THRESHOLD = 2;
+
+export enum PlayerAnimationTypes { }
 export enum OutPacketTypes {
 	GAME = 0,
 	MAP = 1,
@@ -42,3 +44,34 @@ export enum RecvPacketTypes {
 	SR_SCOPE_UPD = 15,
 }
 export const TSCONFIG = JSON.parse(fs.readFileSync("./tsconfig.json", { encoding: "utf8" }));
+
+export enum EntityTypes {
+	AMMO = 0,
+	BACKPACK = 1, 
+	BULLET = 2,
+	EXPLOSION = 3,
+	GRENADE = 4,
+	GUN = 5,
+	HELMET = 6,
+	PLAYER = 7, 
+	SCOPE = 8,
+	VEST = 9,
+	HEALING=10
+}
+
+export enum ObstacleTypes {
+	BARREL = 1,
+	BOX = 2,
+	BUSH = 3,
+	CRATE = 4,
+	DESK = 5,
+	DOOR = 6,
+	LOG = 7,
+	ROOF = 8,
+	STONE = 9,
+	TABLE = 10,
+	TOILET = 11,
+	TOILET_MORE = 12,
+	TREE = 13,
+	WALL = 14
+}

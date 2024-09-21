@@ -41,7 +41,6 @@ export function send(socket: WebSocket, packet: IPacket) {
 export function sendBitstream(socket: WebSocket, packet: IPacketSERVER) {
     packet.serialise();
     socket.send(deflate(packet.getBuffer()).buffer);
-    console.log(deflate(packet.getBuffer()).buffer.byteLength / 8, " bytes for this packet")
 }
 // Receive packet
 export function receive(msg: ArrayBuffer) {

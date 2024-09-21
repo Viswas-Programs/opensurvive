@@ -72,20 +72,21 @@ export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: Isla
     })
 }
 export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitStream, player: Player) {
-	stream.writeASCIIString(entity.type)
+	stream.writeInt8(entity.type)
 	stream.writeInt16(Number(entity.id))
 	//write the type
 	//write position
 	stream.writeFloat64(entity.position.x)
 	stream.writeFloat64(entity.position.y)
 	//write direction
-	if (entity.type == "player"){console.log(entity.direction)}
 	stream.writeFloat64(entity.direction.x)
 	stream.writeFloat64(entity.direction.y)
 	//despawn configs
 	stream.writeBoolean(entity.despawn);
-	stream.writeInt8(entity.animations.length)
-	entity.animations.forEach(animation => stream.writeASCIIString(animation))
+	if (entity._needsToSendAnimations) {
+		stream.writeInt8(entity.animations.length)
+		entity.animations.forEach(animation => stream.writeASCIIString(animation))
+	}
 }
 
 

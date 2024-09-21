@@ -1,5 +1,5 @@
 import { ENTITY_SUPPLIERS, Healing } from ".";
-import { LANG } from "../../constants";
+import { EntityTypes, LANG } from "../../constants";
 import { translate } from "../../languages";
 import { getWeaponHUDImagePath } from "../../textures";
 import { Entity, Inventory, PartialInventory } from "../../types/entity";
@@ -60,7 +60,7 @@ function loadProcItemImages(type: string) {
 }
 ["helmet", "backpack"].forEach(type => loadProcItemImages(type))
 export default class Player extends Entity {
-	static readonly TYPE = "player";
+	static readonly TYPE = EntityTypes.PLAYER;
 	type = Player.TYPE;
 	id!: string;
 	username!: string;

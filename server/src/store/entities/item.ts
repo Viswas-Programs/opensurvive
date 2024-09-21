@@ -6,7 +6,7 @@ import { Obstacle } from "../../types/obstacle";
 import Player from "./player";
 
 export default abstract class Item extends Entity {
-	type = "item";
+	type = 17;
 	discardable = true;
 	interactable = true;
 	friction = 0.02; // frictional acceleration, not force

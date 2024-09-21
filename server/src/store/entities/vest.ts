@@ -5,10 +5,11 @@ import { world } from "../..";
 import Player from "./player";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
+import { EntityTypes } from "../../constants";
 
 export default class Vest extends Item {
 	static readonly VEST_REDUCTION: number[] = [];
-	type = "vest";
+	type = EntityTypes.VEST;
 	hitbox = new CircleHitbox(1);
 	level: number;
 
@@ -21,8 +22,6 @@ export default class Vest extends Item {
 		super();
 		this.level = level;
 		this.allocBytes++;
-		this.allocBytes += this.type.length;
-		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
 
 	picked(player: Player) {

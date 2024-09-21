@@ -1,5 +1,5 @@
 import { world } from "../..";
-import { GLOBAL_UNIT_MULTIPLIER, TICKS_PER_SECOND } from "../../constants";
+import { EntityTypes, GLOBAL_UNIT_MULTIPLIER, TICKS_PER_SECOND } from "../../constants";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
 import { Entity, Inventory } from "../../types/entity";
@@ -16,7 +16,7 @@ import Healing from "./healing";
 import Helmet from "./helmet";
 import Vest from "./vest";
 export default class Player extends Entity {
-	type = "player";
+	type = EntityTypes.PLAYER;
 	currentHealItem: string | null;
 	interactMessage: string | null;
 	hitbox = new CircleHitbox(1);
@@ -72,8 +72,8 @@ export default class Player extends Entity {
 		this.currentHealItem = null;
 		this.accessToken = accessToken;
 		this.isMobile = isMobile!;
-		this.allocBytes += 35 + this.username.length + 1;
-		this.allocBytes += this.type.length;
+		this.allocBytes += 35 + this.username.length + 1 + 1; //last +1 is for animation length byte
+		this._needsToSendAnimations = true
 		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
 
@@ -278,10 +278,6 @@ export default class Player extends Entity {
 				}
 			}
 		}
-
-		for (let ii = 0; ii < Object.keys(GunColor).length / 2; ii++)
-			if (this.inventory.ammos[ii] > 0)
-				spawnAmmo(this.inventory.ammos[ii], ii, this.position);
 
 		for (const healing of Object.keys(this.inventory.healings)) {
 			if (this.inventory.healings[healing]) {

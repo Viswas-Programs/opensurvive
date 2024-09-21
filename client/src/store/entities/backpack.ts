@@ -1,4 +1,5 @@
 import { ENTITY_SUPPLIERS } from ".";
+import { EntityTypes } from "../../constants";
 import { getMode } from "../../homepage";
 import { getBackpackImagePath } from "../../textures";
 import { Entity } from "../../types/entity";
@@ -19,7 +20,7 @@ class BackpackSupplier implements EntitySupplier {
 
 export default class Backpack extends Entity {
 	static readonly backpackImages: HTMLImageElement[] = Array(3).fill(undefined);
-	static readonly TYPE = "backpack";
+	static readonly TYPE = EntityTypes.BACKPACK;
 	type = Backpack.TYPE;
 	level!: number;
 	zIndex = 8;

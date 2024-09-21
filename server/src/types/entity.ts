@@ -91,7 +91,7 @@ export class Inventory {
 
 export class Entity {
 	id: string;
-	type = "";
+	type = 18;
 	position: Vec2;
 	velocity: Vec2 = Vec2.ZERO;
 	direction: Vec2 = Vec2.UNIT_X;
@@ -99,6 +99,7 @@ export class Entity {
 	noCollision = false;
 	collisionLayers = [-1]; // -1 means on all layers
 	vulnerable = true;
+	_needsToSendAnimations = false
 	health = 100;
 	maxHealth = 100;
 	// If airborne, no effect from terrain
@@ -115,7 +116,7 @@ export class Entity {
 	// Particle type to emit when damaged
 	damageParticle?: string;
 	isMobile = false;
-	allocBytes = 37;
+	allocBytes = 36;
 	goodOldPos = Vec2.ZERO;
 	goodOldDirection = Vec2.ZERO;
 	surface = "normal";
@@ -129,6 +130,7 @@ export class Entity {
 	tick(_entities: Entity[], _obstacles: Obstacle[]) {
 		if (!Number.isNaN(this.position.x)) this.goodOldPos = this.position
 		if (!Number.isNaN(this.direction.x)) this.goodOldDirection = this.direction
+		if (this.animations.length )console.log(this.type, this.animations)
 		const lastPosition = this.position;
 		// Add the velocity to the position, and cap it at map size.
 		if (this.airborne)
@@ -223,7 +225,8 @@ export class Entity {
 			direction: this.direction.minimize(),
 			hitbox: this.hitbox.minimize(),
 			animations: this.animations,
-			despawn: this.despawn
+			despawn: this.despawn,
+			_needsToSendAnimations: this._needsToSendAnimations
 		}
 		return a
 	}

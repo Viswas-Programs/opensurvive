@@ -61,3 +61,33 @@ export enum GunColor {
 	GREEN = 3, // 5.56mm
 	OLIVE = 5, // .308 Subsonic
 }
+export enum EntityTypes {
+	AMMO = 0,
+	BACKPACK = 1,
+	BULLET = 2,
+	EXPLOSION = 3,
+	GRENADE = 4,
+	GUN = 5,
+	HELMET = 6,
+	PLAYER = 7,
+	SCOPE = 8,
+	VEST = 9,
+	HEALING = 10
+}
+
+export enum ObstacleTypes {
+	BARREL = 1,
+	BOX = 2,
+	BUSH = 3,
+	CRATE = 4, 
+	DESK = 5, 
+	DOOR = 6,
+	LOG = 7,
+	ROOF = 8,
+	STONE = 9,
+	TABLE = 10,
+	TOILET = 11, 
+	TOILET_MORE = 12,
+	TREE = 13, 
+	WALL = 14
+}

@@ -1,5 +1,5 @@
 import { Ammo, ENTITY_SUPPLIERS } from ".";
-import { GunColor } from "../../constants";
+import { EntityTypes, GunColor } from "../../constants";
 import { getMode } from "../../homepage";
 import { getWeaponImagePath } from "../../textures";
 import { Entity } from "../../types/entity";
@@ -21,7 +21,7 @@ class GunSupplier implements EntitySupplier {
 
 export default class Gun extends Entity {
 	static readonly gunImages = new Map<string, HTMLImageElement>();
-	static readonly TYPE = "gun";
+	static readonly TYPE = EntityTypes.GUN;
 	type = Gun.TYPE;
 	nameId!: string;
 	color!: GunColor;

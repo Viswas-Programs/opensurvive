@@ -1,5 +1,6 @@
 // Note: This is the grenade item
 
+import { EntityTypes } from "../../constants";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
 import { Inventory } from "../../types/entity";
@@ -9,7 +10,7 @@ import Item from "./item";
 import Player from "./player";
 
 export default class Grenade extends Item {
-	type = "grenade";
+	type = EntityTypes.GRENADE;
 	hitbox = new CircleHitbox(1);
 	nameId: string; // grenade ID, but id was taken for entity already
 	amount: number;
@@ -20,7 +21,6 @@ export default class Grenade extends Item {
 		this.nameId = nameId;
 		this.amount = amount;
 		this.allocBytes += 12
-		this.allocBytes += this.type.length;
 		this.animations.forEach(animation => this.allocBytes += animation.length)
 		
 	}

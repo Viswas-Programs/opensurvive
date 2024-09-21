@@ -1,4 +1,5 @@
 import { Player } from ".";
+import { EntityTypes } from "../../constants";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser, writeHitboxes } from "../../serialisers";
 import { Entity } from "../../types/entity";
@@ -6,7 +7,7 @@ import { CircleHitbox, Vec2 } from "../../types/math";
 import { Obstacle } from "../../types/obstacle";
 
 export default class Explosion extends Entity {
-	type = "explosion";
+	type = EntityTypes.EXPLOSION;
 	hitbox: CircleHitbox;
 	exploder: Entity | Obstacle;
 	dmg: number;
@@ -48,7 +49,7 @@ export default class Explosion extends Entity {
 		const slope = (this.radius * this.inflation - this.radius) / this.maxHealth;
 		// y = mx + radius
 		this.hitbox = new CircleHitbox(slope * (this.maxHealth - this.health) + this.radius);
-		this.health--;
+		this.health-=2;
 		if (this.health <= 0) this.die();
 	}
 

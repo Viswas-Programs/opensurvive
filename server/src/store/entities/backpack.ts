@@ -1,4 +1,5 @@
 import { world } from "../..";
+import { EntityTypes } from "../../constants";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
 import { CircleHitbox } from "../../types/math";
@@ -6,7 +7,7 @@ import Item from "./item";
 import Player from "./player";
 
 export default class Backpack extends Item {
-	type = "backpack";
+	type = EntityTypes.BACKPACK;
 	hitbox = new CircleHitbox(1);
 	level: number;
 
@@ -14,8 +15,6 @@ export default class Backpack extends Item {
 		super();
 		this.level = level;
 		this.allocBytes++;
-		this.allocBytes += this.type.length;
-		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
 
 	picked(player: Player) {

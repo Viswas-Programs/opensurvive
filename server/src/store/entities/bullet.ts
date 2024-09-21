@@ -1,5 +1,5 @@
 import { Player } from ".";
-import { GLOBAL_UNIT_MULTIPLIER } from "../../constants";
+import { EntityTypes, GLOBAL_UNIT_MULTIPLIER } from "../../constants";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser, writeHitboxes } from "../../serialisers";
 import { TracerData } from "../../types/data";
@@ -8,7 +8,7 @@ import { CircleHitbox, Line, Vec2 } from "../../types/math";
 import { Obstacle } from "../../types/obstacle";
 
 export default class Bullet extends Entity {
-	type = "bullet";
+	type = EntityTypes.BULLET;
 	collisionLayers = [0];
 	shooter: Entity | Obstacle;
 	data: TracerData;
@@ -29,8 +29,6 @@ export default class Bullet extends Entity {
 		this.vulnerable = false;
 		this.falloff = falloff;
 		this.allocBytes += 44;
-		this.allocBytes += this.type.length;
-		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
 	collisionCheck(entities: Entity[], obstacles: Obstacle[]) {
 		var combined: (Entity | Obstacle)[] = [];

@@ -26,10 +26,11 @@ export type MinHitbox = MinRectHitbox | MinCircleHitbox;
 
 export class MinEntity {
 	id!: string;
-	type!: string;
+	type!: number;
 	position!: MinVec2;
 	direction!: MinVec2;
 	hitbox!: MinHitbox;
+	_needsToSendAnimations!: boolean
 	animations!: string[];
 	despawn!: boolean;
 }

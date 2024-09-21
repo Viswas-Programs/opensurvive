@@ -1,4 +1,5 @@
 import { ENTITY_SUPPLIERS } from ".";
+import { EntityTypes } from "../../constants";
 import { getMode } from "../../homepage";
 import { getScopeImagePath } from "../../textures";
 import { Entity } from "../../types/entity";
@@ -19,7 +20,7 @@ class ScopeSupplier implements EntitySupplier {
 
 export default class Scope extends Entity {
 	static readonly helmetImages: HTMLImageElement[] = Array(15).fill(undefined);
-	static readonly TYPE = "scope";
+	static readonly TYPE = EntityTypes.SCOPE;
 	type = Scope.TYPE;
 	zoom!: number;
 	zIndex = 8;

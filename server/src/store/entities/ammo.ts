@@ -1,3 +1,4 @@
+import { EntityTypes } from "../../constants";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
 import { Inventory } from "../../types/entity";
@@ -7,7 +8,7 @@ import Item from "./item";
 import Player from "./player";
 
 export default class Ammo extends Item {
-	type = "ammo";
+	type = EntityTypes.AMMO;
 	hitbox = new CircleHitbox(1);
 	amount: number;
 	color: GunColor;
@@ -17,8 +18,6 @@ export default class Ammo extends Item {
 		this.amount = amount;
 		this.color = color;
 		this.allocBytes += 2;
-		this.allocBytes += this.type.length;
-		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
 
 	picked(player: Player) {

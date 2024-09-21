@@ -1,4 +1,5 @@
 import { ENTITY_SUPPLIERS } from ".";
+import { EntityTypes } from "../../constants";
 import { Entity } from "../../types/entity";
 import { MinEntity } from "../../types/minimized";
 import { EntitySupplier } from "../../types/supplier";
@@ -17,7 +18,7 @@ class ExplosionSupplier implements EntitySupplier {
 }
 
 export default class Explosion extends Entity {
-	static readonly TYPE = "explosion";
+	static readonly TYPE = EntityTypes.EXPLOSION;
 	type = Explosion.TYPE;
 	
 

@@ -1,5 +1,5 @@
 import { ENTITY_SUPPLIERS } from ".";
-import { GunColor } from "../../constants";
+import { EntityTypes, GunColor } from "../../constants";
 import { getTPS } from "../../game";
 import { getMode } from "../../homepage";
 import { Entity } from "../../types/entity";
@@ -27,7 +27,7 @@ for (let ii = 0; ii < 4; ii++ ) {
 	ammoImgs.set(ii, ammoImg)
 }
 export default class Ammo extends Entity {
-	static readonly TYPE = "ammo";
+	static readonly TYPE = EntityTypes.AMMO;
 	static colorScheme: string[][] = [];
 	type = Ammo.TYPE;
 	amount!: number;

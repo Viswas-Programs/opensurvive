@@ -1,8 +1,9 @@
+import { EntityTypes } from "../../constants";
 import { DummyEntity } from "../../types/entity";
 import { MinEntity } from "../../types/minimized";
 import { EntitySupplier } from "../../types/supplier";
 
-export const ENTITY_SUPPLIERS = new Map<string, EntitySupplier>();
+export const ENTITY_SUPPLIERS = new Map<EntityTypes, EntitySupplier>();
 
 export { default as Ammo } from "./ammo";
 export { default as Bullet } from "./bullet";

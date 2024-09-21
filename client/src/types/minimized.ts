@@ -24,7 +24,7 @@ export type MinHitbox = MinRectHitbox | MinCircleHitbox;
 
 export interface MinEntity {
 	id: string;
-	type: string;
+	type: number;
 	position: MinVec2;
 	direction: MinVec2;
 	hitbox: MinHitbox;

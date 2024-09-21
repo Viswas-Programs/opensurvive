@@ -5,10 +5,11 @@ import Player from "./player";
 import * as fs from "fs";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
+import { EntityTypes } from "../../constants";
 
 export default class Helmet extends Item {
 	static readonly HELMET_REDUCTION: number[] = [];
-	type = "helmet";
+	type = EntityTypes.HELMET;
 	hitbox = new CircleHitbox(1);
 	level: number;
 
@@ -20,8 +21,6 @@ export default class Helmet extends Item {
 		super();
 		this.level = level;
 		this.allocBytes++;
-		this.allocBytes += this.type.length;
-		this.animations.forEach(animation => this.allocBytes += animation.length)
 
 	}
 

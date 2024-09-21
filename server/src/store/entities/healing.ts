@@ -7,10 +7,11 @@ import { HealingData } from "../../types/data";
 import { world } from "../..";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
+import { EntityTypes } from "../../constants";
 
 export default class Healing extends Item {
 	static readonly healingData = new Map<string, { heal: number, boost: number, time: number }>();
-	type = "healing";
+	type = EntityTypes.HEALING;
 	hitbox = new CircleHitbox(1);
 	nameId: string; // healing item ID, but id was taken for entity already
 	amount: number;
@@ -20,7 +21,6 @@ export default class Healing extends Item {
 		this.nameId = nameId;
 		this.amount = amount;
 		this.allocBytes += 12
-		this.allocBytes += this.type.length;
 		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
 

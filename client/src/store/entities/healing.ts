@@ -1,4 +1,5 @@
 import { ENTITY_SUPPLIERS, Player } from ".";
+import { EntityTypes } from "../../constants";
 import { getMode } from "../../homepage";
 import { getHealingImagePath } from "../../textures";
 import { Entity } from "../../types/entity";
@@ -19,7 +20,7 @@ class HealingSupplier implements EntitySupplier {
 export default class Healing extends Entity {
 	static readonly healingImages = new Map<string, HTMLImageElement>();
 	static mapping: string[];
-	static readonly TYPE = "healing";
+	static readonly TYPE = EntityTypes.HEALING;
 	type = Healing.TYPE;
 	// Used for rendering Grenade size
 	nameId!: string;

@@ -1,4 +1,5 @@
 import { ENTITY_SUPPLIERS } from ".";
+import { EntityTypes } from "../../constants";
 import { getTracerColor } from "../../textures";
 import { TracerData } from "../../types/data";
 import { Entity } from "../../types/entity";
@@ -18,7 +19,7 @@ class BulletSupplier implements EntitySupplier {
 }
 
 export default class Bullet extends Entity {
-	static readonly TYPE = "bullet";
+	static readonly TYPE = EntityTypes.BULLET;
 	type = Bullet.TYPE;
 	// Used for rendering bullet size
 	tracer!: TracerData;

@@ -6,6 +6,7 @@ import { circleFromCenter } from "../../utils";
 import Player from "./player";
 import { getVestImagePath } from "../../textures";
 import { getMode } from "../../homepage";
+import { EntityTypes } from "../../constants";
 
 interface AdditionalEntity {
 	level: number;
@@ -19,7 +20,7 @@ class VestSupplier implements EntitySupplier {
 
 export default class Vest extends Entity {
 	static readonly vestImages: HTMLImageElement[] = Array(4).fill(undefined);
-	static readonly TYPE = "vest";
+	static readonly TYPE = EntityTypes.VEST;
 	type = Vest.TYPE;
 	level!: number;
 	zIndex = 8;

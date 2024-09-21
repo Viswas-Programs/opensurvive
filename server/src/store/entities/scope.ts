@@ -1,4 +1,5 @@
 import { world } from "../..";
+import { EntityTypes } from "../../constants";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
 import { CircleHitbox } from "../../types/math";
@@ -6,7 +7,7 @@ import Item from "./item";
 import Player from "./player";
 
 export default class Scope extends Item {
-	type = "scope";
+	type = EntityTypes.SCOPE;
 	hitbox = new CircleHitbox(1);
 	zoom: number;
 
@@ -14,8 +15,6 @@ export default class Scope extends Item {
 		super();
 		this.zoom = zoom;
 		this.allocBytes++;
-		this.allocBytes += this.type.length;
-		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
 
 	picked(player: Player) {

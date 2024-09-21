@@ -1,4 +1,5 @@
 import { ENTITY_SUPPLIERS } from ".";
+import { EntityTypes } from "../../constants";
 import { getMode } from "../../homepage";
 import { getHelmetImagePath } from "../../textures";
 import { Entity } from "../../types/entity";
@@ -19,7 +20,7 @@ class HelmetSupplier implements EntitySupplier {
 
 export default class Helmet extends Entity {
 	static readonly helmetImages: HTMLImageElement[] = Array(4).fill(undefined);
-	static readonly TYPE = "helmet";
+	static readonly TYPE = EntityTypes.HELMET;
 	type = Helmet.TYPE;
 	level!: number;
 	zIndex = 8;

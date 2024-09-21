@@ -62,7 +62,7 @@ export class PartialInventory {
 // An entity with position, velocity and hitbox
 export abstract class Entity implements Renderable {
 	id!: string;
-	type!: string;
+	type!: number;
 	position!: Vec2;
 	direction!: Vec2;
 	hitbox!: Hitbox;

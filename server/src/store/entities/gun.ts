@@ -1,6 +1,7 @@
 // Note: This is the gun item
 
 import { world } from "../..";
+import { EntityTypes } from "../../constants";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
 import { CircleHitbox, CommonAngles, Vec2 } from "../../types/math";
@@ -11,7 +12,7 @@ import Item from "./item";
 import Player from "./player";
 
 export default class Gun extends Item {
-	type = "gun";
+	type = EntityTypes.GUN;
 	hitbox = new CircleHitbox(2);
 	nameId: string; // Gun ID, but id was taken for entity already
 	color: GunColor;
@@ -21,8 +22,8 @@ export default class Gun extends Item {
 		if (!WEAPON_SUPPLIERS.has(nameId)) console.warn("Creating a gun entity that doesn't have a supplier for its type");
 		this.nameId = nameId;
 		this.color = color;
-		this.allocBytes += 14
-		this.allocBytes += this.type.length;
+		this.allocBytes += 15
+		this._needsToSendAnimations = true
 		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
 

@@ -3,7 +3,7 @@
 	"color": 0,
 	"ammo": 120,
 	"dual": true,
-	"length": 2.2,
+	"length": 2.3,
 	"droppable": true,
 	"normal": {
 		"capacity": 17,

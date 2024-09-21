@@ -4,7 +4,7 @@ import { readFileSync } from "fs";
 import * as ws from "ws";
 import { ID, send, wait, sendBitstream, spawnGun} from "./utils";
 import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ScopeUpdatePacket, ServerSideScopeUpdate, PlayerTickPkt } from "./types/packet";
-import { DIRECTION_VEC, RecvPacketTypes, TICKS_PER_SECOND } from "./constants";
+import { DIRECTION_VEC, EntityTypes, RecvPacketTypes, TICKS_PER_SECOND } from "./constants";
 import {  CommonAngles, RectHitbox, Vec2 } from "./types/math";
 import { Bullet, Player } from "./store/entities";
 import { World } from "./types/world";
@@ -275,13 +275,13 @@ server.on("connection", async socket => {
 });
 setInterval(() => {
 	world.entities.forEach(entity => {
-		if (entity.type == "bullet") (entity as Bullet).collisionCheck(world.entities, world.obstacles)
+		if (entity.type == EntityTypes.BULLET) (entity as Bullet).collisionCheck(world.entities, world.obstacles)
 	})
 }, 5)
 setInterval(() => {
 	world.tick();
 	// Filter players from entities and send them packets
-	const players = <Player[]>world.entities.filter(entity => entity.type === "player");
+	const players = <Player[]>world.entities.filter(entity => entity.type === EntityTypes.PLAYER);
 	players.forEach(player => {
 		const socket = sockets.get(player.id);
 		if (!socket || !playerInitialPacketsSent.get(socket)) return;

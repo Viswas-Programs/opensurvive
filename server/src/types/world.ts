@@ -5,7 +5,7 @@ import { Entity } from "./entity";
 import { CircleHitbox, Vec2 } from "./math";
 import { Obstacle } from "./obstacle";
 import { Particle } from "./particle";
-import { PLAYER_THRESHOLD, TICKS_PER_SECOND } from "../constants";
+import { EntityTypes, PLAYER_THRESHOLD, TICKS_PER_SECOND } from "../constants";
 import { Player } from "../store/entities";
 import { Terrain } from "./terrain";
 import { reset } from "..";
@@ -73,7 +73,7 @@ export class World {
 	}
 
 	playerDied() {
-		this.playerCount = this.entities.filter(entity => entity.type === "player" && !entity.despawn).length;
+		this.playerCount = this.entities.filter(entity => entity.type == EntityTypes.PLAYER && !entity.despawn).length;
 		if (this.zoneActive || this.zoneTick > 0) return;
 		if (!this.playerCount) {
 			console.log("All players have died. Resetting game...");
