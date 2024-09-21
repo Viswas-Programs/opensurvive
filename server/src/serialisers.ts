@@ -28,8 +28,7 @@ export function serialiseMinParticles(particleArray: MinParticle[], stream: Isla
 export function calculateAllocBytesForObs(obstacleArray: Obstacle[]): number {
 	let allocBytes = 2;
 	obstacleArray.forEach(obstacle => {
-		allocBytes += 40
-		allocBytes += obstacle.id.length
+		allocBytes += 42
 		const hitbox = obstacle.hitbox.minimize()
 		if (hitbox.type == "circle") allocBytes += 8;
 		else if (hitbox.width == hitbox.height) allocBytes += 8;
@@ -37,7 +36,7 @@ export function calculateAllocBytesForObs(obstacleArray: Obstacle[]): number {
 		obstacle.animations.forEach(animation => { allocBytes += animation.length  + 1})
 		if (obstacle.type == ObstacleTypes.ROOF) {
 			allocBytes += 31;
-			(<Roof>obstacle).roofless.forEach(id => allocBytes += id.length);
+			(<Roof>obstacle).roofless.forEach(id => allocBytes +=2);
 		}
 		if ((obstacle as any).special) {allocBytes +=(<any>obstacle).special.length+1 }
 	})
@@ -46,7 +45,7 @@ export function calculateAllocBytesForObs(obstacleArray: Obstacle[]): number {
 export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: IslandrBitStream) {
     stream.writeInt8(obstacleArray.length)
 	obstacleArray.forEach((obstacle: MinObstacle) => {
-        stream.writeId(obstacle.id);
+        stream.writeInt16(Number(obstacle.id));
         stream.writeInt8(obstacle.type);
 		stream.writeFloat64(obstacle.position.x); stream.writeFloat64(obstacle.position.y);
 		stream.writeFloat64(obstacle.direction.x); stream.writeFloat64(obstacle.direction.y);
@@ -59,7 +58,7 @@ export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: Isla
 		if (obstacle.type == ObstacleTypes.ROOF) {
 			stream.writeInt8((<any>obstacle).roofless.length);
 			for (let ii = 0; ii < (<any>obstacle).roofless.length; ii++) {
-				stream.writeId((<any>obstacle).roofless[ii])
+				stream.writeInt16(Number((<any>obstacle).roofless[ii]))
 			}
 			stream.writeInt32((<any>obstacle).color)
 			stream.writeASCIIString((<any>obstacle).texture.path)
