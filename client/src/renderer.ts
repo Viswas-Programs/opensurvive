@@ -14,6 +14,7 @@ import "./loadout";
 import "./homepage";
 import { checkLoggedIn } from "./homepage";
 import { Particle } from "./types/particle";
+import { Thing } from "./types/thing";
 
 const canvas = <HTMLCanvasElement> document.getElementById("game");
 canvas.width = window.innerWidth;
@@ -65,7 +66,7 @@ function animate(currentTime: number) {
 			world.terrains.filter(t => t.aboveTerrainLine).forEach(terrain => terrain.render(player, canvas, ctx, scale));
 			
 			// Draw obstacles and entities
-			var combined: (Entity | Obstacle | Particle)[] = [];
+			var combined: (Thing | Particle)[] = [];
 			combined = combined.concat(world.entities, world.obstacles, world.particles);
 			combined.push(player);
 			// Sort them by zIndex. Higher = Above

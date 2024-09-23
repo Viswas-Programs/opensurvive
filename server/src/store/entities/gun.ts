@@ -23,7 +23,7 @@ export default class Gun extends Item {
 		this.nameId = nameId;
 		this.color = color;
 		this.allocBytes += 15
-		this._needsToSendAnimations = true
+		this._needToSendAnimations = true
 		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
 
@@ -47,7 +47,7 @@ export default class Gun extends Item {
 		const gun = new Gun(weapon.nameId, weapon.color);
 		gun.position = this.position;
 		gun.velocity = Vec2.UNIT_X.addAngle(Math.random() * CommonAngles.TWO_PI).scaleAll(0.025);
-		world.entities.push(gun);
+		world.things.push(gun);
 		// Swap the player's weapon on hand with the one on ground
 		player.inventory.setWeapon(castCorrectWeapon(this.nameId));
 		return true;

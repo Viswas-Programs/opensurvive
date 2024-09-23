@@ -5,11 +5,12 @@ import { Player } from "../store/entities";
 import Building from "./building";
 import { Entity } from "./entity";
 import { Vec2 } from "./math";
-import { MinBuilding, MinCircleHitbox, MinMinObstacle, MinObstacle, MinParticle, MinTerrain, MinVec2 } from "./minimized";
+import { MinBuilding, MinCircleHitbox, MinMinObstacle, MinObstacle, MinParticle, MinTerrain, MinThing, MinVec2 } from "./minimized";
 import { MovementDirection } from "./misc";
 import { Obstacle } from "./obstacle";
 import { Particle } from "./particle";
 import { Terrain } from "./terrain";
+import { Thing } from "./thing";
 
 export class  IPacketSERVER {
 	type!: number;
@@ -190,21 +191,16 @@ export class AckPacket extends IPacketSERVER {
 export class GamePacket extends IPacketSERVER {
 	type = OutPacketTypes.GAME;
 	allocBytes = 7;
-	entities: Entity[];
-	obstacles: MinObstacle[];
+	things: MinThing[];
 	alivecount: number;
-	discardEntities?: string[];
-	discardObstacles?: string[];
+	discards?: string[];
 	safeZone?: { hitbox: MinCircleHitbox, position: MinVec2 };
 	nextSafeZone?: { hitbox: MinCircleHitbox, position: MinVec2 };
-	anyDiscardEntities = false;
 	player: Player;
-	anyDiscardObstacles = false;
-	constructor(entities: Entity[], obstacles: Obstacle[], player: Player, alivecount: number, sendAll = false, discardEntities: string[] = [], discardObstacles: string[] = []) {
-		super()
-		this.entities = (sendAll ? entities : entities.filter(entity => entity.position.addVec(player.position.inverse()).magnitudeSqr() < Math.pow(BASE_RADIUS * player.scope, 2)));
+	constructor(things: Thing[], player: Player, alivecount: number, sendAll = false, discardEntities: string[] = [], discardObstacles: string[] = []) {
+		super();
+		this.things = (sendAll ? things : things.filter(thing => thing.position.addVec(player.position.inverse()).magnitudeSqr() < Math.pow(BASE_RADIUS * player.scope, 2))).map(obstacle => obstacle.minimize())
 		this.entities.forEach((entity) => {this.allocBytes += entity.allocBytes})
-		this.obstacles = (sendAll ? obstacles : obstacles.filter(obstacle => obstacle.position.addVec(player.position.inverse()).magnitudeSqr() < Math.pow(BASE_RADIUS * player.scope, 2))).map(obstacle => obstacle.minimize());
 		this.allocBytes += calculateAllocBytesForObs(obstacles)
 		this.alivecount = alivecount;
 		this.player = player;
@@ -230,8 +226,8 @@ export class MapPacket implements IPacket {
 	buildings: MinBuilding[];
 	terrains: MinTerrain[]
 
-	constructor(obstacles: Obstacle[], buildings: Building[], terrains: Terrain[]) {
-		this.obstacles = obstacles.map(obstacle => obstacle.minmin());
+	constructor(obstacles: Thing[], buildings: Building[], terrains: Terrain[]) {
+		this.obstacles = obstacles.map(obstacle => (<Obstacle>obstacle).minmin());
 		this.buildings = buildings.map(building => building.minimize());
 		this.terrains = terrains.map(terrain => terrain.minimize());
 	}

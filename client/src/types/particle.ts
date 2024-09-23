@@ -1,10 +1,11 @@
 import { Player } from "../store/entities";
 import { getParticleImagePath } from "../textures";
 import { circleFromCenter, clamp } from "../utils";
+import { Renderable } from "./extenstions";
 import { CommonAngles, Vec2 } from "./math";
 import { MinParticle } from "./minimized";
 
-export abstract class Particle {
+export abstract class Particle implements Renderable {
 	id!: string;
 	type = "generic";
 	position: Vec2;

@@ -98,7 +98,7 @@ export function reset(map = "regular") {
 		for (ii = 0; ii < (data.amount || 1); ii++) {
 			const obstacle = castMapObstacle(data);
 			if (!obstacle) continue;
-			world.obstacles.push(obstacle);
+			world.things.push(obstacle);
 		}
 	}
 }
@@ -157,10 +157,10 @@ server.on("connection", async socket => {
 	// Send the player the entire map
 	const scope = new Healing("syringe", 1)
 	scope.position = player.position
-	world.entities.push(scope)
-	send(socket, new MapPacket(world.obstacles, world.buildings, world.terrains.concat(...world.buildings.map(b => b.floors.map(fl => fl.terrain)))));
+	world.things.push(scope)
+	send(socket, new MapPacket(world.things.filter(thing => thing.thingType == "obstacle"), world.buildings, world.terrains.concat(...world.buildings.map(b => b.floors.map(fl => fl.terrain)))));
 	// Send the player initial objects
-	send(socket, new GamePacket(world.entities, world.obstacles.concat(...world.buildings.map(b => b.obstacles.map(o => o.obstacle))), player, world.playerCount, true));
+	send(socket, new GamePacket(world.things.concat(...world.buildings.map(b => b.obstacles.map(o => o.obstacle))), player, world.playerCount, true));
 	playerInitialPacketsSent.set(socket, true);
 	sendBitstream(socket, new PlayerTickPkt(player));
 	// If the client doesn't ping for 30 seconds, we assume it is a disconnection.

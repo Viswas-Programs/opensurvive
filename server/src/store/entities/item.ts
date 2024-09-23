@@ -3,6 +3,7 @@ import { Entity } from "../../types/entity";
 import { CommonAngles, Vec2 } from "../../types/math";
 import { CollisionType } from "../../types/misc";
 import { Obstacle } from "../../types/obstacle";
+import { Thing } from "../../types/thing";
 import Player from "./player";
 
 export default abstract class Item extends Entity {
@@ -28,10 +29,10 @@ export default abstract class Item extends Entity {
 		this.markDirty();
 	}
 
-	tick(entities: Entity[], obstacles: Obstacle[]) {
-		super.tick(entities, obstacles);
+	tick(things: Thing[]) {
+		super.tick(things);
 		var colliding = false;
-		for (const entity of entities.filter(e => e.id != this.id)) {
+		for (const entity of things.filter(e => e.id != this.id)) {
 			if (this.collided(entity)) {
 				const movement = this.position.addVec(entity.position.inverse());
 				// Avoid doing sqrt more than once
@@ -42,7 +43,8 @@ export default abstract class Item extends Entity {
 			}
 		}
 		if (!colliding) this.setVelocity(this.velocity.scaleAll(1 - this.friction));
-		for (const obstacle of obstacles.filter(obs => obs.type != ObstacleTypes.ROOF)) {
+		for (const thing of things.filter(obs => obs.type != ObstacleTypes.ROOF)) {
+			const obstacle = <Obstacle>thing;
 			const collisionType = obstacle.collided(this);
 			if (collisionType) {
 				obstacle.onCollision(this);

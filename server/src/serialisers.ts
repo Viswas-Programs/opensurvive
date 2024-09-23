@@ -83,7 +83,7 @@ export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitSt
 	stream.writeFloat64(entity.direction.y)
 	//despawn configs
 	stream.writeBoolean(entity.despawn);
-	if (entity._needsToSendAnimations) {
+	if (entity._needToSendAnimations) {
 		stream.writeInt8(entity.animations.length)
 		entity.animations.forEach(animation => stream.writeASCIIString(animation))
 	}

@@ -7,6 +7,7 @@ import { CircleHitbox, Vec2 } from "../../types/math";
 import { CollisionType, GunColor } from "../../types/misc";
 import { Obstacle } from "../../types/obstacle";
 import { Particle } from "../../types/particle";
+import { Thing } from "../../types/thing";
 import { GunWeapon, WeaponType } from "../../types/weapon";
 import { addKillCounts, changeCurrency, spawnAmmo, spawnGun } from "../../utils";
 import { Roof } from "../obstacles";
@@ -73,7 +74,7 @@ export default class Player extends Entity {
 		this.accessToken = accessToken;
 		this.isMobile = isMobile!;
 		this.allocBytes += 35 + this.username.length + 1 + 1; //last +1 is for animation length byte
-		this._needsToSendAnimations = true
+		this._needToSendAnimations = true
 		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
 
@@ -88,7 +89,7 @@ export default class Player extends Entity {
 		super.setVelocity(velocity);
 	}
 
-	tick(entities: Entity[], obstacles: Obstacle[]) {
+	tick(things: Thing[]) {
 		// When the player dies, don't tick anything
 		if (this.despawn) return;
 		// Decrease boost over time
@@ -124,7 +125,7 @@ export default class Player extends Entity {
 				this.setVelocity();
 			}
 		}
-		super.tick(entities, obstacles);
+		super.tick(things);
 		// Terrain particle
 		const terrain = world.terrainAtPos(this.position);
 		if ([Pond.ID, River.ID, Sea.ID].includes(terrain.id)) {
@@ -135,35 +136,37 @@ export default class Player extends Entity {
 		}
 		// Check for entity hitbox intersection
 		let breaked = false;
-		for (const entity of entities) {
-			if (!entity.interactable) continue;
-			const scaleAllVal = 1.5;
-			//if (entity.hitbox.type == "rect") scaleAllVal = 2
-			if (entity.hitbox.scaleAll(scaleAllVal).inside(this.position, entity.position, entity.direction) ){
-			//if (this.collided(entity)) {
-				this.canInteract = true;
-					this.interactMessage = entity.interactionKey();
+		for (const thing of things) {
+			if (!thing.interactable) continue;
+			if (thing.thingType =="entity") {
+				const entity = <Entity> thing;
+				const scaleAllVal = 1.5;
+				//if (entity.hitbox.type == "rect") scaleAllVal = 2
+				if (entity.hitbox.scaleAll(scaleAllVal).inside(this.position, entity.position, entity.direction) ){
+				//if (this.collided(entity)) {
+					this.canInteract = true;
+						this.interactMessage = entity.interactionKey();
+						// Only interact when trying
+						if (this.tryInteracting || this.isMobile) {
+							this.canInteract = false;
+							entity.interact(this);
+						}
+						breaked = true;
+						break;
+				}
+			} else {
+				const obstacle = <Obstacle>thing;
+				if (obstacle.hitbox.scaleAll(1.5).collideCircle(obstacle.position, obstacle.direction, this.hitbox, this.position, this.direction)) {
+					this.canInteract = true;
+					this.interactMessage = obstacle.interactionKey();
 					// Only interact when trying
-					if (this.tryInteracting || this.isMobile) {
+					if (this.tryInteracting) {
 						this.canInteract = false;
-						entity.interact(this);
+						obstacle.interact(this);
 					}
 					breaked = true;
 					break;
-			}
-		}
-		for (const obstacle of obstacles) {
-			if (!obstacle.interactable) continue;
-			if (obstacle.hitbox.scaleAll(1.5).collideCircle(obstacle.position, obstacle.direction, this.hitbox, this.position, this.direction)) {
-				this.canInteract = true;
-				this.interactMessage = obstacle.interactionKey();
-				// Only interact when trying
-				if (this.tryInteracting) {
-					this.canInteract = false;
-					obstacle.interact(this);
 				}
-				breaked = true;
-				break;
 			}
 		}
 		this.tryInteracting = false;
@@ -172,7 +175,7 @@ export default class Player extends Entity {
 		if (this.tryAttacking && this.attackLock <= 0 && weapon) {
 			function _attack(playerInstance: Player) {
 				if (weapon.type == WeaponType.GUN && (<GunWeapon>weapon).magazine == 0) return;
-				weapon.attack(playerInstance, entities, obstacles);
+				weapon.attack(playerInstance, things);
 				playerInstance.attackLock = weapon.lock;
 				playerInstance.maxReloadTicks = playerInstance.reloadTicks = 0;
 				playerInstance.maxHealTicks = playerInstance.healTicks = 0;
@@ -192,7 +195,9 @@ export default class Player extends Entity {
 				setTimeout(() => { rooflessDel.add(building.id);  this.scope = this._scope }, 45 ) }
 		}
 		// Collision handling
-		for (const obstacle of obstacles) {
+		for (const thing of things) {
+			if (thing.thingType != "obstacle") continue;
+			const obstacle = <Obstacle>thing;
 			const collisionType = obstacle.collided(this);
 			if (collisionType) {
 				obstacle.onCollision(this);
@@ -283,28 +288,28 @@ export default class Player extends Entity {
 			if (this.inventory.healings[healing]) {
 				const item = new Healing(healing, this.inventory.healings[healing]);
 				item.position = this.position;
-				world.entities.push(item);
+				world.things.push(item);
 			}
 		}
 		if (this.inventory.vestLevel) {
 			const item = new Vest(this.inventory.vestLevel);
 			item.position = this.position;
-			world.entities.push(item);
+			world.things.push(item);
 		}
 		if (this.inventory.helmetLevel) {
 			const item = new Helmet(this.inventory.helmetLevel);
 			item.position = this.position;
-			world.entities.push(item);
+			world.things.push(item);
 		}
 		if (this.inventory.backpackLevel) {
 			const item = new Backpack(this.inventory.backpackLevel);
 			item.position = this.position;
-			world.entities.push(item);
+			world.things.push(item);
 		}
 		world.playerDied();
 		// Add kill count to killer
 		if (this.potentialKiller) {
-			const entity = world.entities.find(e => e.id == this.potentialKiller);
+			const entity = world.things.find(e => e.id == this.potentialKiller);
 			if (entity?.type === this.type) {
 				(<Player>entity).killCount++;
 				world.killFeeds.push({ weaponUsed: (<Player>entity).lastHolding, killer: `${(<Player>entity).username}#${(<Player>entity).id}`, killed: `${this.username}#${this.id}` });

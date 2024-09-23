@@ -9,6 +9,7 @@ import { MinWeapon } from "./minimized";
 import { Obstacle } from "./obstacle";
 import { BulletStats, GunData, MeleeData, TracerData } from "./data";
 import { Particle } from "./particle";
+import { Thing } from "./thing";
 
 export enum WeaponType {
 	MELEE = "melee",
@@ -34,7 +35,7 @@ export abstract class Weapon {
 		this.droppable = droppable;
 	}
 
-	abstract attack(attacker: Entity, entities: Entity[], obstacles: Obstacle[]): void;
+	abstract attack(attacker: Entity, things: Thing[]): void;
 
 	minimize() {
 		return <MinWeapon>{ nameId: this.nameId };
@@ -62,29 +63,27 @@ export class MeleeWeapon extends Weapon {
 		this.sounds = data.sounds;
 	}
 
-	attack(attacker: Entity, entities: Entity[], obstacles: Obstacle[]): void {
+	attack(attacker: Entity, things: Thing[]): void {
 		const index = Math.floor(Math.random() * this.animations.length);
 		attacker.animations.push(this.animations[index]);
 		world.onceSounds.push({ path: this.sounds.swing, position: attacker.position });
 
-		this.damageThing(attacker, entities, obstacles);
+		this.damageThing(attacker, things);
 	}
 
 	// Do damage to thing. Delay handled.
-	damageThing(attacker: Entity, entities: Entity[], obstacles: Obstacle[]) {
+	damageThing(attacker: Entity, things: Thing[]) {
 		setTimeout(() => {
 			if (attacker.despawn) return;
-			var combined: (Entity | Obstacle)[] = [];
-			combined = combined.concat(entities, obstacles);
 			const position = attacker.position.addVec(this.offset.addAngle(attacker.direction.angle()));
 			const dummy = new Entity();
 			dummy.hitbox = this.hitbox;
 			dummy.position = position;
 			dummy.direction = attacker.direction;
-			for (const thing of combined)
+			for (const thing of things)
 				if (thing.collided(dummy) && thing.id != attacker.id) {
 					thing.damage(this.damage, attacker.id);
-					if (thing.damageParticle) world.particles.push(new Particle(thing.damageParticle, position, 0.25));
+					if (thing instanceof Obstacle && thing.damageParticle) world.particles.push(new Particle(thing.damageParticle, position, 0.25));
 					
 					if (!this.cleave) break;
 				}
@@ -126,7 +125,7 @@ export class GunWeapon extends Weapon {
 		this.particleToDisplay = data.visuals.particleToDisplay
 	}
 
-	attack(attacker: Entity, _entities: Entity[], _obstacles: Obstacle[]) {
+	attack(attacker: Entity, _things: Thing[]) {
 		this.shoot(attacker);
 	}
 
@@ -143,7 +142,7 @@ export class GunWeapon extends Weapon {
 				const bullet = new Bullet(attacker, this.bullet.damage, Vec2.UNIT_X.addAngle(angles).scaleAll(this.bullet.speed / TICKS_PER_SECOND), randomBetween(this.bullet.range[0], this.bullet.range[1]) / (this.bullet.speed / TICKS_PER_SECOND), this.bullet.falloff, this.tracer);
 				
 				bullet.position = position;
-				world.entities.push(bullet);
+				world.things.push(bullet);
 				
 			}
 		}
@@ -159,7 +158,7 @@ export class GrenadeWeapon extends Weapon {
 	}
 
 
-	attack(attacker: Entity, _entities: Entity[], _obstacles: Obstacle[]) {
+	attack(_attacker: Entity, _things: Thing[]) {
 		//this.attack(attacker, _entities, _obstacles);
 	}
 

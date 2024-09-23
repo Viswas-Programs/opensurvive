@@ -1,25 +1,21 @@
 import * as fs from "fs";
 import Building from "./building";
 import { RedZoneDataEntry } from "./data";
-import { Entity } from "./entity";
 import { CircleHitbox, Vec2 } from "./math";
-import { Obstacle } from "./obstacle";
 import { Particle } from "./particle";
 import { EntityTypes, PLAYER_THRESHOLD, TICKS_PER_SECOND } from "../constants";
 import { Player } from "../store/entities";
 import { Terrain } from "./terrain";
 import { reset } from "..";
+import { Thing } from "./thing";
 
 export class World {
 	ticks = 0;
 	size: Vec2;
-	entities: Entity[] = [];
-	obstacles: Obstacle[] = [];
+	things: Thing[] = [];
 	buildings: Building[] = [];
-	discardEntities: string[] = [];
-	discardObstacles: string[] = [];
-	dirtyEntities: Entity[] = [];
-	dirtyObstacles: Obstacle[] = [];
+	discards: string[] = [];
+	dirtys: Thing[] = [];
 	defaultTerrain: Terrain;
 	terrains: Terrain[] = [];
 	lastSecond = 0;
@@ -65,7 +61,7 @@ export class World {
 
 	addPlayer(player: Player) {
 		this.playerCount++;
-		this.entities.push(player);
+		this.things.push(player);
 		if (!this.zoneActive && this.playerCount >= PLAYER_THRESHOLD) {
 			this.zoneActive = true;
 			console.log("Red zone is now active");
@@ -73,7 +69,7 @@ export class World {
 	}
 
 	playerDied() {
-		this.playerCount = this.entities.filter(entity => entity.type == EntityTypes.PLAYER && !entity.despawn).length;
+		this.playerCount = this.things.filter(entity => entity.type == EntityTypes.PLAYER && !entity.despawn).length;
 		if (this.zoneActive || this.zoneTick > 0) return;
 		if (!this.playerCount) {
 			console.log("All players have died. Resetting game...");
@@ -100,41 +96,25 @@ export class World {
 				this.ticks = 0;
 		}*/
 		// Merge obstacles
-		const allObstacles = this.obstacles.concat(...this.buildings.map(b => b.obstacles.map(o => o.obstacle)));
+		const allThings = this.things.concat(...this.buildings.map(b => b.obstacles.map(o => o.obstacle)));
 
 		// Tick every entity and obstacle.
 		let ii: number;
 		var removable: number[] = [];
-		for (ii = 0; ii < this.entities.length; ii++) {
-			const entity = this.entities[ii];
-			entity.tick(this.entities, allObstacles);
+		for (ii = 0; ii < this.things.length; ii++) {
+			const things = this.things[ii];
+			things.tick(allThings);
 			// Mark entity for removal
-			if (entity.despawn && entity.discardable) {
+			if (things.despawn && things.discardable) {
 				removable.push(ii);
-				this.discardEntities.push(entity.id);
-			} else if (entity.dirty) {
-				entity.unmarkDirty();
-				this.dirtyEntities.push(entity);
+				this.discards.push(things.id);
+			} else if (things.dirty) {
+				things.unmarkDirty();
+				this.dirtys.push(things);
 			}
 		}
-		// Remove all discardable entities
-		for (ii = removable.length - 1; ii >= 0; ii--) this.entities.splice(removable[ii], 1);
-
-		removable = [];
-		for (ii = 0; ii < allObstacles.length; ii++) {
-			const obstacle = allObstacles[ii];
-			obstacle.tick(this.entities, allObstacles);
-			// Mark obstacle for removal
-			if (obstacle.despawn && obstacle.discardable) {
-				removable.push(ii);
-				this.discardObstacles.push(obstacle.id);
-			} else if (obstacle.dirty) {
-				obstacle.unmarkDirty();
-				this.dirtyObstacles.push(obstacle);
-			}
-		}
-		// Remove all discardable obstacles
-		for (ii = removable.length - 1; ii >= 0; ii--) this.obstacles.splice(removable[ii], 1);
+		// Remove all discardable things
+		for (ii = removable.length - 1; ii >= 0; ii--) this.things.splice(removable[ii], 1);
 
 		// Tick red zone [DISABLED]
 		/*if (this.zoneActive) {
@@ -170,20 +150,14 @@ export class World {
 
 	// Called after data are sent to clients
 	postTick() {
-		this.entities = this.entities.map(entity => {
+		this.things = this.things.map(entity => {
 			entity.animations = [];
 			return entity;
-		});
-		this.obstacles = this.obstacles.map(obstacle => {
-			obstacle.animations = [];
-			return obstacle;
 		});
 		this.particles = [];
 		this.onceSounds = [];
 		this.killFeeds = [];
-		this.discardEntities = [];
-		this.discardObstacles = [];
-		this.dirtyEntities = [];
-		this.dirtyObstacles = [];
+		this.discards = [];
+		this.dirtys = [];
 	}
 }

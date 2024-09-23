@@ -6,18 +6,19 @@ import { TracerData } from "../../types/data";
 import { Entity } from "../../types/entity";
 import { CircleHitbox, Line, Vec2 } from "../../types/math";
 import { Obstacle } from "../../types/obstacle";
+import { Thing } from "../../types/thing";
 
 export default class Bullet extends Entity {
 	type = EntityTypes.BULLET;
 	collisionLayers = [0];
-	shooter: Entity | Obstacle;
+	shooter: Thing;
 	data: TracerData;
 	dmg: number;
 	despawning = false;
 	falloff: number;
 	distanceSqr = 0;
 
-	constructor(shooter: Entity | Obstacle, dmg: number, velocity: Vec2, ticks: number, falloff: number, data: TracerData) {
+	constructor(shooter: Thing, dmg: number, velocity: Vec2, ticks: number, falloff: number, data: TracerData) {
 		super();
 		this.hitbox = new CircleHitbox(data.width * GLOBAL_UNIT_MULTIPLIER * 0.5);
 		this.shooter = shooter;
@@ -30,25 +31,23 @@ export default class Bullet extends Entity {
 		this.falloff = falloff;
 		this.allocBytes += 44;
 	}
-	collisionCheck(entities: Entity[], obstacles: Obstacle[]) {
-		var combined: (Entity | Obstacle)[] = [];
-		combined = combined.concat(entities, obstacles);
+	collisionCheck(things: Thing[]) {
 		if (!this.despawn)
-			for (const thing of combined) {
+			for (const thing of things) {
 				if (this.type != thing.type && thing.collided(this)) {
 					thing.damage(this.dmg, this.shooter.id);
-					if (thing.surface == "metal") { this.position = this.position.addVec(this.direction.invert()); this.setVelocity(this.direction.invert()); this.direction = this.direction.invert() }
+					if (thing instanceof Obstacle && thing.surface == "metal") { this.position = this.position.addVec(this.direction.invert()); this.setVelocity(this.direction.invert()); this.direction = this.direction.invert() }
 					else if (!thing.noCollision) this.die();
 					break;
 				}
 			}
 	}
-	tick(entities: Entity[], obstacles: Obstacle[]) {
+	tick(things: Thing[]) {
 		const lastPos = this.position;
-		super.tick(entities, obstacles);
+		super.tick(things);
 		this.distanceSqr += this.position.addVec(lastPos.inverse()).magnitudeSqr();
 		if (this.distanceSqr >= 10000) this.dmg *= this.falloff;
-		this.collisionCheck(entities, obstacles);
+		this.collisionCheck(things);
 		// In case the bullet is moving too fast, check for hitbox intersection
 		/*if (!this.despawn)
 			for (const thing of combined) {

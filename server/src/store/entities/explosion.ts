@@ -5,6 +5,7 @@ import { standardEntitySerialiser, writeHitboxes } from "../../serialisers";
 import { Entity } from "../../types/entity";
 import { CircleHitbox, Vec2 } from "../../types/math";
 import { Obstacle } from "../../types/obstacle";
+import { Thing } from "../../types/thing";
 
 export default class Explosion extends Entity {
 	type = EntityTypes.EXPLOSION;
@@ -36,7 +37,7 @@ export default class Explosion extends Entity {
 		super.tick(entities, obstacles);
 
 		// Damage to entities and obstacles
-		var combined: (Entity | Obstacle)[] = [];
+		var combined: Thing[] = [];
 		combined = combined.concat(entities, obstacles);
 		for (const thing of combined) {
 			if (!this.collided(thing) || this.damaged.has(thing.id)) continue;
