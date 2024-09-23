@@ -31,6 +31,7 @@ export default class Helmet extends Item {
 		if (player.inventory.helmetLevel != 0) {
 			const helmet = new Helmet(player.inventory.helmetLevel);
 			helmet.position = player.position;
+			helmet.setBodies();
 			world.entities.push(helmet);
 		}
 		player.inventory.helmetLevel = this.level;

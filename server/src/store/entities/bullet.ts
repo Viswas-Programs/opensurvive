@@ -36,7 +36,7 @@ export default class Bullet extends Entity {
 				if (this.type != thing.type && thing.collided(this)) {
 					thing.damage(this.dmg, this.shooter.id);
 					if (thing.surface == "metal") { this.position = this.position.addVec(this.direction.invert()); this.setVelocity(this.direction.invert()); this.direction = this.direction.invert() }
-					else if (!thing.noCollision) this.die();
+					else if (thing.collisionLayers != CollisionLayers.OVERLAY) this.die();
 					break;
 				}
 			}

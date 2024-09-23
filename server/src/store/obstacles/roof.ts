@@ -1,6 +1,6 @@
 import { OBSTACLE_SUPPLIERS } from ".";
 import { world } from "../..";
-import { ObstacleTypes } from "../../constants";
+import { CollisionLayers, ObstacleTypes } from "../../constants";
 import { ObstacleData, TextureData } from "../../types/data";
 import { Hitbox, Vec2 } from "../../types/math";
 import { Obstacle } from "../../types/obstacle";
@@ -21,13 +21,12 @@ export default class Roof extends Obstacle {
 	roofless = new Set<string>();
 
 	constructor(hitbox: Hitbox, color: number, buildingId: string, texture?: TextureData) {
-		super(world, hitbox, hitbox, 1, 1);
+		super(world, hitbox, hitbox, 1, 1, CollisionLayers.OVERLAY);
 		this.direction = Vec2.UNIT_X;
 		this.color = color;
 		this.texture = texture;
 		this.buildingId = buildingId;
 		this.vulnerable = false;
-		this.noCollision = true;
 	}
 
 	static {

@@ -84,4 +84,6 @@ export enum CollisionLayers {
 	GENERAL = 1,
 	AFTERLIFE = 1 << 1,
 	LOOT = 1 << 2,
+	OVERLAY = 1 << 3,
+	SPECIAL = 1 << 4,
 }

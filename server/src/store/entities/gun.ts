@@ -46,6 +46,7 @@ export default class Gun extends Item {
 		const gun = new Gun(weapon.nameId, weapon.color);
 		gun.position = this.position;
 		gun.velocity = Vec2.UNIT_X.addAngle(Math.random() * CommonAngles.TWO_PI).scaleAll(0.025);
+		gun.setBodies();
 		world.entities.push(gun);
 		// Swap the player's weapon on hand with the one on ground
 		player.inventory.setWeapon(castCorrectWeapon(this.nameId));

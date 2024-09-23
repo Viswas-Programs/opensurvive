@@ -5,7 +5,7 @@ import { Player } from "../store/entities";
 import Building from "./building";
 import { Entity } from "./entity";
 import { Vec2 } from "./math";
-import { MinBuilding, MinCircleHitbox, MinMinObstacle, MinObstacle, MinParticle, MinTerrain, MinVec2 } from "./minimized";
+import { MinBuilding, MinCircleHitbox, MinEntity, MinMinObstacle, MinObstacle, MinParticle, MinTerrain, MinVec2 } from "./minimized";
 import { MovementDirection } from "./misc";
 import { Obstacle } from "./obstacle";
 import { Particle } from "./particle";
@@ -187,6 +187,31 @@ export class AckPacket extends IPacketSERVER {
 	}
 }
 
+export class InitPacket extends IPacketSERVER {
+	type = OutPacketTypes.GAME;
+	allocBytes = 7;
+	entities: MinEntity[];
+	obstacles: MinObstacle[];
+	alivecount: number;
+	discardEntities?: string[];
+	discardObstacles?: string[];
+	safeZone?: { hitbox: MinCircleHitbox, position: MinVec2 };
+	nextSafeZone?: { hitbox: MinCircleHitbox, position: MinVec2 };
+	anyDiscardEntities = false;
+	player: Player;
+	anyDiscardObstacles = false;
+	constructor(entities: Entity[], obstacles: Obstacle[], player: Player, alivecount: number, sendAll = false, discardEntities: string[] = [], discardObstacles: string[] = []) {
+		super()
+		this.entities = (sendAll ? entities : entities.filter(entity => entity.position.addVec(player.position.inverse()).magnitudeSqr() < Math.pow(BASE_RADIUS * player.scope, 2))).map(entity => entity.minimize());
+		this.obstacles = (sendAll ? obstacles : obstacles.filter(obstacle => obstacle.position.addVec(player.position.inverse()).magnitudeSqr() < Math.pow(BASE_RADIUS * player.scope, 2))).map(obstacle => obstacle.minimize());
+		this.allocBytes += calculateAllocBytesForObs(obstacles)
+		this.alivecount = alivecount;
+		this.player = player;
+		if (discardEntities.length) { this.discardEntities = discardEntities; this.discardEntities.forEach(discardable => this.allocBytes += (discardable.length+2)); this.anyDiscardEntities = true }
+		if (discardObstacles.length) { this.discardObstacles = discardObstacles; this.discardObstacles.forEach(discardable => this.allocBytes += (discardable.length + 2)); this.anyDiscardObstacles=true }
+	}
+}
+
 export class GamePacket extends IPacketSERVER {
 	type = OutPacketTypes.GAME;
 	allocBytes = 7;
@@ -203,7 +228,7 @@ export class GamePacket extends IPacketSERVER {
 	constructor(entities: Entity[], obstacles: Obstacle[], player: Player, alivecount: number, sendAll = false, discardEntities: string[] = [], discardObstacles: string[] = []) {
 		super()
 		this.entities = (sendAll ? entities : entities.filter(entity => entity.position.addVec(player.position.inverse()).magnitudeSqr() < Math.pow(BASE_RADIUS * player.scope, 2)));
-		this.entities.forEach((entity) => {this.allocBytes += entity.allocBytes})
+		this.entities.forEach((entity) => {this.allocBytes += entity.allocBytes});
 		this.obstacles = (sendAll ? obstacles : obstacles.filter(obstacle => obstacle.position.addVec(player.position.inverse()).magnitudeSqr() < Math.pow(BASE_RADIUS * player.scope, 2))).map(obstacle => obstacle.minimize());
 		this.allocBytes += calculateAllocBytesForObs(obstacles)
 		this.alivecount = alivecount;

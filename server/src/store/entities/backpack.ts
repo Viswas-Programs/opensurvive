@@ -24,6 +24,7 @@ export default class Backpack extends Item {
 		if (player.inventory.backpackLevel != 0) {
 			const backpack = new Backpack(player.inventory.backpackLevel);
 			backpack.position = player.position;
+			backpack.setBodies();
 			world.entities.push(backpack);
 		}
 		player.inventory.backpackLevel = this.level;

@@ -36,8 +36,10 @@ export default class Building {
 
 	setPosition(position: Vec2) {
 		this.position = position;
-		for (const ob of this.obstacles)
+		for (const ob of this.obstacles) {
 			ob.obstacle.position = this.position.addVec(ob.position);
+			ob.obstacle.setBodies();
+		}
 		for (const fl of this.floors) {
 			fl.terrain.setPosition(this.position.addVec(fl.position));
 		}
@@ -65,6 +67,7 @@ export default class Building {
 		for (const ob of this.obstacles) {
 			ob.obstacle.direction = ob.obstacle.direction.addAngle(-delta);
 			ob.obstacle.position = this.position.addVec(ob.position.addAngle(delta));
+			ob.obstacle.setBodies();
 		}
 		for (const zone of this.zones) zone.position = zone.origPos.addAngle(this.direction.angle());
 		for (const fl of this.floors) {

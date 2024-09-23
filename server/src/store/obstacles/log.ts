@@ -5,7 +5,7 @@ import { LOOT_TABLES } from "../../types/loot_table";
 import { MapObstacleSupplier, ObstacleSupplier } from "../../types/supplier";
 import { MapObstacleData, ObstacleData } from "../../types/data";
 import { MAP_OBSTACLE_SUPPLIERS, OBSTACLE_SUPPLIERS } from ".";
-import { ObstacleTypes } from "../../constants";
+import { CollisionLayers, ObstacleTypes } from "../../constants";
 
 class CrateSupplier extends ObstacleSupplier {
 	make(data: ObstacleData) {
@@ -38,7 +38,7 @@ export default class Log extends Obstacle {
 				health = 80;
 				break;
 		}
-		super(world, hitbox, hitbox.scaleAll(0.75), health, health, Vec2.UNIT_X);
+		super(world, hitbox, hitbox.scaleAll(0.75), health, health, CollisionLayers.EVERYTHING, Vec2.UNIT_X);
 		this.special = special;
 	}
 

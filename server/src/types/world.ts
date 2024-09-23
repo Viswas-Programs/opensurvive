@@ -70,13 +70,15 @@ export class World {
 		// Create physics engines for each collision layer
 		this.engines = Array((Object.keys(CollisionLayers).length / 2) - 1).fill(0).map(() => Engine.create({ gravity: { y: 0 } }));
 		// Create box
-		const box = [
-			Bodies.rectangle(-MAP_WALL_PADDING, -MAP_WALL_PADDING * 2, this.size.x + MAP_WALL_PADDING * 2, 0, { isStatic: true }),
-			Bodies.rectangle(-MAP_WALL_PADDING * 2, -MAP_WALL_PADDING, 0, this.size.y + MAP_WALL_PADDING * 2, { isStatic: true }),
-			Bodies.rectangle(-MAP_WALL_PADDING, this.size.y, this.size.x + MAP_WALL_PADDING * 2, this.size.y + MAP_WALL_PADDING * 2, { isStatic: true }),
-			Bodies.rectangle(this.size.x, -MAP_WALL_PADDING, this.size.x + MAP_WALL_PADDING * 2, this.size.y + MAP_WALL_PADDING * 2, { isStatic: true })
-		];
-		this.engines.forEach(engine => Composite.add(engine.world, box));
+		this.engines.forEach(engine => {
+			const box = [
+				Bodies.rectangle(this.size.x * 0.5, -MAP_WALL_PADDING, this.size.x + MAP_WALL_PADDING * 2, MAP_WALL_PADDING * 2, { isStatic: true }),
+				Bodies.rectangle(-MAP_WALL_PADDING, this.size.y * 0.5, MAP_WALL_PADDING * 2, this.size.y + MAP_WALL_PADDING * 2, { isStatic: true }),
+				Bodies.rectangle(this.size.x * 0.5, this.size.y + MAP_WALL_PADDING, this.size.x + MAP_WALL_PADDING * 2, MAP_WALL_PADDING * 2, { isStatic: true }),
+				Bodies.rectangle(this.size.x + MAP_WALL_PADDING, this.size.y * 0.5, MAP_WALL_PADDING * 2, this.size.y + MAP_WALL_PADDING * 2, { isStatic: true })
+			];
+			Composite.add(engine.world, box);
+		});
 	}
 
 	addPlayer(player: Player) {

@@ -31,6 +31,7 @@ export default class Vest extends Item {
 		if (player.inventory.vestLevel != 0) {
 			const vest = new Vest(player.inventory.vestLevel);
 			vest.position = player.position;
+			vest.setBodies();
 			world.entities.push(vest);
 		}
 		player.inventory.vestLevel = this.level;

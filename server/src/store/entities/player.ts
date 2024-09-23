@@ -282,22 +282,26 @@ export default class Player extends Entity {
 			if (this.inventory.healings[healing]) {
 				const item = new Healing(healing, this.inventory.healings[healing]);
 				item.position = this.position;
+				item.setBodies();
 				world.entities.push(item);
 			}
 		}
 		if (this.inventory.vestLevel) {
 			const item = new Vest(this.inventory.vestLevel);
 			item.position = this.position;
+			item.setBodies();
 			world.entities.push(item);
 		}
 		if (this.inventory.helmetLevel) {
 			const item = new Helmet(this.inventory.helmetLevel);
 			item.position = this.position;
+			item.setBodies();
 			world.entities.push(item);
 		}
 		if (this.inventory.backpackLevel) {
 			const item = new Backpack(this.inventory.backpackLevel);
 			item.position = this.position;
+			item.setBodies();
 			world.entities.push(item);
 		}
 		world.playerDied();

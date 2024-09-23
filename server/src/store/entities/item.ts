@@ -16,7 +16,6 @@ export default abstract class Item extends Entity {
 		super(hitbox, CollisionLayers.LOOT);
 		this.randomVelocity();
 		this.discardable = true;
-		this.noCollision = true;
 		this.vulnerable = false;
 	}
 

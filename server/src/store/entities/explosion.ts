@@ -16,7 +16,7 @@ export default class Explosion extends Entity {
 	damaged = new Set<string>();
 
 	constructor(exploder: Entity | Obstacle, dmg: number, minDmg: number, position: Vec2, radius: number, inflation: number, duration: number) {
-		super(new CircleHitbox(radius));
+		super(new CircleHitbox(radius), CollisionLayers.SPECIAL);
 		this.exploder = exploder;
 		this.position = position;
 		this.dmg = dmg;
@@ -25,9 +25,9 @@ export default class Explosion extends Entity {
 		this.inflation = inflation;
 		this.maxHealth = this.health = duration; // ticks
 		this.discardable = true;
-		this.noCollision = true;
 		this.vulnerable = false;
 		this.allocBytes += 11;
+		this.setBodies();
 	}
 
 	tick(entities: Entity[], obstacles: Obstacle[]) {

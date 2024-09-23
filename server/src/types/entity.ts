@@ -97,7 +97,6 @@ export class Entity {
 	velocity: Vec2 = Vec2.ZERO;
 	direction: Vec2 = Vec2.UNIT_X;
 	hitbox: Hitbox;
-	noCollision = false;
 	collisionLayers = CollisionLayers.EVERYTHING;
 	vulnerable = true;
 	_needsToSendAnimations = false
@@ -124,7 +123,7 @@ export class Entity {
 	readonly actualType = "entity";
 
 	// Matter.js Physics
-	bodies: Body[] = [];
+	bodies: (() => Body)[] = []; // using a supplier to circumvent game packet circular object with msgpack lite TODO
 	actualVelocity = Vec2.ZERO;
 	
 	constructor(hitbox: Hitbox, collisionLayers = CollisionLayers.EVERYTHING) {
@@ -145,25 +144,32 @@ export class Entity {
 		if (this.collisionLayers == CollisionLayers.EVERYTHING) world.engines.forEach(engine => {
 			const body = this.createBody();
 			Composite.add(engine.world, body);
-			this.bodies.push(body);
+			this.bodies.push(() => body);
 		});
 		else {
-			if (this.collisionLayers & CollisionLayers.GENERAL) {
-				const body = this.createBody();
-				Composite.add(world.engines[0].world, body);
-				this.bodies.push(body);
-			}
-			if (this.collisionLayers & CollisionLayers.AFTERLIFE) {
-				const body = this.createBody();
-				Composite.add(world.engines[1].world, body);
-				this.bodies.push(body);
-			}
-			if (this.collisionLayers & CollisionLayers.LOOT) {
-				const body = this.createBody();
-				Composite.add(world.engines[2].world, body);
-				this.bodies.push(body);
+			for (let ii = 0; ii < Object.keys(CollisionLayers).length / 2; ii++) {
+				if (this.collisionLayers & (1 << ii)) {
+					const body = this.createBody();
+					Composite.add(world.engines[ii].world, body);
+					this.bodies.push(() => body);
+				}
 			}
 		}
+	}
+
+	removeBodies() {
+		if (this.collisionLayers == CollisionLayers.EVERYTHING) this.bodies.forEach((body, ii) => Composite.remove(world.engines[ii].world, body()));
+		else
+			for (let ii = 0; ii < Object.keys(CollisionLayers).length / 2; ii++)
+				if (this.collisionLayers & (1 << ii))
+					Composite.remove(world.engines[ii].world, this.bodies.pop()!());
+	}
+
+	setBodies() {
+		this.bodies.forEach(body => {
+			Body.setPosition(body(), this.position.toMatterVector());
+			Body.setAngle(body(), this.direction.angle());
+		});
 	}
 
 	tick(_entities: Entity[], _obstacles: Obstacle[]) {
@@ -188,12 +194,12 @@ export class Entity {
 		if (this.bodies.length) {
 			// Set bodies to same position to avoid desync in different worlds
 			let totalPosition = Vec2.ZERO;
-			this.bodies.forEach(body => totalPosition = totalPosition.addVec(Vec2.fromMatterVector(body.position)));
+			this.bodies.forEach(body => totalPosition = totalPosition.addVec(Vec2.fromMatterVector(body().position)));
 			//if (this.type == EntityTypes.PLAYER) this.bodies.forEach(body => console.log("body position:", body.position.x, body.position.y));
 			const averagePosition = totalPosition.scaleAll(1 / this.bodies.length);
 			this.bodies.forEach(body => {
-				Body.setPosition(body, averagePosition.toMatterVector());
-				Body.setVelocity(body, this.actualVelocity.toMatterVector());
+				Body.setPosition(body(), averagePosition.toMatterVector());
+				Body.setVelocity(body(), this.actualVelocity.toMatterVector());
 			});
 			this.position = averagePosition;
 		}
@@ -248,6 +254,7 @@ export class Entity {
 	die() {
 		this.despawn = true;
 		this.health = 0;
+		this.removeBodies();
 		this.markDirty();
 	}
 

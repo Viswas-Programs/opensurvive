@@ -42,6 +42,7 @@ export default class Spawner extends Obstacle {
 		if (entities) {
 			world.entities.push(...entities.map(e => {
 				e.position = this.position;
+				e.setBodies();
 				return e;
 			}));
 		}

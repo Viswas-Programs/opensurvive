@@ -59,6 +59,7 @@ import fetch from "node-fetch";
 export function spawnGun(id: string, color: GunColor, position: Vec2, ammoAmount: number) {
     const gun = new Gun(id, color);
     gun.position = position;
+    gun.setBodies();
     world.entities.push(gun);
     var halfAmmo = Math.round(ammoAmount/2)
     spawnAmmo(halfAmmo, color, position);
@@ -67,11 +68,13 @@ export function spawnGun(id: string, color: GunColor, position: Vec2, ammoAmount
 export function spawnAmmo(amount: number, color: GunColor, position: Vec2) {
     const ammo = new Ammo(amount, color);
     ammo.position = position;
+    ammo.setBodies();
     world.entities.push(ammo);
 }
 export function spawnGrenade(id: string, amount: number, position: Vec2){
     const grenade = new Grenade(id, amount);
     grenade.position = position;
+    grenade.setBodies();
     world.entities.push(grenade);
 }
 //Overall spawner to spawn any type of loot

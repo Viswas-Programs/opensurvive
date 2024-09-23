@@ -143,6 +143,7 @@ export class GunWeapon extends Weapon {
 				const bullet = new Bullet(attacker, this.bullet.damage, Vec2.UNIT_X.addAngle(angles).scaleAll(this.bullet.speed / TICKS_PER_SECOND), randomBetween(this.bullet.range[0], this.bullet.range[1]) / (this.bullet.speed / TICKS_PER_SECOND), this.bullet.falloff, this.tracer);
 				
 				bullet.position = position;
+				bullet.setBodies();
 				world.entities.push(bullet);
 				
 			}
