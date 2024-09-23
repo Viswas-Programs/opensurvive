@@ -5,7 +5,7 @@ import * as fs from "fs";
 //small amount of players
 export const MAP_SIZE = [200, 200]
 export const TICKS_PER_SECOND = 90;
-export const SENDS_PER_TICK = 2;
+export const TICKS_TO_SEND = 2;
 // Radius of 1x scope
 export const BASE_RADIUS = 50;
 export const DIRECTION_VEC = [Vec2.UNIT_X, Vec2.UNIT_X.addAngle(-CommonAngles.PI_TWO), Vec2.UNIT_X.addAngle(Math.PI), Vec2.UNIT_X.addAngle(CommonAngles.PI_TWO)];

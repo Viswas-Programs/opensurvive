@@ -4,7 +4,7 @@ import { readFileSync } from "fs";
 import * as ws from "ws";
 import { ID, send, wait, sendBitstream, spawnGun} from "./utils";
 import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ScopeUpdatePacket, ServerSideScopeUpdate, PlayerTickPkt } from "./types/packet";
-import { DIRECTION_VEC, EntityTypes, RecvPacketTypes, SENDS_PER_TICK, TICKS_PER_SECOND } from "./constants";
+import { DIRECTION_VEC, EntityTypes, RecvPacketTypes, TICKS_TO_SEND, TICKS_PER_SECOND } from "./constants";
 import {  CommonAngles, RectHitbox, Vec2 } from "./types/math";
 import { Bullet, Player } from "./store/entities";
 import { World } from "./types/world";
@@ -282,7 +282,7 @@ setInterval(() => {
 let count = 0;
 setInterval(() => {
 	world.tick();
-	count = (count + 1) % SENDS_PER_TICK;
+	count = (count + 1) % TICKS_TO_SEND;
 	if (count == 0) {
 		// Filter players from entities and send them packets
 		const players = <Player[]>world.entities.filter(entity => entity.type === EntityTypes.PLAYER);
