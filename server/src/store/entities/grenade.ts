@@ -11,12 +11,11 @@ import Player from "./player";
 
 export default class Grenade extends Item {
 	type = EntityTypes.GRENADE;
-	hitbox = new CircleHitbox(1);
 	nameId: string; // grenade ID, but id was taken for entity already
 	amount: number;
 
 	constructor(nameId: string, amount: number) {
-		super();
+		super(new CircleHitbox(1));
 		if (!WEAPON_SUPPLIERS.has(nameId)) console.warn("Creating a grenade entity that doesn't have a supplier for its type");
 		this.nameId = nameId;
 		this.amount = amount;

@@ -1,6 +1,6 @@
-import { ObstacleTypes, TICKS_PER_SECOND } from "../../constants";
+import { CollisionLayers, ObstacleTypes, TICKS_PER_SECOND } from "../../constants";
 import { Entity } from "../../types/entity";
-import { CommonAngles, Vec2 } from "../../types/math";
+import { CommonAngles, Hitbox, Vec2 } from "../../types/math";
 import { CollisionType } from "../../types/misc";
 import { Obstacle } from "../../types/obstacle";
 import Player from "./player";
@@ -10,11 +10,11 @@ export default abstract class Item extends Entity {
 	discardable = true;
 	interactable = true;
 	friction = 0.02; // frictional acceleration, not force
-	collisionLayers = [1];
+	collisionLayers = CollisionLayers.LOOT;
 	repelExplosions = true;
 
-	constructor() {
-		super();
+	constructor(hitbox: Hitbox) {
+		super(hitbox);
 		this.randomVelocity();
 		this.discardable = true;
 		this.noCollision = true;
@@ -42,7 +42,7 @@ export default abstract class Item extends Entity {
 			}
 		}
 		if (!colliding) this.setVelocity(this.velocity.scaleAll(1 - this.friction));
-		for (const obstacle of obstacles.filter(obs => obs.type != ObstacleTypes.ROOF)) {
+		/*for (const obstacle of obstacles.filter(obs => obs.type != ObstacleTypes.ROOF)) {
 			const collisionType = obstacle.collided(this);
 			if (collisionType) {
 				obstacle.onCollision(this);
@@ -58,7 +58,7 @@ export default abstract class Item extends Entity {
 					this.markDirty();
 				}
 			}
-		}
+		}*/
 	}
 
 	interact(player: Player) {

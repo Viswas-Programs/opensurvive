@@ -8,11 +8,10 @@ import Player from "./player";
 
 export default class Backpack extends Item {
 	type = EntityTypes.BACKPACK;
-	hitbox = new CircleHitbox(1);
 	level: number;
 
 	constructor(level: number) {
-		super();
+		super(new CircleHitbox(1));
 		this.level = level;
 		this.allocBytes++;
 	}

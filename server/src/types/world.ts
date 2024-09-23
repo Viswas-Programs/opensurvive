@@ -1,11 +1,12 @@
 import * as fs from "fs";
+import { Engine } from "matter-js";
 import Building from "./building";
 import { RedZoneDataEntry } from "./data";
 import { Entity } from "./entity";
 import { CircleHitbox, Vec2 } from "./math";
 import { Obstacle } from "./obstacle";
 import { Particle } from "./particle";
-import { EntityTypes, PLAYER_THRESHOLD, TICKS_PER_SECOND } from "../constants";
+import { CollisionLayers, EntityTypes, PLAYER_THRESHOLD, TICKS_PER_SECOND } from "../constants";
 import { Player } from "../store/entities";
 import { Terrain } from "./terrain";
 import { reset } from "..";
@@ -22,7 +23,7 @@ export class World {
 	dirtyObstacles: Obstacle[] = [];
 	defaultTerrain: Terrain;
 	terrains: Terrain[] = [];
-	lastSecond = 0;
+	lastSecond = Date.now();
 	playerCount = 0;
 
 	// Red zone stuff
@@ -42,6 +43,10 @@ export class World {
 
 	//Kill feed storage
 	killFeeds: { weaponUsed: string; killer: string; killed: string; }[] = [];
+
+	// Matter.js Physics
+	engines: Engine[];
+
 	constructor(size: Vec2, defaultTerrain: Terrain) {
 		// Set the size of map
 		this.size = size;
@@ -61,6 +66,8 @@ export class World {
 			oPosition: this.size.scaleAll(0.5)
 		};
 		this.nextSafeZone = this.safeZone;
+
+		this.engines = Array((Object.keys(CollisionLayers).length / 2) - 1).fill(0).map(() => Engine.create({ gravity: { y: 0 } }));
 	}
 
 	addPlayer(player: Player) {
@@ -92,6 +99,8 @@ export class World {
 
 	tick() {
 		this.ticks++;
+		const elapsed = Date.now() - this.lastSecond;
+		this.lastSecond += elapsed;
 		// TPS observer
 		/*if (!this.lastSecond) this.lastSecond = Date.now();
 		else if (Date.now() - this.lastSecond >= 1000) {
@@ -166,6 +175,8 @@ export class World {
 				this.safeZone.hitbox = new CircleHitbox((this.safeZone.oHitbox.radius - this.nextSafeZone.hitbox.radius) * this.zoneTick / (this.zoneData[this.zoneStep].move * TICKS_PER_SECOND) + this.nextSafeZone.hitbox.radius);
 			}
 		}*/
+	
+		this.engines.forEach(engine => Engine.update(engine, elapsed));
 	}
 
 	// Called after data are sent to clients

@@ -9,12 +9,11 @@ import Player from "./player";
 
 export default class Ammo extends Item {
 	type = EntityTypes.AMMO;
-	hitbox = new CircleHitbox(1);
 	amount: number;
 	color: GunColor;
 
 	constructor(amount: number, color: GunColor) {
-		super();
+		super(new CircleHitbox(1));
 		this.amount = amount;
 		this.color = color;
 		this.allocBytes += 2;

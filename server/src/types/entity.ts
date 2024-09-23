@@ -7,9 +7,10 @@ import { WEAPON_SUPPLIERS } from "../store/weapons";
 import { MinEntity, MinInventory } from "./minimized";
 import { CollisionType, CountableString, GunColor } from "./misc";
 import { world } from "..";
-import { PUSH_THRESHOLD } from "../constants";
+import { CollisionLayers, EntityTypes, PUSH_THRESHOLD } from "../constants";
 import { Player } from "../store/entities";
 import { IslandrBitStream } from "../packets";
+import { Bodies, Body, Composite, Vector } from "matter-js";
 
 export class Inventory {
 	// Maximum amount of things.
@@ -95,9 +96,9 @@ export class Entity {
 	position: Vec2;
 	velocity: Vec2 = Vec2.ZERO;
 	direction: Vec2 = Vec2.UNIT_X;
-	hitbox: Hitbox = CircleHitbox.ZERO;
+	hitbox: Hitbox;
 	noCollision = false;
-	collisionLayers = [-1]; // -1 means on all layers
+	collisionLayers = CollisionLayers.EVERYTHING;
 	vulnerable = true;
 	_needsToSendAnimations = false
 	health = 100;
@@ -121,10 +122,47 @@ export class Entity {
 	goodOldDirection = Vec2.ZERO;
 	surface = "normal";
 	readonly actualType = "entity";
-	constructor() {
+
+	// Matter.js Physics
+	bodies: Body[] = [];
+	actualVelocity = Vec2.ZERO;
+	
+	constructor(hitbox: Hitbox) {
 		this.id = ID();
 		// Currently selects a random position to spawn. Will change in the future.
 		this.position = this.goodOldPos = world.size.scale(Math.random(), Math.random());
+		this.hitbox = hitbox;
+		this.createBodies();
+	}
+
+	createBody() {
+		if (this.hitbox.type == "rect") return Bodies.rectangle(this.position.x, this.position.y, (<RectHitbox>this.hitbox).width, (<RectHitbox>this.hitbox).height);
+		else return Bodies.circle(this.position.x, this.position.y, this.hitbox.comparable);
+	}
+
+	createBodies() {
+		if (this.collisionLayers == CollisionLayers.EVERYTHING) world.engines.forEach(engine => {
+			const body = this.createBody();
+			Composite.add(engine.world, body);
+			this.bodies.push(body);
+		});
+		else {
+			if (this.collisionLayers & CollisionLayers.GENERAL) {
+				const body = this.createBody();
+				Composite.add(world.engines[0].world, body);
+				this.bodies.push(body);
+			}
+			if (this.collisionLayers & CollisionLayers.AFTERLIFE) {
+				const body = this.createBody();
+				Composite.add(world.engines[1].world, body);
+				this.bodies.push(body);
+			}
+			if (this.collisionLayers & CollisionLayers.LOOT) {
+				const body = this.createBody();
+				Composite.add(world.engines[2].world, body);
+				this.bodies.push(body);
+			}
+		}
 	}
 
 	tick(_entities: Entity[], _obstacles: Obstacle[]) {
@@ -134,20 +172,32 @@ export class Entity {
 		const lastPosition = this.position;
 		// Add the velocity to the position, and cap it at map size.
 		if (this.airborne)
-			this.position = this.position.addVec(this.velocity);
+			this.actualVelocity = this.velocity;
 		else {
 			const terrain = world.terrainAtPos(this.position);
-			this.position = this.position.addVec(this.velocity.scaleAll(terrain.speed));
+			this.actualVelocity = this.velocity.scaleAll(terrain.speed);
 			// Also handle terrain damage
 			if (terrain.damage != 0 && !(world.ticks % terrain.interval))
 				this.damage(terrain.damage);
 		}
-		this.position = new Vec2(clamp(this.position.x, this.hitbox.comparable, world.size.x - this.hitbox.comparable), clamp(this.position.y, this.hitbox.comparable, world.size.y - this.hitbox.comparable));
-
-		if (this.position != lastPosition) this.markDirty();
 
 		// Check health and maybe call death
 		if (this.vulnerable && this.health <= 0) this.die();
+
+		if (this.bodies.length) {
+			// Set bodies to same position to avoid desync in different worlds
+			let totalPosition = Vec2.ZERO;
+			this.bodies.forEach(body => totalPosition = totalPosition.addVec(Vec2.fromMatterVector(body.position)));
+			//if (this.type == EntityTypes.PLAYER) this.bodies.forEach(body => console.log("body position:", body.position.x, body.position.y));
+			const averagePosition = totalPosition.scaleAll(1 / this.bodies.length);
+			this.bodies.forEach(body => {
+				Body.setPosition(body, averagePosition.toMatterVector());
+				Body.setVelocity(body, this.actualVelocity.toMatterVector());
+			});
+			this.position = averagePosition;
+		}
+		//if (this.type == EntityTypes.PLAYER) console.log("player pos:", this.position.x, this.position.y);
+		if (this.position != lastPosition) this.markDirty();
 	}
 
 	setVelocity(velocity: Vec2) {
@@ -164,7 +214,7 @@ export class Entity {
 	// Hitbox collision check
 	collided(thing: Entity | Obstacle) {
 		if (this.id == thing.id || this.despawn) return CollisionType.NONE;
-		if (!this.collisionLayers.includes(-1) && !thing.collisionLayers.includes(-1) && !this.collisionLayers.some(layer => thing.collisionLayers.includes(layer))) return CollisionType.NONE;
+		if (this.collisionLayers != CollisionLayers.EVERYTHING && thing.collisionLayers != CollisionLayers.EVERYTHING && !(this.collisionLayers & thing.collisionLayers)) return CollisionType.NONE;
 		if (this.position.distanceTo(thing.position) > this.hitbox.comparable + thing.hitbox.comparable) return CollisionType.NONE;
 		// For circle it is distance < sum of radii
 		// Reason this doesn't require additional checking: Look up 2 lines

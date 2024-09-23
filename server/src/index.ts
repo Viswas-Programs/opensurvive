@@ -4,7 +4,7 @@ import { readFileSync } from "fs";
 import * as ws from "ws";
 import { ID, send, wait, sendBitstream, spawnGun} from "./utils";
 import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ScopeUpdatePacket, ServerSideScopeUpdate, PlayerTickPkt } from "./types/packet";
-import { DIRECTION_VEC, EntityTypes, RecvPacketTypes, TICKS_PER_SECOND } from "./constants";
+import { DIRECTION_VEC, EntityTypes, RecvPacketTypes, SENDS_PER_TICK, TICKS_PER_SECOND } from "./constants";
 import {  CommonAngles, RectHitbox, Vec2 } from "./types/math";
 import { Bullet, Player } from "./store/entities";
 import { World } from "./types/world";
@@ -160,7 +160,7 @@ server.on("connection", async socket => {
 	world.entities.push(scope)
 	send(socket, new MapPacket(world.obstacles, world.buildings, world.terrains.concat(...world.buildings.map(b => b.floors.map(fl => fl.terrain)))));
 	// Send the player initial objects
-	send(socket, new GamePacket(world.entities, world.obstacles.concat(...world.buildings.map(b => b.obstacles.map(o => o.obstacle))), player, world.playerCount, true));
+	sendBitstream(socket, new GamePacket(world.entities, world.obstacles.concat(...world.buildings.map(b => b.obstacles.map(o => o.obstacle))), player, world.playerCount, true));
 	playerInitialPacketsSent.set(socket, true);
 	sendBitstream(socket, new PlayerTickPkt(player));
 	// If the client doesn't ping for 30 seconds, we assume it is a disconnection.
@@ -278,22 +278,26 @@ setInterval(() => {
 	world.entities.forEach(entity => {
 		if (entity.type == EntityTypes.BULLET) (entity as Bullet).collisionCheck(world.entities, world.obstacles)
 	})
-}, 5)
+}, 5);
+let count = 0;
 setInterval(() => {
 	world.tick();
-	// Filter players from entities and send them packets
-	const players = <Player[]>world.entities.filter(entity => entity.type === EntityTypes.PLAYER);
-	players.forEach(player => {
-		const socket = sockets.get(player.id);
-		if (!socket || !playerInitialPacketsSent.get(socket)) return;
-		const pkt = new GamePacket(world.dirtyEntities.filter(entity => entity.id != player.id), world.dirtyObstacles, player, world.playerCount, false, world.discardEntities, world.discardObstacles)
-		sendBitstream(socket, pkt);
-		sendBitstream(socket, new PlayerTickPkt(player));
-		if (world.particles.length) sendBitstream(socket, new ParticlesPacket(world.particles, player));
-		//for (const sound of world.onceSounds) sendBitstream(socket, new SoundPacket(sound.path, sound.position));
-		for (const killFeed of world.killFeeds) sendBitstream(socket, new AnnouncePacket(killFeed.weaponUsed, killFeed.killer, killFeed.killed))
-		if (player.changedScope) {
-			sendBitstream(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false; }
-	});
-	world.postTick();
+	count = (count + 1) % SENDS_PER_TICK;
+	if (count == 0) {
+		// Filter players from entities and send them packets
+		const players = <Player[]>world.entities.filter(entity => entity.type === EntityTypes.PLAYER);
+		players.forEach(player => {
+			const socket = sockets.get(player.id);
+			if (!socket || !playerInitialPacketsSent.get(socket)) return;
+			const pkt = new GamePacket(world.dirtyEntities.filter(entity => entity.id != player.id), world.dirtyObstacles, player, world.playerCount, false, world.discardEntities, world.discardObstacles)
+			sendBitstream(socket, pkt);
+			sendBitstream(socket, new PlayerTickPkt(player));
+			if (world.particles.length) sendBitstream(socket, new ParticlesPacket(world.particles, player));
+			//for (const sound of world.onceSounds) sendBitstream(socket, new SoundPacket(sound.path, sound.position));
+			for (const killFeed of world.killFeeds) sendBitstream(socket, new AnnouncePacket(killFeed.weaponUsed, killFeed.killer, killFeed.killed))
+			if (player.changedScope) {
+				sendBitstream(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false; }
+		});
+		world.postTick();
+	}
 }, 1000 / TICKS_PER_SECOND);

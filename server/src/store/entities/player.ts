@@ -1,5 +1,6 @@
+import { Body } from "matter-js";
 import { world } from "../..";
-import { EntityTypes, GLOBAL_UNIT_MULTIPLIER, TICKS_PER_SECOND } from "../../constants";
+import { CollisionLayers, EntityTypes, GLOBAL_UNIT_MULTIPLIER, TICKS_PER_SECOND } from "../../constants";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
 import { Entity, Inventory } from "../../types/entity";
@@ -19,10 +20,9 @@ export default class Player extends Entity {
 	type = EntityTypes.PLAYER;
 	currentHealItem: string | null;
 	interactMessage: string | null;
-	hitbox = new CircleHitbox(1);
 	id: string;
 	username: string;
-	collisionLayers = [0];
+	collisionLayers = CollisionLayers.GENERAL;
 	lastPickedUpScope = 1
 	boost = 0;
 	maxBoost = 100;
@@ -61,7 +61,7 @@ export default class Player extends Entity {
 	usernamesAndIDsSent = false;
 
 	constructor(id: string, username: string, skin: string | null, deathImg: string | null, accessToken?: string, isMobile?: boolean) {
-		super();
+		super(new CircleHitbox(1));
 		this.id = id;
 		this.interactMessage = null;
 		this.username = username;
@@ -193,7 +193,7 @@ export default class Player extends Entity {
 		}
 		// Collision handling
 		for (const obstacle of obstacles) {
-			const collisionType = obstacle.collided(this);
+			/*const collisionType = obstacle.collided(this);
 			if (collisionType) {
 				obstacle.onCollision(this);
 				if (!obstacle.noCollision) {
@@ -203,7 +203,7 @@ export default class Player extends Entity {
 					else if (collisionType == CollisionType.CIRCLE_RECT_LINE_INSIDE) this.handleCircleRectLineCollision(obstacle);
 					this.markDirty();
 				}
-			}
+			}*/
 			// For roof to be roofless
 			if (obstacle.type === Roof.ID) {
 				const roof = <Roof>obstacle;

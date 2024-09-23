@@ -10,7 +10,6 @@ import { EntityTypes } from "../../constants";
 export default class Vest extends Item {
 	static readonly VEST_REDUCTION: number[] = [];
 	type = EntityTypes.VEST;
-	hitbox = new CircleHitbox(1);
 	level: number;
 
 	static {
@@ -19,7 +18,7 @@ export default class Vest extends Item {
 	}
 
 	constructor(level: number) {
-		super();
+		super(new CircleHitbox(1));
 		this.level = level;
 		this.allocBytes++;
 	}

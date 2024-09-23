@@ -10,7 +10,6 @@ import { EntityTypes } from "../../constants";
 export default class Helmet extends Item {
 	static readonly HELMET_REDUCTION: number[] = [];
 	type = EntityTypes.HELMET;
-	hitbox = new CircleHitbox(1);
 	level: number;
 
 	static {
@@ -18,7 +17,7 @@ export default class Helmet extends Item {
 		this.HELMET_REDUCTION.push(...data);
 	}
 	constructor(level: number) {
-		super();
+		super(new CircleHitbox(1));
 		this.level = level;
 		this.allocBytes++;
 

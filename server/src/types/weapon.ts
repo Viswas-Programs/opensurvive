@@ -77,7 +77,7 @@ export class MeleeWeapon extends Weapon {
 			var combined: (Entity | Obstacle)[] = [];
 			combined = combined.concat(entities, obstacles);
 			const position = attacker.position.addVec(this.offset.addAngle(attacker.direction.angle()));
-			const dummy = new Entity();
+			const dummy = new Entity(CircleHitbox.ZERO);
 			dummy.hitbox = this.hitbox;
 			dummy.position = position;
 			dummy.direction = attacker.direction;

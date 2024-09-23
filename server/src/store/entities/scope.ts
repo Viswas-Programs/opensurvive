@@ -8,11 +8,10 @@ import Player from "./player";
 
 export default class Scope extends Item {
 	type = EntityTypes.SCOPE;
-	hitbox = new CircleHitbox(1);
 	zoom: number;
 
 	constructor(zoom: number) {
-		super();
+		super(new CircleHitbox(1));
 		this.zoom = zoom;
 		this.allocBytes++;
 	}

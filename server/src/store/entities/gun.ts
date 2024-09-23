@@ -13,12 +13,11 @@ import Player from "./player";
 
 export default class Gun extends Item {
 	type = EntityTypes.GUN;
-	hitbox = new CircleHitbox(2);
 	nameId: string; // Gun ID, but id was taken for entity already
 	color: GunColor;
 
 	constructor(nameId: string, color: GunColor) {
-		super();
+		super(new CircleHitbox(2));
 		if (!WEAPON_SUPPLIERS.has(nameId)) console.warn("Creating a gun entity that doesn't have a supplier for its type");
 		this.nameId = nameId;
 		this.color = color;

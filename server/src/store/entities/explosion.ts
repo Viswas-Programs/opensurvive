@@ -1,5 +1,5 @@
 import { Player } from ".";
-import { EntityTypes } from "../../constants";
+import { CollisionLayers, EntityTypes } from "../../constants";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser, writeHitboxes } from "../../serialisers";
 import { Entity } from "../../types/entity";
@@ -8,7 +8,6 @@ import { Obstacle } from "../../types/obstacle";
 
 export default class Explosion extends Entity {
 	type = EntityTypes.EXPLOSION;
-	hitbox: CircleHitbox;
 	exploder: Entity | Obstacle;
 	dmg: number;
 	minDmg: number;
@@ -17,10 +16,9 @@ export default class Explosion extends Entity {
 	damaged = new Set<string>();
 
 	constructor(exploder: Entity | Obstacle, dmg: number, minDmg: number, position: Vec2, radius: number, inflation: number, duration: number) {
-		super();
+		super(new CircleHitbox(radius));
 		this.exploder = exploder;
 		this.position = position;
-		this.hitbox = new CircleHitbox(radius);
 		this.dmg = dmg;
 		this.minDmg = minDmg;
 		this.radius = radius;
