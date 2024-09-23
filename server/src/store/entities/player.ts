@@ -192,17 +192,6 @@ export default class Player extends Entity {
 		}
 		// Collision handling
 		for (const obstacle of obstacles) {
-			/*const collisionType = obstacle.collided(this);
-			if (collisionType) {
-				obstacle.onCollision(this);
-				if (!obstacle.noCollision) {
-					if (collisionType == CollisionType.CIRCLE_CIRCLE) this.handleCircleCircleCollision(obstacle);
-					else if (collisionType == CollisionType.CIRCLE_RECT_CENTER_INSIDE) this.handleCircleRectCenterCollision(obstacle);
-					else if (collisionType == CollisionType.CIRCLE_RECT_POINT_INSIDE) this.handleCircleRectPointCollision(obstacle);
-					else if (collisionType == CollisionType.CIRCLE_RECT_LINE_INSIDE) this.handleCircleRectLineCollision(obstacle);
-					this.markDirty();
-				}
-			}*/
 			// For roof to be roofless
 			if (obstacle.type === Roof.ID) {
 				const roof = <Roof>obstacle;

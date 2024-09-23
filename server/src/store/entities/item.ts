@@ -40,23 +40,6 @@ export default abstract class Item extends Entity {
 			}
 		}
 		if (!colliding) this.setVelocity(this.velocity.scaleAll(1 - this.friction));
-		/*for (const obstacle of obstacles.filter(obs => obs.type != ObstacleTypes.ROOF)) {
-			const collisionType = obstacle.collided(this);
-			if (collisionType) {
-				obstacle.onCollision(this);
-				if (!obstacle.noCollision) {
-					const oldPosition = this.position;
-					if (collisionType == CollisionType.CIRCLE_CIRCLE) this.handleCircleCircleCollision(obstacle);
-					else if (collisionType == CollisionType.CIRCLE_RECT_CENTER_INSIDE) this.handleCircleRectCenterCollision(obstacle);
-					else if (collisionType == CollisionType.CIRCLE_RECT_POINT_INSIDE) this.handleCircleRectPointCollision(obstacle);
-					else if (collisionType == CollisionType.CIRCLE_RECT_LINE_INSIDE) this.handleCircleRectLineCollision(obstacle);
-					// Avoid glitchy movements
-					if (this.position.x == oldPosition.x) this.velocity = this.velocity.scale(0, 1);
-					if (this.position.y == oldPosition.y) this.velocity = this.velocity.scale(1, 0);
-					this.markDirty();
-				}
-			}
-		}*/
 	}
 
 	interact(player: Player) {
