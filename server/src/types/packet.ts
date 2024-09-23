@@ -1,13 +1,15 @@
+import { Vector } from "matter-js";
 import { BASE_RADIUS } from "../constants";
 import { Player } from "../store/entities";
 import Building from "./building";
-import { Entity } from "./entity";
-import { CircleHitbox, Vec2 } from "./math";
-import { MinBuilding, MinCircleHitbox, MinEntity, MinMinObstacle, MinObstacle, MinParticle, MinTerrain, MinVec2 } from "./minimized";
+import { CircleHitbox } from "./math";
+import { MinBuilding, MinCircleHitbox, MinMinObstacle, MinThing, MinParticle, MinTerrain, MinVec2 } from "./minimized";
 import { MovementDirection } from "./misc";
 import { Obstacle } from "./obstacle";
 import { Particle } from "./particle";
 import { Terrain } from "./terrain";
+import { Thing } from "./thing";
+import { minimizeVector } from "../utils";
 
 export interface IPacket {
 	type: string;
@@ -102,7 +104,7 @@ export class AckPacket implements IPacket {
 	size: number[];
 	terrain: string;
 
-	constructor(id: string, tps: number, size: Vec2, terrain: Terrain) {
+	constructor(id: string, tps: number, size: Vector, terrain: Terrain) {
 		this.id = id;
 		this.tps = tps;
 		this.size = Object.values(size);
@@ -112,30 +114,26 @@ export class AckPacket implements IPacket {
 
 export class GamePacket implements IPacket {
 	type = "game";
-	entities: MinEntity[];
-	obstacles: MinObstacle[];
+	things: MinThing[];
 	player: Player;
 	alivecount: number;
-	discardEntities?: string[];
-	discardObstacles?: string[];
+	discards?: string[];
 	safeZone?: { hitbox: MinCircleHitbox, position: MinVec2 };
 	nextSafeZone?: { hitbox: MinCircleHitbox, position: MinVec2 };
 
-	constructor(entities: Entity[], obstacles: Obstacle[], player: Player, alivecount: number, sendAll = false, discardEntities: string[] = [], discardObstacles: string[] = []) {
-		this.entities = (sendAll ? entities : entities.filter(entity => entity.position.addVec(player.position.inverse()).magnitudeSqr() < Math.pow(BASE_RADIUS * player.scope, 2))).map(entity => entity.minimize());
-		this.obstacles = (sendAll ? obstacles : obstacles.filter(obstacle => obstacle.position.addVec(player.position.inverse()).magnitudeSqr() < Math.pow(BASE_RADIUS * player.scope, 2))).map(obstacle => obstacle.minimize());
+	constructor(things: Thing[], player: Player, alivecount: number, sendAll = false, discards: string[] = []) {
+		this.things = (sendAll ? things : things.filter(thing => Vector.magnitudeSquared(Vector.sub(thing.body.position, player.body.position)) < Math.pow(BASE_RADIUS * player.scope, 2))).map(thing => thing.minimize())
 		this.player = player;
 		this.alivecount = alivecount;
-		if (discardEntities.length) this.discardEntities = discardEntities;
-		if (discardObstacles.length) this.discardObstacles = discardObstacles;
+		if (discards.length) this.discards = discards;
 	}
 
-	addSafeZoneData(safeZone: { hitbox: CircleHitbox, position: Vec2 }) {
-		this.safeZone = { hitbox: safeZone.hitbox.minimize(), position: safeZone.position.minimize() };
+	addSafeZoneData(safeZone: { hitbox: CircleHitbox, position: Vector }) {
+		this.safeZone = { hitbox: safeZone.hitbox.minimize(), position: minimizeVector(safeZone.position) };
 	}
 
-	addNextSafeZoneData(nextSafeZone: { hitbox: CircleHitbox, position: Vec2 }) {
-		this.nextSafeZone = { hitbox: nextSafeZone.hitbox.minimize(), position: nextSafeZone.position.minimize() };
+	addNextSafeZoneData(nextSafeZone: { hitbox: CircleHitbox, position: Vector }) {
+		this.nextSafeZone = { hitbox: nextSafeZone.hitbox.minimize(), position: minimizeVector(nextSafeZone.position) };
 	}
 }
 
@@ -145,8 +143,8 @@ export class MapPacket implements IPacket {
 	buildings: MinBuilding[];
 	terrains: MinTerrain[]
 
-	constructor(obstacles: Obstacle[], buildings: Building[], terrains: Terrain[]) {
-		this.obstacles = obstacles.map(obstacle => obstacle.minmin());
+	constructor(things: Thing[], buildings: Building[], terrains: Terrain[]) {
+		this.obstacles = things.filter(thing => thing.thingType === "obstacle").map(obstacle => (obstacle as Obstacle).minmin());
 		this.buildings = buildings.map(building => building.minimize());
 		this.terrains = terrains.map(terrain => terrain.minimize());
 	}
@@ -169,7 +167,7 @@ export class ParticlesPacket implements IPacket {
 	particles: MinParticle[];
 
 	constructor(particles: Particle[], player: Player) {
-		this.particles = particles.filter(particle => particle.position.addVec(player.position.inverse()).magnitudeSqr() < Math.pow(BASE_RADIUS * player.scope, 2)).map(particle => particle.minimize());
+		this.particles = particles.filter(particle => Vector.magnitudeSquared(Vector.sub(particle.position, player.body.position)) < Math.pow(BASE_RADIUS * player.scope, 2)).map(particle => particle.minimize());
 	}
 }
 
@@ -177,9 +175,9 @@ export class SoundPacket implements IPacket {
 	type = "sound";
 	// No need to include "client/assets/sounds"
 	path: string;
-	position: Vec2;
+	position: Vector;
 
-	constructor(path: string, position: Vec2) {
+	constructor(path: string, position: Vector) {
 		this.path = path;
 		this.position = position;
 	}

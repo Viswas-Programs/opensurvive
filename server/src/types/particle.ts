@@ -1,18 +1,19 @@
-import { Vec2 } from "./math";
+import { Vector } from "matter-js";
 import { MinParticle } from "./minimized";
+import { minimizeVector } from "../utils";
 
 export class Particle {
 	id: string;
-	position: Vec2;
+	position: Vector;
 	size: number;
 
-	constructor(id: string, position: Vec2, size: number) {
+	constructor(id: string, position: Vector, size: number) {
 		this.id = id;
 		this.position = position;
 		this.size = size;
 	}
 
 	minimize() {
-		return <MinParticle> { id: this.id, position: this.position.minimize(), size: this.size };
+		return <MinParticle> { id: this.id, position: minimizeVector(this.position), size: this.size };
 	}
 }

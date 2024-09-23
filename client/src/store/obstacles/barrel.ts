@@ -1,6 +1,6 @@
 import { Player } from "../entities";
 import { Obstacle } from "../../types/obstacle";
-import { MinObstacle } from "../../types/minimized";
+import { MinThing } from "../../types/minimized";
 import { circleFromCenter } from "../../utils";
 import { ObstacleSupplier } from "../../types/supplier";
 import { OBSTACLE_SUPPLIERS } from ".";
@@ -8,7 +8,7 @@ import { getMode } from "../../homepage";
 
 
 class BarrelSupplier implements ObstacleSupplier {
-	create(minObstacle: MinObstacle) {
+	create(minObstacle: MinThing) {
 		return new Barrel(minObstacle);
 	}
 }

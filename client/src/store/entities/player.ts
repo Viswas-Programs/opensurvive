@@ -3,7 +3,7 @@ import { LANG } from "../../constants";
 import { translate } from "../../languages";
 import { getWeaponImagePath } from "../../textures";
 import { Entity, Inventory, PartialInventory } from "../../types/entity";
-import { MinEntity, MinInventory } from "../../types/minimized";
+import { MinThing, MinInventory } from "../../types/minimized";
 import { EntitySupplier } from "../../types/supplier";
 import { GunWeapon, WeaponType } from "../../types/weapon";
 import { circleFromCenter } from "../../utils";
@@ -41,7 +41,7 @@ interface AdditionalEntity {
 }
 
 class PlayerSupplier implements EntitySupplier {
-	create(minEntity: MinEntity & AdditionalEntity) {
+	create(minEntity: MinThing & AdditionalEntity) {
 		return new PartialPlayer(minEntity);
 	}
 }
@@ -61,14 +61,14 @@ export default class Player extends Entity {
 	currentHealItem: string | null = null;
 	
 
-	constructor(minEntity: MinEntity & AdditionalEntity) {
+	constructor(minEntity: MinThing & AdditionalEntity) {
 		super(minEntity);
 		this.copy(minEntity);
 		this.currentSkinImg.src = "assets/" + getMode() + "/images/game/skins/" + this.skin + ".svg";
 		this.currentDeathImg.src = "assets/" + getMode() + "/images/game/entities/" + this.deathImg + ".svg";
 	}
 
-	copy(minEntity: MinEntity & AdditionalEntity) {
+	copy(minEntity: MinThing & AdditionalEntity) {
 		super.copy(minEntity);
 		this.username = minEntity.username;
 		this.skin = minEntity.skin;
@@ -175,7 +175,7 @@ export class FullPlayer extends Player {
 	interactMessage!: string | null;
 	currentHealItem!: string | null;
 
-	copy(minEntity: MinEntity & AdditionalEntity) {
+	copy(minEntity: MinThing & AdditionalEntity) {
 		super.copy(minEntity);
 		this.health = minEntity.health;
 		this.maxHealth = minEntity.maxHealth;

@@ -1,6 +1,6 @@
 import { Player } from "../entities";
 import { Obstacle } from "../../types/obstacle";
-import { MinObstacle } from "../../types/minimized";
+import { MinThing } from "../../types/minimized";
 import { circleFromCenter } from "../../utils";
 import { ObstacleSupplier } from "../../types/supplier";
 import { OBSTACLE_SUPPLIERS } from ".";
@@ -11,7 +11,7 @@ interface AdditionalObstacle {
 }
 
 class TreeSupplier implements ObstacleSupplier {
-	create(minObstacle: MinObstacle) {
+	create(minObstacle: MinThing) {
 		return new Tree(minObstacle);
 	}
 }
@@ -36,7 +36,7 @@ export default class Tree extends Obstacle {
 		this.treeResidueImg.src = "assets/" + getMode() + "/images/game/objects/residues/tree.svg";
 	}
 
-	copy(minObstacle: MinObstacle & AdditionalObstacle) {
+	copy(minObstacle: MinThing & AdditionalObstacle) {
 		super.copy(minObstacle);
 		this.special = minObstacle.special;
 	}

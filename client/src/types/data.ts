@@ -174,7 +174,7 @@ export type MapTerrainData = {
 export type MapBuildingData = {
 	id: string;
 	position?: number[];
-	direction?: number[];
+	angle?: number;
 	amount?: number;
 	includeTerrains?: string[];
 }

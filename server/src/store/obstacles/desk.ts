@@ -5,6 +5,7 @@ import { LOOT_TABLES } from "../../types/loot_table";
 import { MapObstacleSupplier, ObstacleSupplier } from "../../types/supplier";
 import { MapObstacleData, ObstacleData } from "../../types/data";
 import { MAP_OBSTACLE_SUPPLIERS, OBSTACLE_SUPPLIERS } from ".";
+import { Vector } from "matter-js";
 
 class DeskSupplier extends ObstacleSupplier {
 	make(data: ObstacleData) {
@@ -26,7 +27,7 @@ export default class Desk extends Obstacle {
 	constructor() {
 		var hitbox = new RectHitbox(4, 2);
 		var health = 140;
-		super(world, hitbox, hitbox.scaleAll(0.75), health, health, Vec2.UNIT_X);
+		super(world, hitbox, hitbox.scaleAll(0.75), health, health, 0);
 	}
 
 	static {
@@ -36,7 +37,7 @@ export default class Desk extends Obstacle {
 
 	damage(dmg: number) {
 		super.damage(dmg);
-		world.onceSounds.push({ path: `obstacles/crate_hit.mp3`, position: this.position });
+		world.onceSounds.push({ path: `obstacles/crate_hit.mp3`, position: this.body.position });
 	}
 
 	die() {
@@ -44,12 +45,12 @@ export default class Desk extends Obstacle {
 		var lootTable = "toilet_more";
 		const entities = LOOT_TABLES.get(lootTable)?.roll();
 		if (entities) {
-			world.entities.push(...entities.map(e => {
-				e.position = this.position;
+			world.spawn(...entities.map(e => {
+				e.body.position = Vector.clone(this.body.position);
 				return e;
 			}));
 		}
-		world.onceSounds.push({ path: "obstacles/crate_break.mp3", position: this.position });
+		world.onceSounds.push({ path: "obstacles/crate_break.mp3", position: this.body.position });
 	}
 
 	minimize() {

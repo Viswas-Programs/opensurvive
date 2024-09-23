@@ -1,10 +1,10 @@
+import { Body, Vector } from "matter-js";
 import { Entity } from "../../types/entity";
 import { CircleHitbox, Vec2 } from "../../types/math";
 import { Obstacle } from "../../types/obstacle";
 
 export default class Explosion extends Entity {
 	type = "explosion";
-	hitbox: CircleHitbox;
 	exploder: Entity | Obstacle;
 	dmg: number;
 	minDmg: number;
@@ -12,11 +12,10 @@ export default class Explosion extends Entity {
 	inflation: number;
 	damaged = new Set<string>();
 
-	constructor(exploder: Entity | Obstacle, dmg: number, minDmg: number, position: Vec2, radius: number, inflation: number, duration: number) {
-		super();
+	constructor(exploder: Entity | Obstacle, dmg: number, minDmg: number, position: Vector, radius: number, inflation: number, duration: number) {
+		super(new CircleHitbox(radius));
 		this.exploder = exploder;
-		this.position = position;
-		this.hitbox = new CircleHitbox(radius);
+		Body.setPosition(this.body, position);
 		this.dmg = dmg;
 		this.minDmg = minDmg;
 		this.radius = radius;

@@ -1,3 +1,4 @@
+import { Vector } from "matter-js";
 import { MAP_OBSTACLE_SUPPLIERS, OBSTACLE_SUPPLIERS } from ".";
 import { world } from "../..";
 import { MapObstacleData, ObstacleData } from "../../types/data";
@@ -39,8 +40,8 @@ export default class Spawner extends Obstacle {
 		super.die();
 		const entities = LOOT_TABLES.get(this.lootTable)?.roll();
 		if (entities) {
-			world.entities.push(...entities.map(e => {
-				e.position = this.position;
+			world.spawn(...entities.map(e => {
+				e.body.position = Vector.clone(this.body.position);
 				return e;
 			}));
 		}

@@ -1,7 +1,7 @@
 import { ENTITY_SUPPLIERS, Player } from ".";
 import { getHealingImagePath } from "../../textures";
 import { Entity } from "../../types/entity";
-import { MinEntity } from "../../types/minimized";
+import { MinThing } from "../../types/minimized";
 import { EntitySupplier } from "../../types/supplier";
 import { circleFromCenter } from "../../utils";
 
@@ -10,7 +10,7 @@ interface AdditionalEntity {
 }
 
 class HealingSupplier implements EntitySupplier {
-	create(minEntity: MinEntity & AdditionalEntity) {
+	create(minEntity: MinThing & AdditionalEntity) {
 		return new Healing(minEntity);
 	}
 }
@@ -24,7 +24,7 @@ export default class Healing extends Entity {
 	nameId!: string;
 	zIndex = 8;
 
-	constructor(minEntity: MinEntity & AdditionalEntity) {
+	constructor(minEntity: MinThing & AdditionalEntity) {
 		super(minEntity);
 		this.copy(minEntity);
 	}
@@ -44,7 +44,7 @@ export default class Healing extends Entity {
 		}
 	}
 
-	copy(minEntity: MinEntity & AdditionalEntity) {
+	copy(minEntity: MinThing & AdditionalEntity) {
 		super.copy(minEntity);
 		this.nameId = minEntity.nameId;
 	}
