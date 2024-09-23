@@ -1,7 +1,7 @@
 import { ENTITY_SUPPLIERS } from ".";
 import { getWeaponImagePath } from "../../textures";
 import { Entity } from "../../types/entity";
-import { MinEntity } from "../../types/minimized";
+import { MinThing } from "../../types/minimized";
 import { EntitySupplier } from "../../types/supplier";
 import { circleFromCenter } from "../../utils";
 import Player from "./player";
@@ -11,7 +11,7 @@ interface AdditionalEntity {
 }
 
 class GrenadeSupplier implements EntitySupplier {
-	create(minEntity: MinEntity & AdditionalEntity) {
+	create(minEntity: MinThing & AdditionalEntity) {
 		return new Grenade(minEntity);
 	}
 }
@@ -24,7 +24,7 @@ export default class Grenade extends Entity {
 	nameId!: string;
 	zIndex = 8;
 
-	constructor(minEntity: MinEntity & AdditionalEntity) {
+	constructor(minEntity: MinThing & AdditionalEntity) {
 		super(minEntity);
 		this.copy(minEntity);
 	}
@@ -33,7 +33,7 @@ export default class Grenade extends Entity {
 		ENTITY_SUPPLIERS.set(Grenade.TYPE, new GrenadeSupplier());
 	}
 
-	copy(minEntity: MinEntity & AdditionalEntity) {
+	copy(minEntity: MinThing & AdditionalEntity) {
 		super.copy(minEntity);
 		this.nameId = minEntity.nameId;
 	}

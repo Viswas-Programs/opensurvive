@@ -1,5 +1,5 @@
 import { CircleHitbox, Vec2 } from "../../types/math";
-import { MinObstacle, MinMinObstacle } from "../../types/minimized";
+import { MinThing, MinMinObstacle } from "../../types/minimized";
 import { DummyObstacle } from "../../types/obstacle";
 import { ObstacleSupplier } from "../../types/supplier";
 
@@ -17,7 +17,7 @@ export { default as Door } from "./door";
 export { default as ToiletMore } from "./toilet_more";
 export { default as Table } from "./table";
 export { default as Desk } from "./desk";
-export function castObstacle(minObstacle: MinObstacle & any) {
+export function castObstacle(minObstacle: MinThing & any) {
 	return OBSTACLE_SUPPLIERS.get(minObstacle.type)?.create(minObstacle);
 }
 

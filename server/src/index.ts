@@ -1,9 +1,9 @@
 import "dotenv/config";
 import { readFileSync } from "fs";
 import * as ws from "ws";
-import { ID, receive, send, wait } from "./utils";
+import { ID, receive, send, vecFromArray, wait } from "./utils";
 import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta } from "./types/packet";
-import { DIRECTION_VEC, TICKS_PER_SECOND } from "./constants";
+import { DIRECTION_VEC, TICKS_PER_SECOND, UNIT_X } from "./constants";
 import { CommonAngles, Vec2 } from "./types/math";
 import { Player } from "./store/entities";
 import { World } from "./types/world";
@@ -11,6 +11,7 @@ import { Plain, castMapTerrain } from "./store/terrains";
 import { castMapObstacle } from "./store/obstacles";
 import { castBuilding } from "./store/buildings";
 import { MapData } from "./types/data";
+import { Vector } from "matter-js";
 
 export var ticksElapsed = 0;
 
@@ -43,15 +44,15 @@ export function reset(map = "regular") {
 		for (ii = 0; ii < (data.amount || 1); ii++) {
 			const building = castBuilding(data.id);
 			if (!building) continue;
-			let position = world.size.scale(Math.random(), Math.random());
-			if (data.position) position = Vec2.fromArray(data.position);
+			let position = Vector.create(world.size.x * Math.random(), world.size.y * Math.random());
+			if (data.position) position = vecFromArray(data.position);
 			else if (data.includeTerrains)
 				while (!data.includeTerrains.includes(world.terrainAtPos(position).id))
-					position = world.size.scale(Math.random(), Math.random());
+					position = Vector.create(world.size.x * Math.random(), world.size.y * Math.random());
 			building.setPosition(position);
-			if (data.direction) building.setDirection(Vec2.fromArray(data.direction));
-			else building.setDirection(Vec2.UNIT_X.addAngle(Math.floor(Math.random() * 4) * CommonAngles.PI_TWO));
-			world.buildings.push(building);
+			if (data.angle !== undefined) building.setAngle(data.angle);
+			else building.setAngle(Math.floor(Math.random() * 4) * CommonAngles.PI_TWO);
+			world.addBuilding(building);
 		}
 	}
 	
@@ -60,7 +61,7 @@ export function reset(map = "regular") {
 		for (ii = 0; ii < (data.amount || 1); ii++) {
 			const obstacle = castMapObstacle(data);
 			if (!obstacle) continue;
-			world.obstacles.push(obstacle);
+			world.spawn(obstacle);
 		}
 	}
 }
@@ -113,9 +114,9 @@ server.on("connection", async socket => {
 	const player = new Player(id, username, skin, deathImg, accessToken, isMobile);
 	world.addPlayer(player);
 	// Send the player the entire map
-	send(socket, new MapPacket(world.obstacles, world.buildings, world.terrains.concat(...world.buildings.map(b => b.floors.map(fl => fl.terrain)))));
+	send(socket, new MapPacket(world.things, world.buildings, world.terrains.concat(...world.buildings.map(b => b.floors.map(fl => fl.terrain)))));
 	// Send the player initial objects
-	send(socket, new GamePacket(world.entities, world.obstacles.concat(...world.buildings.map(b => b.obstacles.map(o => o.obstacle))), player, world.playerCount, true));
+	send(socket, new GamePacket(world.things, player, world.playerCount, true));
 	// Send the player music
 	for (const sound of world.joinSounds) send(socket, new SoundPacket(sound.path, sound.position));
 
@@ -139,11 +140,11 @@ server.on("connection", async socket => {
 				break;
 			case "playerRotation":
 				const RotationPacket = <PlayerRotationDelta>decoded;
-				player.setDirection(new Vec2(Math.cos(RotationPacket.angle) * 1.45, Math.sin(RotationPacket.angle) * 1.45))
+				player.setAngle(RotationPacket.angle);
 				break;
 			case "mobilemovement":
 				const MMvPacket = <MobileMovementPacket>decoded
-				player.setVelocity(new Vec2(Math.cos(MMvPacket.direction) * 1.45, Math.sin(MMvPacket.direction) * 1.45))
+				player.setVelocity(Vector.rotate(UNIT_X, MMvPacket.direction))
 				break;
 			case "movementpress":
 				// Make the direction true
@@ -175,7 +176,7 @@ server.on("connection", async socket => {
 			case "mousemove":
 				const mMvPacket = <MouseMovePacket>decoded;
 				// { x, y } will be x and y offset of the client from the centre of the screen.
-				player.setDirection(new Vec2(mMvPacket.x, mMvPacket.y));
+				player.setAngle(Vector.angle(UNIT_X, Vector.create(mMvPacket.x, mMvPacket.y)));
 				break;
 			case "interact":
 				player.tryInteracting = true;
@@ -211,11 +212,11 @@ server.on("connection", async socket => {
 setInterval(() => {
 	world.tick();
 	// Filter players from entities and send them packets
-	const players = <Player[]>world.entities.filter(entity => entity.type === "player");
+	const players = <Player[]>world.things.filter(entity => entity.type === "player");
 	players.forEach(player => {
 		const socket = sockets.get(player.id);
 		if (!socket) return;
-		const pkt = new GamePacket(world.dirtyEntities, world.dirtyObstacles, player, world.playerCount, false, world.discardEntities, world.discardObstacles)
+		const pkt = new GamePacket(world.dirtys, player, world.playerCount, false, world.discards);
 		if (world.zoneMoving) pkt.addSafeZoneData(world.safeZone);
 		else pkt.addNextSafeZoneData(world.nextSafeZone);
 		send(socket, pkt);

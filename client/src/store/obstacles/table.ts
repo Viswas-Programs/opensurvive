@@ -1,7 +1,7 @@
 import { OBSTACLE_SUPPLIERS } from ".";
 import { getMode } from "../../homepage";
 import { RectHitbox } from "../../types/math";
-import { MinObstacle } from "../../types/minimized";
+import { MinThing } from "../../types/minimized";
 import { Obstacle } from "../../types/obstacle";
 import { ObstacleSupplier } from "../../types/supplier";
 import { Player } from "../entities";
@@ -13,7 +13,7 @@ awcCrateImg.onload = () => awcCrateImg.loaded = true;
 
 
 class TableSupplier implements ObstacleSupplier {
-	create(minObstacle: MinObstacle) {
+	create(minObstacle: MinThing) {
 		return new Table(minObstacle);
 	}
 }
@@ -34,7 +34,7 @@ export default class Table extends Obstacle {
 		this.tableResidueImg.src = "assets/" + getMode() + "/images/game/objects/residues/table.svg";
 	}
 
-	copy(minObstacle: MinObstacle) {
+	copy(minObstacle: MinThing) {
 		super.copy(minObstacle);
 	}
 

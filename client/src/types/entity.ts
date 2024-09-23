@@ -1,7 +1,7 @@
 import { Player } from "../store/entities";
 import { castCorrectWeapon, WEAPON_SUPPLIERS } from "../store/weapons";
 import { CircleHitbox, Hitbox, RectHitbox, Vec2 } from "./math";
-import { MinCircleHitbox, MinEntity, MinInventory, MinRectHitbox } from "./minimized";
+import { MinCircleHitbox, MinThing, MinInventory, MinRectHitbox } from "./minimized";
 import { Renderable } from "./extenstions";
 import {  Weapon } from "./weapon";
 import { GunColor } from "../constants";
@@ -71,11 +71,11 @@ export abstract class Entity implements Renderable {
 	despawn!: boolean;
 	zIndex = 0;
 
-	constructor(minEntity: MinEntity) {
+	constructor(minEntity: MinThing) {
 		this.copy(minEntity);
 	}
 
-	copy(minEntity: MinEntity) {
+	copy(minEntity: MinThing) {
 		this.id = minEntity.id;
 		this.type = minEntity.type;
 		this.position = new Vec2(minEntity.position.x, minEntity.position.y);

@@ -1,3 +1,4 @@
+import { Vector } from "matter-js";
 import { world } from "../..";
 import { CircleHitbox } from "../../types/math";
 import Item from "./item";
@@ -5,16 +6,19 @@ import Player from "./player";
 
 export default class Scope extends Item {
 	type = "scope";
-	hitbox = new CircleHitbox(1);
 	zoom: number;
 
 	constructor(zoom: number) {
-		super();
+		super(new CircleHitbox(1));
 		this.zoom = zoom;
 	}
 
 	picked(player: Player) {
-		world.onceSounds.push({"path": "items/scope_equip.mp3", "position": this.position})
+		world.onceSounds.push({ path: "items/scope_equip.mp3", position: this.body.position });
+		if (player.inventory.scopes.includes(this.zoom)) {
+			this.randomVelocity(Vector.add(this.body.position, Vector.neg(player.body.position)));
+			return false;
+		}
 		return player.inventory.addScope(this.zoom);
 	}
 

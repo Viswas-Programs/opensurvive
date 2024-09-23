@@ -1,3 +1,4 @@
+import { Vector } from "matter-js";
 import { OBSTACLE_SUPPLIERS } from ".";
 import { world } from "../..";
 import { ObstacleData } from "../../types/data";
@@ -15,13 +16,13 @@ export default class Door extends Obstacle {
 	static readonly TYPE = "door";
 	type = Door.TYPE;
 	// Pivot is relative to the center of 
-	pivot: Vec2;
+	pivot: Vector;
 	discardable = true;
 	interactable = true;
 	opened = false;
 
 	// We may add a metal type later
-	constructor(hitbox: RectHitbox, health: number, pivot: Vec2) {
+	constructor(hitbox: RectHitbox, health: number, pivot: Vector) {
 		super(world, hitbox, hitbox, health, health);
 		this.pivot = pivot;
 	}
@@ -32,14 +33,12 @@ export default class Door extends Obstacle {
 
 	interact() {
 		if (this.opened) {
-			this.position = this.position.addVec(this.pivot).addVec(this.pivot.inverse().addAngle(-CommonAngles.PI_TWO));
-			this.direction = this.direction.addAngle(-CommonAngles.PI_TWO);
-			this.pivot = this.pivot.addAngle(-CommonAngles.PI_TWO);
+			this.body.position = Vector.add(Vector.add(this.body.position, this.pivot), Vector.rotate(Vector.neg(this.pivot), -CommonAngles.PI_TWO));
+			this.pivot = Vector.rotate(this.pivot, -CommonAngles.PI_TWO);
 			this.opened = false;
 		} else {
-			this.position = this.position.addVec(this.pivot).addVec(this.pivot.inverse().addAngle(CommonAngles.PI_TWO));
-			this.direction = this.direction.addAngle(CommonAngles.PI_TWO);
-			this.pivot = this.pivot.addAngle(CommonAngles.PI_TWO);
+			this.body.position = Vector.add(Vector.add(this.body.position, this.pivot), Vector.rotate(Vector.neg(this.pivot), CommonAngles.PI_TWO));
+			this.pivot = Vector.rotate(this.pivot, CommonAngles.PI_TWO);
 			this.opened = true;
 		}
 		this.markDirty();

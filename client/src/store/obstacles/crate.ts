@@ -1,7 +1,7 @@
 import { OBSTACLE_SUPPLIERS } from ".";
 import { getMode } from "../../homepage";
 import { RectHitbox } from "../../types/math";
-import { MinObstacle } from "../../types/minimized";
+import { MinThing } from "../../types/minimized";
 import { Obstacle } from "../../types/obstacle";
 import { ObstacleSupplier } from "../../types/supplier";
 import { Player } from "../entities";
@@ -16,7 +16,7 @@ interface AdditionalObstacle {
 }
 
 class CrateSupplier implements ObstacleSupplier {
-	create(minObstacle: MinObstacle & AdditionalObstacle) {
+	create(minObstacle: MinThing & AdditionalObstacle) {
 		return new Crate(minObstacle);
 	}
 }
@@ -40,7 +40,7 @@ export default class Crate extends Obstacle {
 		this.sovietCrateImg.src = "assets/" + getMode() + "/images/game/objects/soviet_crate.svg";
 	}
 
-	copy(minObstacle: MinObstacle & AdditionalObstacle) {
+	copy(minObstacle: MinThing & AdditionalObstacle) {
 		super.copy(minObstacle);
 		this.special = minObstacle.special;
 	}

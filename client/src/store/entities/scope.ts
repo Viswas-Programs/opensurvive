@@ -1,6 +1,6 @@
 import { ENTITY_SUPPLIERS } from ".";
 import { Entity } from "../../types/entity";
-import { MinEntity } from "../../types/minimized";
+import { MinThing } from "../../types/minimized";
 import { EntitySupplier } from "../../types/supplier";
 import { circleFromCenter } from "../../utils";
 import Player from "./player";
@@ -10,7 +10,7 @@ interface AdditionalEntity {
 }
 
 class ScopeSupplier implements EntitySupplier {
-	create(minEntity: MinEntity & AdditionalEntity) {
+	create(minEntity: MinThing & AdditionalEntity) {
 		return new Scope(minEntity);
 	}
 }
@@ -21,7 +21,7 @@ export default class Scope extends Entity {
 	zoom!: number;
 	zIndex = 8;
 
-	constructor(minEntity: MinEntity & AdditionalEntity) {
+	constructor(minEntity: MinThing & AdditionalEntity) {
 		super(minEntity);
 		this.copy(minEntity);
 	}
@@ -30,7 +30,7 @@ export default class Scope extends Entity {
 		ENTITY_SUPPLIERS.set(Scope.TYPE, new ScopeSupplier());
 	}
 
-	copy(minEntity: MinEntity & AdditionalEntity) {
+	copy(minEntity: MinThing & AdditionalEntity) {
 		super.copy(minEntity);
 		this.zoom = minEntity.zoom;
 	}

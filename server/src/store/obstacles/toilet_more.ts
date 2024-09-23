@@ -5,6 +5,7 @@ import { LOOT_TABLES } from "../../types/loot_table";
 import { ObstacleSupplier } from "../../types/supplier";
 import { ObstacleData } from "../../types/data"; 
 import { OBSTACLE_SUPPLIERS } from ".";
+import { Vector } from "matter-js";
 
 class ToiletMoreSupplier extends ObstacleSupplier {
 	make(data: ObstacleData) {
@@ -26,18 +27,18 @@ export default class ToiletMore extends Obstacle {
 
 	damage(dmg: number) {
 		super.damage(dmg);
-		world.onceSounds.push({ path: `obstacles/toilet_hit.mp3`, position: this.position });
+		world.onceSounds.push({ path: `obstacles/toilet_hit.mp3`, position: this.body.position });
 	}
 
 	die() {
 		super.die();
 		const entities = LOOT_TABLES.get("toilet_more")?.roll();
 		if (entities) {
-			world.entities.push(...entities.map(e => {
-				e.position = this.position;
+			world.spawn(...entities.map(e => {
+				e.body.position = Vector.clone(this.body.position);
 				return e;
 			}));
 		}
-		world.onceSounds.push({ path: `obstacles/toilet_break.mp3`, position: this.position });
+		world.onceSounds.push({ path: `obstacles/toilet_break.mp3`, position: this.body.position });
 	}
 }

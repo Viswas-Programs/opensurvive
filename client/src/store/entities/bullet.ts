@@ -2,7 +2,7 @@ import { ENTITY_SUPPLIERS } from ".";
 import { getTracerColor } from "../../textures";
 import { TracerData } from "../../types/data";
 import { Entity } from "../../types/entity";
-import { MinEntity } from "../../types/minimized";
+import { MinThing } from "../../types/minimized";
 import { EntitySupplier } from "../../types/supplier";
 import { lineBetween } from "../../utils";
 import Player from "./player";
@@ -12,7 +12,7 @@ interface AdditionalEntity {
 }
 
 class BulletSupplier implements EntitySupplier {
-	create(minEntity: MinEntity & AdditionalEntity) {
+	create(minEntity: MinThing & AdditionalEntity) {
 		return new Bullet(minEntity);
 	}
 }
@@ -23,7 +23,7 @@ export default class Bullet extends Entity {
 	// Used for rendering bullet size
 	tracer!: TracerData;
 
-	constructor(minEntity: MinEntity & AdditionalEntity) {
+	constructor(minEntity: MinThing & AdditionalEntity) {
 		super(minEntity);
 		this.copy(minEntity);
 	}
@@ -32,7 +32,7 @@ export default class Bullet extends Entity {
 		ENTITY_SUPPLIERS.set(Bullet.TYPE, new BulletSupplier());
 	}
 
-	copy(minEntity: MinEntity & AdditionalEntity) {
+	copy(minEntity: MinThing & AdditionalEntity) {
 		super.copy(minEntity);
 		this.tracer = minEntity.tracer;
 	}

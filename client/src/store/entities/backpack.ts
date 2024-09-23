@@ -1,7 +1,7 @@
 import { ENTITY_SUPPLIERS } from ".";
 import { getBackpackImagePath } from "../../textures";
 import { Entity } from "../../types/entity";
-import { MinEntity } from "../../types/minimized";
+import { MinThing } from "../../types/minimized";
 import { EntitySupplier } from "../../types/supplier";
 import { circleFromCenter } from "../../utils";
 import Player from "./player";
@@ -11,7 +11,7 @@ interface AdditionalEntity {
 }
 
 class BackpackSupplier implements EntitySupplier {
-	create(minEntity: MinEntity & AdditionalEntity) {
+	create(minEntity: MinThing & AdditionalEntity) {
 		return new Backpack(minEntity);
 	}
 }
@@ -23,7 +23,7 @@ export default class Backpack extends Entity {
 	level!: number;
 	zIndex = 8;
 	
-	constructor(minEntity: MinEntity & AdditionalEntity) {
+	constructor(minEntity: MinThing & AdditionalEntity) {
 		super(minEntity);
 		this.copy(minEntity);
 	}
@@ -32,7 +32,7 @@ export default class Backpack extends Entity {
 		ENTITY_SUPPLIERS.set(Backpack.TYPE, new BackpackSupplier());
 	}
 
-	copy(minEntity: MinEntity & AdditionalEntity) {
+	copy(minEntity: MinThing & AdditionalEntity) {
 		super.copy(minEntity);
 		this.level = minEntity.level;
 	}

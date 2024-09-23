@@ -1,5 +1,6 @@
 // Note: This is the gun item
 
+import { Vector } from "matter-js";
 import { world } from "../..";
 import { CircleHitbox, CommonAngles, Vec2 } from "../../types/math";
 import { GunColor } from "../../types/misc";
@@ -10,12 +11,11 @@ import Player from "./player";
 
 export default class Gun extends Item {
 	type = "gun";
-	hitbox = new CircleHitbox(2);
 	nameId: string; // Gun ID, but id was taken for entity already
 	color: GunColor;
 
 	constructor(nameId: string, color: GunColor) {
-		super();
+		super(new CircleHitbox(2));
 		if (!WEAPON_SUPPLIERS.has(nameId)) console.warn("Creating a gun entity that doesn't have a supplier for its type");
 		this.nameId = nameId;
 		this.color = color;
@@ -39,9 +39,9 @@ export default class Gun extends Item {
 		// Spawn swapped weapon
 		const weapon = <GunWeapon>player.inventory.getWeapon();
 		const gun = new Gun(weapon.nameId, weapon.color);
-		gun.position = this.position;
-		gun.velocity = Vec2.UNIT_X.addAngle(Math.random() * CommonAngles.TWO_PI).scaleAll(0.025);
-		world.entities.push(gun);
+		gun.body.position = Vector.clone(this.body.position);
+		gun.setVelocity(Vector.mult(Vector.rotate(Vector.create(1, 0), Math.random() * CommonAngles.TWO_PI), 0.025));
+		world.spawn(gun);
 		// Swap the player's weapon on hand with the one on ground
 		player.inventory.setWeapon(castCorrectWeapon(this.nameId));
 		return true;

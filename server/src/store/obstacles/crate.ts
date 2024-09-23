@@ -5,8 +5,7 @@ import { LOOT_TABLES } from "../../types/loot_table";
 import { MapObstacleSupplier, ObstacleSupplier } from "../../types/supplier";
 import { MapObstacleData, ObstacleData } from "../../types/data";
 import { MAP_OBSTACLE_SUPPLIERS, OBSTACLE_SUPPLIERS } from ".";
-import { spawnGun } from "../../utils";
-import { GunColor } from "../../types/misc";
+import { Body } from "matter-js";
 
 class CrateSupplier extends ObstacleSupplier {
 	make(data: ObstacleData) {
@@ -43,7 +42,7 @@ export default class Crate extends Obstacle {
 				health = 80;
 				break;
 		}
-		super(world, hitbox, hitbox.scaleAll(0.75), health, health, Vec2.UNIT_X);
+		super(world, hitbox, hitbox.scaleAll(0.75), health, health, 0);
 		this.special = special;
 	}
 
@@ -54,7 +53,7 @@ export default class Crate extends Obstacle {
 
 	damage(dmg: number) {
 		super.damage(dmg);
-		world.onceSounds.push({ path: `obstacles/crate_hit.mp3`, position: this.position });
+		world.onceSounds.push({ path: `obstacles/crate_hit.mp3`, position: this.body.position });
 	}
 
 	die() {
@@ -76,12 +75,12 @@ export default class Crate extends Obstacle {
 		}
 		const entities = LOOT_TABLES.get(lootTable)?.roll();
 		if (entities) {
-			world.entities.push(...entities.map(e => {
-				e.position = this.position;
+			world.spawn(...entities.map(e => {
+				Body.setPosition(e.body, this.body.position);
 				return e;
 			}));
 		}
-		world.onceSounds.push({ path: "obstacles/crate_break.mp3", position: this.position });
+		world.onceSounds.push({ path: "obstacles/crate_break.mp3", position: this.body.position });
 	}
 
 	minimize() {

@@ -33,11 +33,11 @@ export default class Bush extends Obstacle {
 
 	damage(dmg: number) {
 		super.damage(dmg);
-		world.onceSounds.push({ path: `obstacles/bush_hit.mp3`, position: this.position });
+		world.onceSounds.push({ path: `obstacles/bush_hit.mp3`, position: this.body.position });
 	}
 
 	die() {
 		super.die();
-		world.onceSounds.push({ path: `obstacles/bush_break.mp3`, position: this.position });
+		world.onceSounds.push({ path: `obstacles/bush_break.mp3`, position: this.body.position });
 	}
 }

@@ -1,5 +1,5 @@
 import { DummyEntity } from "../../types/entity";
-import { MinEntity } from "../../types/minimized";
+import { MinThing } from "../../types/minimized";
 import { EntitySupplier } from "../../types/supplier";
 
 export const ENTITY_SUPPLIERS = new Map<string, EntitySupplier>();
@@ -17,6 +17,6 @@ export { default as Vest } from "./vest";
 export { default as Helmet} from "./helmet"
 
 // This still need hard-coding unfortunately
-export function castEntity(minEntity: MinEntity & { [key: string]: any }) {
+export function castEntity(minEntity: MinThing & { [key: string]: any }) {
 	return ENTITY_SUPPLIERS.get(minEntity.type)?.create(minEntity) || new DummyEntity(minEntity);
 }
