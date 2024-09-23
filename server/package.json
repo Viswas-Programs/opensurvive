@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/North-West-Wind/islandr.io#readme",
   "devDependencies": {
+    "@damienvesper/bit-buffer": "^1.0.1",
     "@types/msgpack-lite": "^0.1.8",
     "@types/node": "^17.0.38",
     "@types/node-fetch": "^2.6.4",

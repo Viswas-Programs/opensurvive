@@ -22,14 +22,15 @@ export interface MinCircleHitbox {
 
 export type MinHitbox = MinRectHitbox | MinCircleHitbox;
 
-export interface MinEntity {
-	id: string;
-	type: string;
-	position: MinVec2;
-	direction: MinVec2;
-	hitbox: MinHitbox;
-	animations: string[];
-	despawn: boolean;
+export class MinEntity {
+	id!: string;
+	type!: number;
+	position!: MinVec2;
+	direction!: MinVec2;
+	hitbox!: MinHitbox;
+	_needsToSendAnimations!: boolean
+	animations!: string[];
+	despawn!: boolean;
 }
 
 export interface MinInventory {
@@ -41,17 +42,18 @@ export interface MinInventory {
 
 export interface MinObstacle {
 	id: string;
-	type: string;
+	type: number;
 	position: MinVec2;
 	direction: MinVec2;
 	hitbox: MinHitbox;
 	despawn: boolean;
 	animations: string[];
+	_needToSendAnimations: boolean;
 }
 
 export interface MinMinObstacle {
 	id: string;
-	type: string;
+	type: number;
 	position: MinVec2;
 }
 

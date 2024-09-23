@@ -56,6 +56,7 @@ export type GunData = {
 		tracer: TracerData
 		animations: string[]
 		hasBarrelImage: boolean
+		particleToDisplay: string
 	},
 	fistPositions?: Array<number>
 }
@@ -135,6 +136,7 @@ export type ObstacleData = {
 	type: string;
 	direction?: number[] | number;
 	position: number[];
+	special?: string;
 	[key: string]: any;
 }
 
@@ -151,7 +153,7 @@ export type BuildingData = {
 	roofs?: ObstacleData[];
 	mapColor?: number;
 	subBuildings?: {
-		id: "string",
+		id: string,
 		position: number[],
 		direction: number[]
 	}
@@ -183,6 +185,11 @@ export type MapBuildingData = {
 	direction?: number[];
 	amount?: number;
 	includeTerrains?: string[];
+	subBuildings?: {
+		id: string,
+		position: number[],
+		direction: number[]
+	}
 }
 
 export type MapObstacleData = {

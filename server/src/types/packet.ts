@@ -266,9 +266,9 @@ export class AnnouncePacket extends IPacketSERVER {
 	}
 	serialise() {
 		super.serialise();
-		this.stream.writeASCIIString(this.weaponUsed)
-		this.stream.writeASCIIString(this.killer)
-		this.stream.writeASCIIString(this.killed)
+		this.stream.writeASCIIString(this.weaponUsed, this.weaponUsed.length + 1);
+		this.stream.writeASCIIString(this.killer, this.killed.length + 1);
+		this.stream.writeASCIIString(this.killed, this.killed.length + 1);
 	}
 }
 

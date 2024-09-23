@@ -1,5 +1,3 @@
-import { IslandrBitStream } from "../packets";
-
 export interface MinVec2 {
 	x: number;
 	y: number;
