@@ -35,6 +35,10 @@ export class Vec2 {
 		return new Vec2(-this.x, -this.y);
 	}
 
+	invert() {
+		return new Vec2(this.y, this.x);
+	}
+
 	unit() {
 		const mag = this.magnitude();
 		if (mag === 0) return Vec2.ZERO;
@@ -55,9 +59,7 @@ export class Vec2 {
 		if (this.y > 0) return angle;
 		else return -angle;
 	}
-	inverseAngle() {
-		return -this.angle()
-	}
+
 	addAngle(radian: number) {
 		const angle = this.angle();
 		if (isNaN(angle)) return new Vec2(this.x, this.y);
@@ -98,6 +100,10 @@ export class Vec2 {
 		return Math.sqrt(this.distanceSqrTo(vec));
 	}
 
+	interpolate(endVec: Vec2, factor: number) {
+		return this.scaleAll(1-factor).addVec(endVec.scaleAll(factor));
+	}
+
 	perpendicular() {
 		return new Vec2(this.y, -this.x);
 	}
@@ -108,12 +114,6 @@ export class Vec2 {
 
 	minimize() {
 		return <MinVec2>{ x: this.x, y: this.y };
-	}
-
-	invert() {
-		const oldX = this.x
-		const oldY = this.y
-		return new Vec2(this.y, this.x)
 	}
 }
 

@@ -57,7 +57,7 @@ export type GunData = {
 		animations: string[]
 		hasBarrelImage: boolean
 		particleToDisplay: string
-	}
+	},
 	fistPositions?: Array<number>
 }
 
@@ -153,7 +153,7 @@ export type BuildingData = {
 	roofs?: ObstacleData[];
 	mapColor?: number;
 	subBuildings?: {
-		id: "string",
+		id: string,
 		position: number[],
 		direction: number[]
 	}
@@ -186,10 +186,10 @@ export type MapBuildingData = {
 	amount?: number;
 	includeTerrains?: string[];
 	subBuildings?: {
-		id: "string",
+		id: string,
 		position: number[],
 		direction: number[]
-}
+	}
 }
 
 export type MapObstacleData = {

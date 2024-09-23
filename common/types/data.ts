@@ -56,7 +56,9 @@ export type GunData = {
 		tracer: TracerData
 		animations: string[]
 		hasBarrelImage: boolean
-	}
+		particleToDisplay: string
+	},
+	fistPositions?: Array<number>
 }
 
 interface MeleeStats {
@@ -134,6 +136,7 @@ export type ObstacleData = {
 	type: string;
 	direction?: number[] | number;
 	position: number[];
+	special?: string;
 	[key: string]: any;
 }
 
@@ -149,6 +152,11 @@ export type BuildingData = {
 	floors?: TerrainData[];
 	roofs?: ObstacleData[];
 	mapColor?: number;
+	subBuildings?: {
+		id: string,
+		position: number[],
+		direction: number[]
+	}
 }
 
 export type RedZoneDataEntry = {
@@ -177,6 +185,11 @@ export type MapBuildingData = {
 	direction?: number[];
 	amount?: number;
 	includeTerrains?: string[];
+	subBuildings?: {
+		id: string,
+		position: number[],
+		direction: number[]
+	}
 }
 
 export type MapObstacleData = {

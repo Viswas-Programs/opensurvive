@@ -136,7 +136,8 @@ export function deserialiseMinObstacles(stream: IslandrBitStream): MinObstacle[]
             despawn: stream.readBoolean(),
             animations: <string[]>_getAnimations(stream),
             roofless: new Set<string>(),
-            special: "normal"
+            special: "normal",
+            _needToSendAnimations: false, // TODO: make this actually read
         }
         if (obstacle.type == ObstacleTypes.ROOF) {
             const size = stream.readInt8()

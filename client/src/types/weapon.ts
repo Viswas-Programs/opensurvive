@@ -4,10 +4,10 @@ import { Renderable } from "./extenstions";
 import { roundRect } from "../utils";
 import { CircleHitbox, CommonAngles, CommonNumbers, Vec2 } from "./math";
 import { GunData, MeleeData } from "./data";
-import { GunColor } from "../constants";
 import { DEFINED_ANIMATIONS } from "../store/animations";
 import { getBarrelImagePath } from "../textures";
 import { getMode } from "../homepage";
+import { GunColor } from "./misc";
 
 export enum WeaponType {
 	MELEE = "melee",
