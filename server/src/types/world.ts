@@ -1,12 +1,12 @@
 import * as fs from "fs";
-import { Engine } from "matter-js";
+import { Bodies, Composite, Engine } from "matter-js";
 import Building from "./building";
 import { RedZoneDataEntry } from "./data";
 import { Entity } from "./entity";
 import { CircleHitbox, Vec2 } from "./math";
 import { Obstacle } from "./obstacle";
 import { Particle } from "./particle";
-import { CollisionLayers, EntityTypes, PLAYER_THRESHOLD, TICKS_PER_SECOND } from "../constants";
+import { CollisionLayers, EntityTypes, MAP_WALL_PADDING, PLAYER_THRESHOLD, TICKS_PER_SECOND } from "../constants";
 import { Player } from "../store/entities";
 import { Terrain } from "./terrain";
 import { reset } from "..";
@@ -67,7 +67,16 @@ export class World {
 		};
 		this.nextSafeZone = this.safeZone;
 
+		// Create physics engines for each collision layer
 		this.engines = Array((Object.keys(CollisionLayers).length / 2) - 1).fill(0).map(() => Engine.create({ gravity: { y: 0 } }));
+		// Create box
+		const box = [
+			Bodies.rectangle(-MAP_WALL_PADDING, -MAP_WALL_PADDING * 2, this.size.x + MAP_WALL_PADDING * 2, 0, { isStatic: true }),
+			Bodies.rectangle(-MAP_WALL_PADDING * 2, -MAP_WALL_PADDING, 0, this.size.y + MAP_WALL_PADDING * 2, { isStatic: true }),
+			Bodies.rectangle(-MAP_WALL_PADDING, this.size.y, this.size.x + MAP_WALL_PADDING * 2, this.size.y + MAP_WALL_PADDING * 2, { isStatic: true }),
+			Bodies.rectangle(this.size.x, -MAP_WALL_PADDING, this.size.x + MAP_WALL_PADDING * 2, this.size.y + MAP_WALL_PADDING * 2, { isStatic: true })
+		];
+		this.engines.forEach(engine => Composite.add(engine.world, box));
 	}
 
 	addPlayer(player: Player) {

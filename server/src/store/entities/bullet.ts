@@ -9,7 +9,6 @@ import { Obstacle } from "../../types/obstacle";
 
 export default class Bullet extends Entity {
 	type = EntityTypes.BULLET;
-	collisionLayers = CollisionLayers.GENERAL;
 	shooter: Entity | Obstacle;
 	data: TracerData;
 	dmg: number;
@@ -18,7 +17,7 @@ export default class Bullet extends Entity {
 	distanceSqr = 0;
 
 	constructor(shooter: Entity | Obstacle, dmg: number, velocity: Vec2, ticks: number, falloff: number, data: TracerData) {
-		super(new CircleHitbox(data.width * GLOBAL_UNIT_MULTIPLIER * 0.5));
+		super(new CircleHitbox(data.width * GLOBAL_UNIT_MULTIPLIER * 0.5), CollisionLayers.GENERAL);
 		this.shooter = shooter;
 		this.data = data;
 		this.dmg = dmg;

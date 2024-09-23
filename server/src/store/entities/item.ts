@@ -10,11 +10,10 @@ export default abstract class Item extends Entity {
 	discardable = true;
 	interactable = true;
 	friction = 0.02; // frictional acceleration, not force
-	collisionLayers = CollisionLayers.LOOT;
 	repelExplosions = true;
 
 	constructor(hitbox: Hitbox) {
-		super(hitbox);
+		super(hitbox, CollisionLayers.LOOT);
 		this.randomVelocity();
 		this.discardable = true;
 		this.noCollision = true;

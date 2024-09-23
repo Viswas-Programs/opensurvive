@@ -3,7 +3,8 @@ import * as fs from "fs";
 
 //export const MAP_SIZE = [400, 400];
 //small amount of players
-export const MAP_SIZE = [200, 200]
+export const MAP_SIZE = [200, 200];
+export const MAP_WALL_PADDING = 100;
 export const TICKS_PER_SECOND = 90;
 export const TICKS_TO_SEND = 2;
 // Radius of 1x scope

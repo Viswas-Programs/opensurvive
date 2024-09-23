@@ -22,7 +22,6 @@ export default class Player extends Entity {
 	interactMessage: string | null;
 	id: string;
 	username: string;
-	collisionLayers = CollisionLayers.GENERAL;
 	lastPickedUpScope = 1
 	boost = 0;
 	maxBoost = 100;
@@ -61,7 +60,7 @@ export default class Player extends Entity {
 	usernamesAndIDsSent = false;
 
 	constructor(id: string, username: string, skin: string | null, deathImg: string | null, accessToken?: string, isMobile?: boolean) {
-		super(new CircleHitbox(1));
+		super(new CircleHitbox(1), CollisionLayers.GENERAL);
 		this.id = id;
 		this.interactMessage = null;
 		this.username = username;

@@ -127,11 +127,12 @@ export class Entity {
 	bodies: Body[] = [];
 	actualVelocity = Vec2.ZERO;
 	
-	constructor(hitbox: Hitbox) {
+	constructor(hitbox: Hitbox, collisionLayers = CollisionLayers.EVERYTHING) {
 		this.id = ID();
 		// Currently selects a random position to spawn. Will change in the future.
 		this.position = this.goodOldPos = world.size.scale(Math.random(), Math.random());
 		this.hitbox = hitbox;
+		this.collisionLayers = collisionLayers;
 		this.createBodies();
 	}
 
