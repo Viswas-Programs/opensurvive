@@ -4,15 +4,20 @@ import MarkdownIt from "markdown-it";
 import { createHash } from "crypto";
 import "./loadout";
 import { getToken, setToken, setUsername } from "./states";
+import { wait } from "./utils";
 let mode = "normal"
-console.log("homepage ts called")
+let pageLoaded = false
+wait(10000).then(() => {
+	if (document.readyState.toLowerCase() != "complete" || !pageLoaded) { document.getElementsByClassName("loading-text")[0]!.textContent = "Error in loading page, reloading in 5"; wait(5000).then(() => window.location.reload()) }
+})
 export function setMode(md: string) {
 	mode = md
 }
 export function getMode(): string {
 	return mode
 }
-	$(document).ready(function () {
+$(document).ready(function () {
+
 		$('.arrow').click(function () {
 			$('.box-selectable').toggle();
 			$(this).toggleClass('arrow-down');
@@ -42,12 +47,13 @@ if (!window.location.href!.includes("/loadout")) {
 			document.getElementById('loading')!.style.display = 'none';
 		}, 1000);
 	};
+	
 	document.addEventListener('DOMContentLoaded', function () {
 		var audio = <HTMLAudioElement>document.getElementById('menu-audio');
 		var volumeIcon = <HTMLDivElement>document.getElementById('volume-icon');
 		var volumeSlider = <HTMLDivElement>document.getElementById('volume-slider');
 		var volumeRange = <HTMLInputElement>document.getElementById('volume-range');
-
+		pageLoaded = true
 		var started = false;
 		if (!started) {
 			audio.play();
@@ -83,12 +89,10 @@ if (!window.location.href!.includes("/loadout")) {
 	}
 	document.getElementById("button-close")!.onclick = closeBox;
 }
-const modes = ["normal", "suroi_collab", "dfbg-collab"]
+const modes = ["normal", "suroi_collab", "classic"]
 modes.forEach(md => {
-	console.log(document.getElementsByClassName("box-selectable")[0].children[modes.indexOf(md)].querySelector("div"))
-	document.getElementsByClassName("box-selectable")[0].children[modes.indexOf(md)].querySelector("div")?.addEventListener("click", () => { setMode(md); console.log("DONE:)") })
+	document.getElementsByClassName("box-selectable")[0].children[modes.indexOf(md)].querySelector("div")?.addEventListener("click", () => { setMode(md); })
 })
-console.log(getMode())
 	function showAds() {
 		document.querySelectorAll('.ads').forEach(ad => { (<HTMLElement>ad).style.visibility = "visible"; });
 	}
@@ -159,11 +163,9 @@ console.log(getMode())
 
 		document.getElementById("button-signup")!.onclick = () => {
 			if (signupWorking) return;
-			console.log("signing up");
 			signupWorking = true;
 			const username = (<HTMLInputElement>document.getElementById("login_username")).value;
 			const password = (<HTMLInputElement>document.getElementById("password")).value;
-			console.log(username, password);
 			if (!username || !password) return signupWorking = false;
 			const hashed = createHash("sha1").update(password).digest("hex");
 			fetch("/api/signup", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password: hashed.slice(0, 16) }) })

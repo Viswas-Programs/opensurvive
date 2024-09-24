@@ -1,20 +1,25 @@
 import { world } from "../..";
+import { EntityTypes } from "../../constants";
+import { IslandrBitStream } from "../../packets";
+import { standardEntitySerialiser } from "../../serialisers";
 import { CircleHitbox } from "../../types/math";
 import Item from "./item";
 import Player from "./player";
 
 export default class Scope extends Item {
-	type = "scope";
-	hitbox = new CircleHitbox(1);
+	type = EntityTypes.SCOPE;
 	zoom: number;
 
 	constructor(zoom: number) {
-		super();
+		super(new CircleHitbox(1));
 		this.zoom = zoom;
+		this.allocBytes++;
 	}
 
 	picked(player: Player) {
-		world.onceSounds.push({"path": "items/scope_equip.mp3", "position": this.position})
+		world.onceSounds.push({ "path": "items/scope_equip.mp3", "position": this.position })
+		player.changedScope = true;
+		player.lastPickedUpScope = this.zoom
 		return player.inventory.addScope(this.zoom);
 	}
 
@@ -24,5 +29,9 @@ export default class Scope extends Item {
 
 	minimize() {
 		return Object.assign(super.minimize(), { zoom: this.zoom });
+	}
+	serialise(stream: IslandrBitStream, player: Player) {
+		standardEntitySerialiser(this.minimize(), stream, player)
+		stream.writeInt8(this.zoom)
 	}
 }

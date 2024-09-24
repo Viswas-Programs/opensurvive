@@ -1,11 +1,14 @@
+import { Body } from "matter-js";
 import { world } from "../..";
-import { GLOBAL_UNIT_MULTIPLIER, TICKS_PER_SECOND } from "../../constants";
+import { CollisionLayers, EntityTypes, GLOBAL_UNIT_MULTIPLIER, TICKS_PER_SECOND } from "../../constants";
+import { IslandrBitStream } from "../../packets";
+import { standardEntitySerialiser } from "../../serialisers";
 import { Entity, Inventory } from "../../types/entity";
 import { CircleHitbox, Vec2 } from "../../types/math";
 import { CollisionType, GunColor } from "../../types/misc";
 import { Obstacle } from "../../types/obstacle";
 import { Particle } from "../../types/particle";
-import { GunWeapon, Weapon, WeaponType } from "../../types/weapon";
+import { GunWeapon, WeaponType } from "../../types/weapon";
 import { addKillCounts, changeCurrency, spawnAmmo, spawnGun } from "../../utils";
 import { Roof } from "../obstacles";
 import { Pond, River, Sea } from "../terrains";
@@ -14,16 +17,16 @@ import Healing from "./healing";
 import Helmet from "./helmet";
 import Vest from "./vest";
 export default class Player extends Entity {
-	type = "player";
+	type = EntityTypes.PLAYER;
 	currentHealItem: string | null;
 	interactMessage: string | null;
-	hitbox = new CircleHitbox(1);
 	id: string;
 	username: string;
-	collisionLayers = [0];
+	lastPickedUpScope = 1
 	boost = 0;
 	maxBoost = 100;
 	scope = 1;
+	changedScope = false;
 	buildingEnterScope = 1;
 	_scope = 1;
 	tryAttacking = false;
@@ -54,9 +57,10 @@ export default class Player extends Entity {
 	accessToken?: string;
 	killCount = 0;
 	currencyChanged = false;
+	usernamesAndIDsSent = false;
 
 	constructor(id: string, username: string, skin: string | null, deathImg: string | null, accessToken?: string, isMobile?: boolean) {
-		super();
+		super(new CircleHitbox(1), CollisionLayers.GENERAL);
 		this.id = id;
 		this.interactMessage = null;
 		this.username = username;
@@ -67,6 +71,9 @@ export default class Player extends Entity {
 		this.currentHealItem = null;
 		this.accessToken = accessToken;
 		this.isMobile = isMobile!;
+		this.allocBytes += 35 + this.username.length + 1 + 1; //last +1 is for animation length byte
+		this._needsToSendAnimations = true
+		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
 
 	setVelocity(velocity?: Vec2) {
@@ -129,21 +136,24 @@ export default class Player extends Entity {
 		let breaked = false;
 		for (const entity of entities) {
 			if (!entity.interactable) continue;
-			if (entity.hitbox.inside(this.position, entity.position, entity.direction)) {
+			const scaleAllVal = 1.5;
+			//if (entity.hitbox.type == "rect") scaleAllVal = 2
+			if (entity.hitbox.scaleAll(scaleAllVal).inside(this.position, entity.position, entity.direction) ){
+			//if (this.collided(entity)) {
 				this.canInteract = true;
-				this.interactMessage = entity.interactionKey();
-				// Only interact when trying
-				if (this.tryInteracting || this.isMobile) {
-					this.canInteract = false;
-					entity.interact(this);
-				}
-				breaked = true;
-				break;
+					this.interactMessage = entity.interactionKey();
+					// Only interact when trying
+					if (this.tryInteracting || this.isMobile) {
+						this.canInteract = false;
+						entity.interact(this);
+					}
+					breaked = true;
+					break;
 			}
 		}
 		for (const obstacle of obstacles) {
 			if (!obstacle.interactable) continue;
-			if (obstacle.hitbox.scaleAll(1.25).collideCircle(obstacle.position, obstacle.direction, this.hitbox, this.position, this.direction)) {
+			if (obstacle.hitbox.scaleAll(1.5).collideCircle(obstacle.position, obstacle.direction, this.hitbox, this.position, this.direction)) {
 				this.canInteract = true;
 				this.interactMessage = obstacle.interactionKey();
 				// Only interact when trying
@@ -159,12 +169,18 @@ export default class Player extends Entity {
 		if (!breaked) this.canInteract = false;
 		// Only attack when trying + not attacking + there's a weapon
 		if (this.tryAttacking && this.attackLock <= 0 && weapon) {
-			weapon.attack(this, entities, obstacles);
-			this.attackLock = weapon.lock;
-			this.maxReloadTicks = this.reloadTicks = 0;
-			this.maxHealTicks = this.healTicks = 0;
-			if (!weapon.auto) this.tryAttacking = false;
-			this.markDirty();
+			function _attack(playerInstance: Player) {
+				if (weapon.type == WeaponType.GUN && (<GunWeapon>weapon).magazine == 0) return;
+				weapon.attack(playerInstance, entities, obstacles);
+				playerInstance.attackLock = weapon.lock;
+				playerInstance.maxReloadTicks = playerInstance.reloadTicks = 0;
+				playerInstance.maxHealTicks = playerInstance.healTicks = 0;
+				if (!weapon.auto) playerInstance.tryAttacking = false;
+				playerInstance.markDirty();
+			}
+			_attack(this)
+			
+			
 		}
 		// Building collision handling
 		const rooflessAdd = new Set<string>();
@@ -176,17 +192,6 @@ export default class Player extends Entity {
 		}
 		// Collision handling
 		for (const obstacle of obstacles) {
-			const collisionType = obstacle.collided(this);
-			if (collisionType) {
-				obstacle.onCollision(this);
-				if (!obstacle.noCollision) {
-					if (collisionType == CollisionType.CIRCLE_CIRCLE) this.handleCircleCircleCollision(obstacle);
-					else if (collisionType == CollisionType.CIRCLE_RECT_CENTER_INSIDE) this.handleCircleRectCenterCollision(obstacle);
-					else if (collisionType == CollisionType.CIRCLE_RECT_POINT_INSIDE) this.handleCircleRectPointCollision(obstacle);
-					else if (collisionType == CollisionType.CIRCLE_RECT_LINE_INSIDE) this.handleCircleRectLineCollision(obstacle);
-					this.markDirty();
-				}
-			}
 			// For roof to be roofless
 			if (obstacle.type === Roof.ID) {
 				const roof = <Roof>obstacle;
@@ -233,13 +238,13 @@ export default class Player extends Entity {
 		if (this.inventory.selectedScope != this._scope) this._scope = this.inventory.selectedScope;
 
 		// Check red zone
-		if (!world.safeZone.hitbox.inside(this.position, world.safeZone.position, Vec2.UNIT_X)) {
+		/*if (!world.safeZone.hitbox.inside(this.position, world.safeZone.position, Vec2.UNIT_X)) {
 			this.zoneDamageTicks--;
 			if (!this.zoneDamageTicks) {
 				this.zoneDamageTicks = 2 * TICKS_PER_SECOND;
 				this.damage(world.zoneDamage);
 			}
-		}
+		}*/
 	}
 
 	damage(dmg: number, damager?: string) {
@@ -262,30 +267,30 @@ export default class Player extends Entity {
 			}
 		}
 
-		for (let ii = 0; ii < Object.keys(GunColor).length / 2; ii++)
-			if (this.inventory.ammos[ii] > 0)
-				spawnAmmo(this.inventory.ammos[ii], ii, this.position);
-
 		for (const healing of Object.keys(this.inventory.healings)) {
 			if (this.inventory.healings[healing]) {
 				const item = new Healing(healing, this.inventory.healings[healing]);
 				item.position = this.position;
+				item.setBodies();
 				world.entities.push(item);
 			}
 		}
 		if (this.inventory.vestLevel) {
 			const item = new Vest(this.inventory.vestLevel);
 			item.position = this.position;
+			item.setBodies();
 			world.entities.push(item);
 		}
 		if (this.inventory.helmetLevel) {
 			const item = new Helmet(this.inventory.helmetLevel);
 			item.position = this.position;
+			item.setBodies();
 			world.entities.push(item);
 		}
 		if (this.inventory.backpackLevel) {
 			const item = new Backpack(this.inventory.backpackLevel);
 			item.position = this.position;
+			item.setBodies();
 			world.entities.push(item);
 		}
 		world.playerDied();
@@ -294,7 +299,7 @@ export default class Player extends Entity {
 			const entity = world.entities.find(e => e.id == this.potentialKiller);
 			if (entity?.type === this.type) {
 				(<Player>entity).killCount++;
-				world.killFeeds.push({ killFeed: `${(<Player>entity).username} killed ${this.username} with ${(<Player>entity).lastHolding}`, killer: (<Player>entity).id});
+				world.killFeeds.push({ weaponUsed: (<Player>entity).lastHolding, killer: `${(<Player>entity).username}#${(<Player>entity).id}`, killed: `${this.username}#${this.id}` });
 			}
 		}
 		// Add currency to user if they are logged in and have kills
@@ -317,9 +322,9 @@ export default class Player extends Entity {
 		if (this.maxHealTicks) return;
 		if (!this.inventory.healings[item]) return;
 		if (this.health >= this.maxHealth && !Healing.healingData.get(item)?.boost) return;
-		world.onceSounds.push({ path: `items/${item}.mp3`, position: this.position })
+		//world.onceSounds.push({ path: `items/${item}.mp3`, position: this.position })
 		this.maxHealTicks = this.healTicks = Healing.healingData.get(item)!.time * TICKS_PER_SECOND / 1000;
-		this.currentHealItem = `entity.healing.${item}`;
+		this.currentHealItem = item;
 		this.healItem = item;
 		this.markDirty();
 	}
@@ -327,5 +332,16 @@ export default class Player extends Entity {
 	minimize() {
 		const min = super.minimize();
 		return Object.assign(min, { username: this.username, inventory: this.inventory.minimize(), skin: this.skin, deathImg: this.deathImg })
+	}
+	serialise(stream: IslandrBitStream, player: Player) {
+		const minPlayer = this.minimize()
+		standardEntitySerialiser(minPlayer, stream, player)
+		stream.writeASCIIString(minPlayer.username)
+		stream.writeInt8(minPlayer.inventory.backpackLevel) //inventory's backpackLevel 
+		stream.writeInt8(minPlayer.inventory.helmetLevel) //inventory's helmetLevel
+		stream.writeInt8(minPlayer.inventory.vestLevel) // inventory vestLevel
+		stream.writeId(minPlayer.inventory.holding.nameId) // inventory holding currently,
+		stream.writeSkinOrLoadout(minPlayer.skin!)
+		stream.writeSkinOrLoadout(minPlayer.deathImg!)
 	}
 }

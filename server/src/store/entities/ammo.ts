@@ -1,19 +1,22 @@
+import { EntityTypes } from "../../constants";
+import { IslandrBitStream } from "../../packets";
+import { standardEntitySerialiser } from "../../serialisers";
 import { Inventory } from "../../types/entity";
-import { CircleHitbox, Vec2 } from "../../types/math";
+import { CircleHitbox, RectHitbox, Vec2 } from "../../types/math";
 import { GunColor } from "../../types/misc";
 import Item from "./item";
 import Player from "./player";
 
 export default class Ammo extends Item {
-	type = "ammo";
-	hitbox = new CircleHitbox(1);
+	type = EntityTypes.AMMO;
 	amount: number;
 	color: GunColor;
 
 	constructor(amount: number, color: GunColor) {
-		super();
+		super(new CircleHitbox(1));
 		this.amount = amount;
 		this.color = color;
+		this.allocBytes += 2;
 	}
 
 	picked(player: Player) {
@@ -35,5 +38,10 @@ export default class Ammo extends Item {
 	minimize() {
 		const min = super.minimize();
 		return Object.assign(min, { amount: this.amount, color: this.color });
+	}
+	serialise(stream: IslandrBitStream, player: Player) {
+		standardEntitySerialiser(this.minimize(), stream, player)
+		stream.writeInt8(this.amount)
+		stream.writeInt8(this.color)
 	}
 }

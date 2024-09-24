@@ -17,7 +17,7 @@ export abstract class Terrain {
 		this.interval = interval;
 	}
 
-	abstract inside(position: Vec2): boolean;
+	abstract inside(position: Vec2, extend: boolean): boolean;
 
 	abstract setPosition(position: Vec2): void;
 	abstract setDirection(direction: Vec2): void;
@@ -34,7 +34,7 @@ export class DummyTerrain extends Terrain {
 		super(0, 0, 0);
 	}
 
-	inside(_position: Vec2) {
+	inside(_position: Vec2, extend=false) {
 		return false;
 	}
 
@@ -45,7 +45,7 @@ export class DummyTerrain extends Terrain {
 export class FullTerrain extends Terrain {
 	type = "full";
 
-	inside(_position: Vec2) {
+	inside(_position: Vec2, extend = false) {
 		return true;
 	}
 
@@ -65,7 +65,7 @@ export class DotTerrain extends Terrain {
 		this.radius = radius;
 	}
 
-	inside(position: Vec2) {
+	inside(position: Vec2, extend = false) {
 		return position.distanceSqrTo(this.position) <= this.radius * this.radius;
 	}
 
@@ -99,11 +99,18 @@ export class LineTerrain extends Terrain {
 		this.boundary = { start: boundary?.start || pab, end: boundary?.end || pab };
 	}
 
-	inside(position: Vec2) {
+	inside(position: Vec2, extend = false) {
 		if (this.line.distanceSqrTo(position) > this.range * this.range) return false;
-		const startLine = new Line(this.line.a, this.line.a.addVec(this.boundary.start.inverse()));
-		const endLine = new Line(this.line.b, this.line.b.addVec(this.boundary.end.inverse()));
-		return startLine.rightTo(position) && endLine.leftTo(position);
+		if (extend) {
+			const startLine = new Line(this.line.a, this.line.a.addVec(this.boundary.start.inverse().addX(5).addY(5)));
+			const endLine = new Line(this.line.b, this.line.b.addVec(this.boundary.end.inverse().addX(5).addY(5)));
+			return startLine.rightTo(position) && endLine.leftTo(position);
+		}
+		else {
+			const startLine = new Line(this.line.a, this.line.a.addVec(this.boundary.start.inverse()));
+			const endLine = new Line(this.line.b, this.line.b.addVec(this.boundary.end.inverse()));
+			return startLine.rightTo(position) && endLine.leftTo(position);
+		}
 	}
 
 	setPosition(position: Vec2) {
@@ -131,7 +138,7 @@ export class PiecewiseTerrain extends Terrain {
 	// All the lines
 	lines: LineTerrain[] = [];
 
-	inside(position: Vec2) {
+	inside(position: Vec2, extend = false) {
 		for (const terrain of this.lines) {
 			if (terrain.inside(position)) return true;
 		}

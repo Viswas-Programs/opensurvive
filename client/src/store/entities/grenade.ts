@@ -1,4 +1,5 @@
 import { ENTITY_SUPPLIERS } from ".";
+import { EntityTypes } from "../../constants";
 import { getWeaponImagePath } from "../../textures";
 import { Entity } from "../../types/entity";
 import { MinEntity } from "../../types/minimized";
@@ -18,7 +19,7 @@ class GrenadeSupplier implements EntitySupplier {
 
 export default class Grenade extends Entity {
 	static readonly grenadeImages = new Map<string, HTMLImageElement>();
-	static readonly TYPE = "grenade";
+	static readonly TYPE = EntityTypes.GRENADE;
 	type = Grenade.TYPE;
 	// Used for rendering Grenade size
 	nameId!: string;

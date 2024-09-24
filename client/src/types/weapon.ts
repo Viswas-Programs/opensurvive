@@ -4,10 +4,10 @@ import { Renderable } from "./extenstions";
 import { roundRect } from "../utils";
 import { CircleHitbox, CommonAngles, CommonNumbers, Vec2 } from "./math";
 import { GunData, MeleeData } from "./data";
-import { GunColor } from "../constants";
 import { DEFINED_ANIMATIONS } from "../store/animations";
 import { getBarrelImagePath } from "../textures";
 import { getMode } from "../homepage";
+import { GunColor } from "./misc";
 
 export enum WeaponType {
 	MELEE = "melee",
@@ -87,6 +87,7 @@ export class GunWeapon extends Weapon {
 	length: number;
 	hasBarrelImage: boolean;
 	magazine: number;
+	fistPositions: Array<number> | undefined
 
 	constructor(nameId: string, data: GunData, magazine = 0) {
 		super(nameId);
@@ -94,6 +95,7 @@ export class GunWeapon extends Weapon {
 		this.length = data.length;
 		this.hasBarrelImage = data.visuals.hasBarrelImage;
 		this.magazine = magazine;
+		this.fistPositions = data.fistPositions
 	}
 
 	render(player: Player, _canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scale: number): void {
@@ -101,23 +103,6 @@ export class GunWeapon extends Weapon {
 		const fistRadius = radius / 3;
 		const fistPositions = [new Vec2(player.hitbox.comparable, 0.1), new Vec2(player.hitbox.comparable + 0.25, -0.1)];
 		var offset = Vec2.ZERO;
-		ctx.fillStyle = "#222";
-		ctx.strokeStyle = "#000";
-		ctx.lineWidth = 0.025 * scale;
-		if (!this.hasBarrelImage)
-			roundRect(ctx, player.hitbox.comparable * scale, -0.15 * scale, this.length * scale, 0.3 * scale, 0.15 * scale, true, true);
-		else {
-			const img = GunWeapon.barrelImages.get(this.nameId);
-			if (!img?.complete) {
-				if (!img) {
-					const image = new Image();
-					image.src = getBarrelImagePath(this.nameId);
-					GunWeapon.barrelImages.set(this.nameId, image);
-				}
-				roundRect(ctx, player.hitbox.comparable * scale, -0.15 * scale, this.length * scale, 0.3 * scale, 0.15 * scale, true, true);
-			} else
-				ctx.drawImage(img, player.hitbox.comparable * scale, - this.length * scale / 2, this.length * scale, this.length * scale)
-		}
 		ctx.lineWidth = fistRadius / 3;
 		ctx.strokeStyle = "#000000";
 		const img = MeleeWeapon.fistImages.get(player.skin!);
@@ -127,9 +112,33 @@ export class GunWeapon extends Weapon {
 			newImg.src = "assets/" + getMode() + "/images/game/fists/" + player.skin + ".svg";
 		} else if (img.complete)
 			for (const pos of fistPositions) {
+				if (this.fistPositions) offset = offset.addVec(Vec2.fromArray([this.fistPositions[fistPositions.indexOf(pos)], 0]))
 				const fist = pos.addVec(offset).scaleAll(scale);
-				ctx.drawImage(img, fist.x - fistRadius, fist.y - fistRadius, fistRadius *2, fistRadius*2)
+				ctx.drawImage(img, fist.x - fistRadius, fist.y - fistRadius, fistRadius * 2, fistRadius * 2)
 			}
+		ctx.fillStyle = "#222";
+		ctx.strokeStyle = "#000";
+		ctx.lineWidth = 0.025 * scale;
+
+		if (!this.hasBarrelImage)
+			roundRect(ctx, player.hitbox.comparable * scale, -0.15 * scale, this.length * scale, 0.3 * scale, 0.15 * scale, true, true);
+		else {
+			ctx.save()
+			ctx.rotate(-90 * Math.PI / 180)
+			const img = GunWeapon.barrelImages.get(this.nameId);
+			if (!img?.complete) {
+				if (!img) {
+					const image = new Image();
+					image.src = getBarrelImagePath(this.nameId);
+					GunWeapon.barrelImages.set(this.nameId, image);
+				}
+				roundRect(ctx, player.hitbox.comparable * scale, -0.15 * scale, this.length * scale, 0.3 * scale, 0.15 * scale, true, true);
+			} else {
+				ctx.drawImage(img, -(player.hitbox as CircleHitbox).radius * scale / 3, (player.hitbox as CircleHitbox).radius * scale, this.length / 4.5 * scale, (scale**2)*(this.length**2)/(img.naturalHeight));
+		}
+			ctx.restore();
+		}
+		
 	}
 }
 

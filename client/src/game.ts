@@ -1,37 +1,45 @@
 /* eslint-disable no-fallthrough */
 import $ from "jquery"
 import { Howl, Howler } from "howler";
-import { KeyBind, movementKeys, TIMEOUT } from "./constants";
+import { GunColor, KeyBind, movementKeys, RecvPacketTypes, TIMEOUT } from "./constants";
 import { start, stop } from "./renderer";
 import { initMap } from "./rendering/map";
 import { addKeyPressed, addMousePressed, getToken, isKeyPressed, isMenuHidden, isMouseDisabled, removeKeyPressed, removeMousePressed, toggleBigMap, toggleHud, toggleMap, toggleMenu, toggleMinimap, toggleMouseDisabled } from "./states";
 import { FullPlayer, Healing } from "./store/entities";
-import { castObstacle, castMinObstacle, Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table } from "./store/obstacles";
+import { castObstacle, castMinObstacle, Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table, Box } from "./store/obstacles";
 import { castTerrain } from "./store/terrains";
 import { Vec2 } from "./types/math";
-import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta } from "./types/packet";
+import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta, ScopeUpdatePacket, ServerScopeUpdatePacket, ServerPacketResolvable, CancelActionsPacket } from "./types/packet";
 import { World } from "./types/world";
 import { receive, send } from "./utils";
 import Building from "./types/building";
 import { cookieExists, getCookieValue } from "cookies-utils";
 import { Obstacle } from "./types/obstacle";
 import { getMode } from "./homepage";
+import { IslandrBitStream } from "./packets";
+import { MinTerrain, MinVec2 } from "./types/minimized";
+import { deserialiseDiscardables, deserialiseMinEntities, deserialiseMinObstacles, deserialiseMinParticles, deserialisePlayer, setUsrnameIdDeathImg } from "./deserialisers";
+import { inflate } from "pako";
+import { type } from "os";
+//handle users that tried to go to old domain name, or direct ip
+var urlargs = new URLSearchParams(window.location.search);
+if(urlargs.get("from")){
+	alert("We have moved from " + urlargs.get("from") + " to islandr.io!")
+}
 
-export var world: World;
+export let world: World;
 
-var id: string | null; // Player ID, obtained when connected
-var tps = 1; // Default should be 1, so even if no TPS detail from server, we will not be dividing by 0
-var username: string | null;
-var address: string | null;
-var skin: string | null = localStorage.getItem("playerSkin");
+let id: string | null;
+let tps = 1; // Default should be 1, so even if no TPS detail from server, we will not be dividing by 0
+let username: string | null;
+let address: string | null;
+let skin: string | null = localStorage.getItem("playerSkin");
 if (!localStorage.getItem("playerDeathImg")) localStorage.setItem("playerDeathImg", "default")
 
-var deathImg: string | null = localStorage.getItem("playerDeathImg");
+let deathImg: string | null = localStorage.getItem("playerDeathImg");
 
-console.log(skin)
-console.log(deathImg)
 const isMobile = /Android/.test(navigator.userAgent) || /iPhone/.test(navigator.userAgent) || /iPad/.test(navigator.userAgent) || /Tablet/.test(navigator.userAgent)
-var player: FullPlayer | null;
+let player: FullPlayer | null;
 
 /**
  * Getter of player ID
@@ -49,18 +57,21 @@ export function getPlayer(): FullPlayer | null { return player; }
  */
 export function getTPS(): number { return tps; }
 
-var ws: WebSocket;
-var connected = false;
-function getConnected() { return connected; }
+let ws: WebSocket;
+let connected = false;
+export function getConnected() { return connected; }
 function setConnected(v: boolean) { connected = v; return connected; }
 enum modeMapColours {
-	normal = 0x80B251,
-	suroi_collab = 0x4823358
+	normal = 0x748838,
+	suroi_collab = 0x49993e,
+	classic = 0x80B251
 }
 const joystick = document.getElementsByClassName('joystick-container')[0];
 const handle = document.getElementsByClassName('joystick-handle')[0];
 const aimJoystick = document.getElementsByClassName('aimjoystick-container')[0];
 const aimHandle = document.getElementsByClassName('aimjoystick-handle')[0];
+let _selectedScope = 1;
+let data: any;
 declare type modeMapColourType = keyof typeof modeMapColours
 
 /**
@@ -69,7 +80,7 @@ declare type modeMapColourType = keyof typeof modeMapColours
  */
 async function init(address: string) {
 	// Initialize the websocket
-	var protocol = "ws";
+	const protocol = "ws";
 	// if ((<HTMLInputElement>document.getElementById("wss")).checked) protocol += "s";
 	ws = new WebSocket(`${protocol}://${address}`);
 	ws.binaryType = "arraybuffer";
@@ -81,11 +92,18 @@ async function init(address: string) {
 		}, TIMEOUT);
 
 		ws.onmessage = async (event) => {
-			const data = <AckPacket>receive(event.data);
-			id = data.id;
-			tps = data.tps;
-			world = new World(new Vec2(data.size[0], data.size[1]), castTerrain(data.terrain).setColour((modeMapColours[getMode() as modeMapColourType])));
-			const gameObjects = [Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table]
+			const stream = new IslandrBitStream(inflate(event.data).buffer)
+			const dataA = <AckPacket>{
+				type:stream.readPacketType(),
+				id:stream.readId(),
+				tps:stream.readInt8(),
+				size:[stream.readInt16(),stream.readInt16()],
+				terrain: <MinTerrain>{ id:stream.readId() }
+			}
+			id = dataA.id;
+			tps = dataA.tps;
+			world = new World(new Vec2(dataA.size[0], dataA.size[1]), castTerrain(dataA.terrain).setColour((modeMapColours[getMode() as modeMapColourType])));
+			const gameObjects = [Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table, Box]
 			gameObjects.forEach(OBJ => {OBJ.updateAssets() })
 	
 			// Call renderer start to setup
@@ -94,13 +112,30 @@ async function init(address: string) {
 			if (!currentCursor){localStorage.setItem("selectedCursor", "default"); currentCursor = localStorage.getItem("selectedCursor")}
 			if (currentCursor) { document.documentElement.style.cursor = currentCursor }
 			const responsePacket = new ResponsePacket(id, username!, skin!, deathImg!, isMobile!, (cookieExists("gave_me_cookies") ? getCookieValue("access_token") : getToken()) as string)
-			send(ws, responsePacket);
-			console.log(responsePacket)
 			connected = true;
+			send(ws, responsePacket);
 			setConnected(true)
 			showMobControls();
 			clearTimeout(timer);
-			
+			const scopes = document.getElementById(`scopes`);
+			const scopeList = [1, 2, 4, 8, 15];
+			const x1scope = scopes?.children.item(0) as HTMLElement
+			x1scope.style.background = "rgba(55, 55, 55, 1.5)"
+			x1scope.addEventListener("click", () => {
+				if (_selectedScope == 1) return;
+				_selectedScope = 1;
+				send(ws, new ServerScopeUpdatePacket(1));
+				for (let ii = 0; ii < scopeList.length; ii++) {
+					if (_selectedScope == scopeList[ii]) {
+						(scopes?.children.item(ii) as HTMLElement).style.background = "rgba(55, 55, 55, 1.5)"
+					}
+					else {
+						(scopes?.children.item(ii) as HTMLElement).style.background = "rgba(51, 51, 51, 0.5)"
+					}
+				}
+			}
+
+			)
 			// Setup healing items click events
 			for (const element of document.getElementsByClassName("healing-panel")) {
 				const el = <HTMLElement> element;
@@ -119,30 +154,16 @@ async function init(address: string) {
 				if (connected) send(ws, new PingPacket());
 				else clearInterval(interval);
 			}, 1000);
-	
 			ws.onmessage = (event) => {
-				const data = receive(event.data);
-				switch (data.type) {
-					// The update packet. It syncs the client world with the server world.
-					case "game": {
-						const gamePkt = <GamePacket>data;
-						world.updateEntities(gamePkt.entities, gamePkt.discardEntities);
-						world.updateObstacles(gamePkt.obstacles, gamePkt.discardObstacles);
-						world.updateLiveCount(gamePkt.alivecount);
-						if (gamePkt.safeZone) world.updateSafeZone(gamePkt.safeZone);
-						if (gamePkt.nextSafeZone) world.updateNextSafeZone(gamePkt.nextSafeZone);
-						if (!player) player = new FullPlayer(gamePkt.player);
-						else player.copy(gamePkt.player);
-						// Client side ticking
-						world.clientTick(player);
-						break;
-					}
-					// The map packet. Sent once only. Client caches the map with this packet.
-					case "map": {
+				let bitstream = true;
+				let stream;
+				let packetType: number;
+				if (receive(event.data) && (receive(event.data)!.type == RecvPacketTypes.GAME || receive(event.data)!.type == RecvPacketTypes.MAP)) { data = receive(event.data); bitstream = false; packetType = receive(event.data)!.type }
+				else { stream = new IslandrBitStream(inflate(event.data).buffer); packetType = (stream as IslandrBitStream).readPacketType() } 
+				switch (packetType) {
+					case RecvPacketTypes.MAP: {
 						const mapPkt = <MapPacket>data;
-						console.log("packet terrains:", mapPkt.terrains);
 						world.terrains = mapPkt.terrains.map(ter => castTerrain(ter));
-						console.log("terrains:" , world.terrains);
 						world.obstacles = <Obstacle[]>mapPkt.obstacles.map(obs => castObstacle(castMinObstacle(obs))).filter(obs => !!obs);
 						world.buildings = mapPkt.buildings.map(bui => new Building(bui));
 						initMap();
@@ -150,9 +171,47 @@ async function init(address: string) {
 						(document.querySelector("#playercountcontainer") as HTMLInputElement).style.display = "block";
 						break;
 					}
-					// The sound packet. Each packet contains one sound.
-					case "sound": {
+					case RecvPacketTypes.GAME: {
+						if (bitstream) {
+							data = {
+								type: packetType,
+								entities: deserialiseMinEntities(stream as IslandrBitStream as IslandrBitStream),
+								obstacles: deserialiseMinObstacles(stream as IslandrBitStream),
+								alivecount: (stream as IslandrBitStream).readInt8(),
+								discardEntities: deserialiseDiscardables(stream as IslandrBitStream),
+								discardObstacles: deserialiseDiscardables(stream as IslandrBitStream),
+							}
+						}
+						const gamePkt = <GamePacket>data;
+						world.updateEntities(gamePkt.entities, gamePkt.discardEntities);
+						world.updateObstacles(gamePkt.obstacles, gamePkt.discardObstacles);
+						world.updateLiveCount(gamePkt.alivecount);
+						break;
+					}
+					case RecvPacketTypes.PLAYERTICK: {
+						const playerSrvr = deserialisePlayer(stream as IslandrBitStream)
+						if (!player) player = new FullPlayer(playerSrvr);
+						else player.copy(playerSrvr);
+						const usableGunAmmoNames = ["9mm", "12 gauge", "7.62mm", "5.56mm", ".308 subsonic"];
+						const usableGunAmmos = [
+							player.inventory.ammos[GunColor.YELLOW],
+							player.inventory.ammos[GunColor.RED],
+							player.inventory.ammos[GunColor.BLUE],
+							player.inventory.ammos[GunColor.GREEN],
+							player.inventory.ammos[GunColor.OLIVE]];
+						const ammosElements = document.getElementsByClassName("ammos");
+						for (let ii = 0; ii < usableGunAmmoNames.length; ii++) {
+							(<HTMLElement>ammosElements.item(ii)).textContent = `${usableGunAmmoNames[ii]}: ${usableGunAmmos[ii]}`
+						}
+						break;
+					}
+					case RecvPacketTypes.SOUND: {
 						if (!player) break;
+						const data = {
+							type: packetType,
+							path: (stream as IslandrBitStream).readASCIIString(50),
+							position: Vec2.fromMinVec2(<MinVec2>{x: (stream as IslandrBitStream).readInt16(), y: (stream as IslandrBitStream).readInt16()})
+						}
 						const soundPkt = <SoundPacket>data;
 						const howl = new Howl({
 							src: `assets/${getMode()}/sounds/${soundPkt.path}`
@@ -165,25 +224,62 @@ async function init(address: string) {
 						howl.on("end", () => world.sounds.delete(id));
 						break;
 					}
-					// The particles packet. Client handles the drawing of particles.
-					case "particles": {
+					case RecvPacketTypes.PARTICLES: {
+						const data = {
+							type: packetType,
+							particles: deserialiseMinParticles(stream as IslandrBitStream)
+						}
 						const partPkt = <ParticlesPacket>data;
 						world.addParticles(partPkt.particles);
 						break;
 					}
-					case "announce": {
+					case RecvPacketTypes.ANNOUNCE: {
+						const data = {
+							type: packetType,
+							weaponUsed: (stream as IslandrBitStream).readASCIIString(),
+							killer: (stream as IslandrBitStream).readASCIIString(),
+							killed: (stream as IslandrBitStream).readASCIIString()
+						}
 						const announcementPacket = <AnnouncementPacket>data;
 						const killFeeds = document.getElementById("kill-feeds")
 						const killFeedItem = document.createElement("div")
 						if (killFeeds?.childNodes.length as number > 5) { killFeeds?.childNodes[killFeeds.childNodes.length - 1].remove(); }
 						if (announcementPacket.killer == getPlayer()!.id) { killFeedItem.style.background = "rgba(0, 0, 139, 0.5)" }
 						else { killFeedItem.style.background = "rgba(139, 0, 0, 0.5)" }
-						killFeedItem.prepend(`${announcementPacket.announcement}\n`)
+						const KILLFEED_STRING = `${announcementPacket.killer} killed ${announcementPacket.killed} with ${announcementPacket.weaponUsed}`;
+						killFeedItem.prepend(`${KILLFEED_STRING}\n`)
 						killFeeds?.prepend(killFeedItem);
 						setTimeout(() => {
-							console.log(killFeeds?.childNodes, killFeeds?.children)
 							killFeeds?.childNodes[killFeeds.childNodes.length-1].remove();
 						}, 5000);
+						break;
+					}
+					case RecvPacketTypes.SCOPEUPD: {
+						const data = {
+							type:packetType,
+							scope: (stream as IslandrBitStream).readInt8()
+						}
+						const scopeChangePkt = <ScopeUpdatePacket>data;
+						for (let ii = 0; ii < scopes!.children.length; ii++) {
+							(<HTMLElement>scopes?.children.item(ii)).style.background = "rgba(55, 55, 55, 0.5)";
+						}
+						const scopeElement = (scopes?.children.item(scopeList.indexOf(Number(scopeChangePkt.scope))) as HTMLElement);
+						console.log(scopeElement)
+						scopeElement.style.display = "block";
+						scopeElement.style.background = "rgba(55, 55, 55, 1.5)"
+						
+						scopeElement.addEventListener("click", () => {
+							_selectedScope = scopeChangePkt.scope
+							send(ws, new ServerScopeUpdatePacket(Number(scopeElement.textContent?.replace("x", "") as unknown)))
+							for (let ii = 0; ii < scopeList.length; ii++) {
+								if (_selectedScope == scopeList[ii]) {
+									(scopes?.children.item(ii) as HTMLElement).style.background = "rgba(55, 55, 55, 1.5)"
+								}
+								else {
+									(scopes?.children.item(ii) as HTMLElement).style.background = "rgba(51, 51, 51, 0.5)"
+								}
+							}
+						})
 					}
 				}
 			}
@@ -199,12 +295,19 @@ async function init(address: string) {
 			tps = 1;
 			username = null;
 			player = null;
+			setUsrnameIdDeathImg([null, null, null])
 			res(undefined);
+			Healing.setupHud()
+			for (const ammoElement of document.getElementsByClassName("ammos")) {
+				ammoElement.textContent = "";
+			}
+			//remove playercount
 		}
 	
 		ws.onerror = (err) => {
 			console.error(err);
 			rej(new Error("Failed joining game"));
+			ws.close()
 		};
 	});
 }
@@ -365,7 +468,6 @@ function showMobControls() {
 
 		joystickDirection = '';
 		if (resettedMovement == false) send(ws, new MovementResetPacket())
-		console.log(resettedMovement)
 		resettedMovement = true;
 	}
 	setInterval(function () {
@@ -426,6 +528,8 @@ window.onkeydown = (event) => {
 			send(ws, new InteractPacket());
 		else if (event.key == KeyBind.RELOAD)
 			send(ws, new ReloadWeaponPacket());
+		else if (event.key == KeyBind.CANCEL)
+			send(ws, new CancelActionsPacket())
 		else if (!isNaN(parseInt(event.key)))
 			send(ws, new SwitchWeaponPacket(parseInt(event.key) - 1, true));
 	}

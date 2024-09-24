@@ -35,6 +35,10 @@ export class Vec2 {
 		return new Vec2(-this.x, -this.y);
 	}
 
+	invert() {
+		return new Vec2(this.y, this.x);
+	}
+
 	unit() {
 		const mag = this.magnitude();
 		if (mag === 0) return Vec2.ZERO;
@@ -94,6 +98,10 @@ export class Vec2 {
 
 	distanceTo(vec: Vec2) {
 		return Math.sqrt(this.distanceSqrTo(vec));
+	}
+
+	interpolate(endVec: Vec2, factor: number) {
+		return this.scaleAll(1-factor).addVec(endVec.scaleAll(factor));
 	}
 
 	perpendicular() {

@@ -1,4 +1,5 @@
 import { OBSTACLE_SUPPLIERS } from ".";
+import { ObstacleTypes } from "../../constants";
 import { getMode } from "../../homepage";
 import { RectHitbox } from "../../types/math";
 import { MinObstacle } from "../../types/minimized";
@@ -11,24 +12,27 @@ awcCrateImg.onload = () => awcCrateImg.loaded = true;
 //awmCrateImg.src = "assets/images/game/objects/awm_crate.png";
 */
 
-interface AdditionalObstacle {
-	special: "normal" | "grenade" | "soviet" | "awc";
+export interface AdditionalObstacle {
+	special: "normal" | "grenade" | "soviet" | "woodpile" ;
 }
 
-class CrateSupplier implements ObstacleSupplier {
+export class CrateSupplier implements ObstacleSupplier {
 	create(minObstacle: MinObstacle & AdditionalObstacle) {
 		return new Crate(minObstacle);
 	}
 }
 
 export default class Crate extends Obstacle {
-	static readonly TYPE = "crate";
+	static readonly TYPE = ObstacleTypes.CRATE;
 	type = Crate.TYPE;
-	special!: "normal" | "grenade" | "soviet" | "awc";
+	special!: "normal" | "grenade" | "soviet" | "woodpile";
 	static crateImg = new Image();
 	static crateResidueImg = new Image();
 	static grenadeCrateImg = new Image();
 	static sovietCrateImg = new Image();
+	static plusCrateImg = new Image();
+	static cratePlusResidueImg = new Image();
+	static woodpileImg = new Image();
 
 	static {
 		OBSTACLE_SUPPLIERS.set(Crate.TYPE, new CrateSupplier());
@@ -36,8 +40,10 @@ export default class Crate extends Obstacle {
 	static updateAssets() {
 		this.crateImg.src = "assets/" + getMode() + "/images/game/objects/crate.svg";
 		this.crateResidueImg.src = "assets/" + getMode() + "/images/game/objects/residues/crate.svg";
+		this.cratePlusResidueImg.src = "assets/" + getMode() + "/images/game/objects/residues/crate_plus.svg";
 		this.grenadeCrateImg.src = "assets/" + getMode() + "/images/game/objects/grenade_crate.svg";
-		this.sovietCrateImg.src = "assets/" + getMode() + "/images/game/objects/soviet_crate.svg";
+		this.sovietCrateImg.src = "assets/" + getMode() + "/images/game/objects/crate_plus.svg";
+		this.woodpileImg.src = "assets/" + getMode() + "/images/game/objects/woodpile.svg";
 	}
 
 	copy(minObstacle: MinObstacle & AdditionalObstacle) {
@@ -54,6 +60,9 @@ export default class Crate extends Obstacle {
 			case "soviet":
 				img = Crate.sovietCrateImg;
 				break;
+			case "woodpile":
+				img = Crate.woodpileImg;
+				break;
 			default:
 				img = Crate.crateImg;
 				break;
@@ -62,7 +71,8 @@ export default class Crate extends Obstacle {
 		const relative = this.position.addVec(you.position.inverse());
 		const width = scale * (<RectHitbox>this.hitbox).width * (this.despawn ? 0.5 : 1), height = width * Crate.crateImg.naturalWidth / Crate.crateImg.naturalHeight;
 		ctx.translate(canvas.width / 2 + relative.x * scale, canvas.height / 2 + relative.y * scale);
-		ctx.rotate(-this.direction.angle());
+		ctx.rotate(-this.direction.angle() );
+		if (this.special == "soviet") ctx.drawImage(this.despawn ? Crate.cratePlusResidueImg : img, -width / 2, -height / 2, width, height);
 		ctx.drawImage(this.despawn ? Crate.crateResidueImg : img, -width / 2, -height / 2, width, height);
 		ctx.resetTransform();
 	}

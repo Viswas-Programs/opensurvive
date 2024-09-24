@@ -1,0 +1,45 @@
+{
+	"name": "M18 CQBP",
+	"color": 0,
+	"ammo": 120,
+	"dual": true,
+	"length": 2.3,
+	"droppable": true,
+	"normal": {
+		"capacity": 17,
+		"reload": {
+			"time": 1600
+		},
+		"delay": {
+			"switch": 250,
+			"firing": 130
+		},
+		"spread": {
+			"still": 3,
+			"move": 10
+		},
+		"bullets": 1,
+		"speed": {
+			"equip": 12,
+			"attack": 6
+		},
+		"headshot": 2,
+		"bullet": {
+			"damage": 16,
+			"falloff": 0.7,
+			"speed": 80,
+			"range": [ 100, 100 ],
+			"suppressed": false
+		}
+	},
+	"visuals": {
+		"tracer": {
+			"type": "9mm",
+			"width": 0.1,
+			"length": 0.7
+		},
+		"animations": [ "small_recoil" ],
+		"hasBarrelImage": true,
+		"particleToDisplay": "case_small"
+	}
+}

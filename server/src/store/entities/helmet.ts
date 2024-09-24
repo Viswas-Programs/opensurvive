@@ -3,11 +3,13 @@ import { CircleHitbox } from "../../types/math";
 import Item from "./item";
 import Player from "./player";
 import * as fs from "fs";
+import { IslandrBitStream } from "../../packets";
+import { standardEntitySerialiser } from "../../serialisers";
+import { EntityTypes } from "../../constants";
 
 export default class Helmet extends Item {
 	static readonly HELMET_REDUCTION: number[] = [];
-	type = "helmet";
-	hitbox = new CircleHitbox(1);
+	type = EntityTypes.HELMET;
 	level: number;
 
 	static {
@@ -15,8 +17,10 @@ export default class Helmet extends Item {
 		this.HELMET_REDUCTION.push(...data);
 	}
 	constructor(level: number) {
-		super();
+		super(new CircleHitbox(1));
 		this.level = level;
+		this.allocBytes++;
+
 	}
 
 	picked(player: Player) {
@@ -27,6 +31,7 @@ export default class Helmet extends Item {
 		if (player.inventory.helmetLevel != 0) {
 			const helmet = new Helmet(player.inventory.helmetLevel);
 			helmet.position = player.position;
+			helmet.setBodies();
 			world.entities.push(helmet);
 		}
 		player.inventory.helmetLevel = this.level;
@@ -40,5 +45,9 @@ export default class Helmet extends Item {
 
 	minimize() {
 		return Object.assign(super.minimize(), { level: this.level });
+	}
+	serialise(stream: IslandrBitStream, player: Player) {
+		standardEntitySerialiser(this.minimize(), stream, player)
+		stream.writeInt8(this.level)
 	}
 }

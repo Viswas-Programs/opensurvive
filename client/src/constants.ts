@@ -15,10 +15,38 @@ export enum KeyBind {
 	INTERACT = "f",
 	MELEE = "e",
 	LAST_USED = "q",
-	RELOAD = "r"
+	RELOAD = "r",
+	CANCEL = "x"
+}
+export enum RecvPacketTypes {
+	GAME = 0,
+	MAP = 1,
+	PLAYERTICK = 2,
+	SOUND = 3,
+	PARTICLES = 4,
+	ANNOUNCE = 5,
+	SCOPEUPD = 6,
+	ACK = 7
 }
 
-// Keys for right, up, left, down (ordered)
+export enum OutPacketTypes {
+	RESPONSE = 0,
+	PING = 1,
+	MOV_PRESS = 2,
+	MOV_REL = 3,
+	MOV_RESET = 4,
+	MOBILE_MOV = 5,
+	MOUSEMOVE = 6,
+	MOS_PRESS = 7,
+	MOS_REL = 8,
+	PL_ROATION = 9,
+	INTERACT = 10,
+	SW_WEAPON = 11,
+	REL_WEAPON = 12,
+	CANCEL_ACT = 13,
+	HEAL = 14,
+	SR_SCOPE_UPD = 15,
+}
 export const movementKeys = [KeyBind.RIGHT, KeyBind.UP, KeyBind.LEFT, KeyBind.DOWN].map(k => <string> k);
 // In-game units interval between the grid lines
 export const GRID_INTERVAL = 20;
@@ -36,14 +64,36 @@ export enum GunColor {
 	RED = 1, // 12 gauge
 	BLUE = 2, // 7.62mm
 	GREEN = 3, // 5.56mm
-	BLACK = 4, // .50 AE
 	OLIVE = 5, // .308 Subsonic
-	ORANGE = 6, // Flare
-	PURPLE = 7, // .45 ACP
-	TEAL = 8, // 40mm
-	BROWN = 9, // potato
-	PINK = 10, // Heart
-	PURE_BLACK = 11, // Rainbow
-	CURSED = 12,
-	BUGLE = 13,
+}
+export enum EntityTypes {
+	AMMO = 0,
+	BACKPACK = 1,
+	BULLET = 2,
+	EXPLOSION = 3,
+	GRENADE = 4,
+	GUN = 5,
+	HELMET = 6,
+	PLAYER = 7,
+	SCOPE = 8,
+	VEST = 9,
+	HEALING = 10
+}
+
+export enum ObstacleTypes {
+	BARREL = 21,
+	BOX = 22,
+	BUSH = 23,
+	CRATE = 24,
+	DESK = 25,
+	DOOR = 26,
+	LOG = 27,
+	ROOF = 28,
+	STONE = 29,
+	TABLE = 30,
+	TOILET = 31,
+	TOILET_MORE = 32,
+	TREE = 33,
+	WALL = 34,
+	SPAWNER = 35
 }

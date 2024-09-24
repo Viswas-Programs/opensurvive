@@ -1,16 +1,19 @@
 import { world } from "../..";
+import { EntityTypes } from "../../constants";
+import { IslandrBitStream } from "../../packets";
+import { standardEntitySerialiser } from "../../serialisers";
 import { CircleHitbox } from "../../types/math";
 import Item from "./item";
 import Player from "./player";
 
 export default class Backpack extends Item {
-	type = "backpack";
-	hitbox = new CircleHitbox(1);
+	type = EntityTypes.BACKPACK;
 	level: number;
 
 	constructor(level: number) {
-		super();
+		super(new CircleHitbox(1));
 		this.level = level;
+		this.allocBytes++;
 	}
 
 	picked(player: Player) {
@@ -21,6 +24,7 @@ export default class Backpack extends Item {
 		if (player.inventory.backpackLevel != 0) {
 			const backpack = new Backpack(player.inventory.backpackLevel);
 			backpack.position = player.position;
+			backpack.setBodies();
 			world.entities.push(backpack);
 		}
 		player.inventory.backpackLevel = this.level;
@@ -34,5 +38,9 @@ export default class Backpack extends Item {
 
 	minimize() {
 		return Object.assign(super.minimize(), { level: this.level });
+	}
+	serialise(stream: IslandrBitStream, player: Player) {
+		standardEntitySerialiser(this.minimize(), stream, player)
+		stream.writeInt8(this.level)
 	}
 }

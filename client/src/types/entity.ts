@@ -8,6 +8,7 @@ import { GunColor } from "../constants";
 import { DEFINED_ANIMATIONS } from "../store/animations";
 import { Animation } from "./animation";
 import { CountableString } from "./misc";
+import { getPlayer, getTPS } from "../game";
 
 export class Inventory {
 	helmetLevel !: number
@@ -61,7 +62,7 @@ export class PartialInventory {
 // An entity with position, velocity and hitbox
 export abstract class Entity implements Renderable {
 	id!: string;
-	type!: string;
+	type!: number;
 	position!: Vec2;
 	direction!: Vec2;
 	hitbox!: Hitbox;
@@ -70,6 +71,10 @@ export abstract class Entity implements Renderable {
 	maxHealth!: number;
 	despawn!: boolean;
 	zIndex = 0;
+	oldPos!: Vec2;
+	oldDir!: Vec2;
+	_lastDirectionChng = Date.now();
+	_lastPosChange = Date.now();
 
 	constructor(minEntity: MinEntity) {
 		this.copy(minEntity);
@@ -78,8 +83,10 @@ export abstract class Entity implements Renderable {
 	copy(minEntity: MinEntity) {
 		this.id = minEntity.id;
 		this.type = minEntity.type;
-		this.position = new Vec2(minEntity.position.x, minEntity.position.y);
+		this.position = new Vec2(minEntity.position.x, minEntity.position.y)
+		if (!this.oldPos) this.oldPos = this.position;
 		this.direction = new Vec2(minEntity.direction.x, minEntity.direction.y);
+		if (!this.oldDir) this.oldDir = this.direction;
 		if (minEntity.hitbox.type === "rect") {
 			const rect = <MinRectHitbox> minEntity.hitbox;
 			this.hitbox = new RectHitbox(rect.width, rect.height);

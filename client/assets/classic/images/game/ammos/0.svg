@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="52.45" height="36.86" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 52.45 36.86">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-1, .cls-2 {
+        stroke-width: 0px;
+      }
+
+      .cls-3 {
+        isolation: isolate;
+      }
+
+      .cls-2 {
+        fill: #cdab00;
+      }
+
+      .cls-4 {
+        fill: #fff;
+        font-family: BioSans-Bold, 'Bio Sans';
+        font-size: 19.85px;
+        font-weight: 700;
+        letter-spacing: -.05em;
+        mix-blend-mode: soft-light;
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="5.32" y1="-2.49" x2="47.14" y2="39.34" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#cdab00"/>
+      <stop offset="1" stop-color="#5e5b00"/>
+    </linearGradient>
+  </defs>
+  <g class="cls-3">
+    <g id="Layer_1" data-name="Layer 1">
+      <g>
+        <path class="cls-1" d="M2.84,2.83v31.19h46.78V2.83H2.84ZM21.27,19.85c0,.78-.64,1.41-1.42,1.41H7.09c-.78,0-1.42-.63-1.42-1.41V7.09c0-.78.64-1.42,1.42-1.42h12.76c.78,0,1.42.64,1.42,1.42v12.76Z"/>
+        <path class="cls-2" d="M51.04,0H1.42C.64,0,0,.63,0,1.42v34.02c0,.78.64,1.42,1.42,1.42h49.62c.78,0,1.41-.64,1.41-1.42V1.42c0-.79-.63-1.42-1.41-1.42ZM49.62,34.02H2.84V2.83h46.78v31.19Z"/>
+        <rect class="cls-2" x="5.67" y="5.67" width="15.59" height="15.59" rx="1.42" ry="1.42"/>
+        <text class="cls-4" transform="translate(4.32 27.05)"><tspan x="0" y="0">9mm</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg>

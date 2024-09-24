@@ -5,6 +5,7 @@ import { circleFromCenter } from "../../utils";
 import { ObstacleSupplier } from "../../types/supplier";
 import { OBSTACLE_SUPPLIERS } from ".";
 import { getMode } from "../../homepage";
+import { ObstacleTypes } from "../../constants";
 
 interface AdditionalObstacle {
 	special: "normal" | "mosin";
@@ -17,7 +18,7 @@ class TreeSupplier implements ObstacleSupplier {
 }
 
 export default class Tree extends Obstacle {
-	static readonly TYPE = "tree";
+	static readonly TYPE = ObstacleTypes.TREE;
 	type = Tree.TYPE;
 	zIndex = 1000;
 	static treeImg = new Image();

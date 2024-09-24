@@ -1,5 +1,6 @@
 import { MAP_OBSTACLE_SUPPLIERS, OBSTACLE_SUPPLIERS } from ".";
 import { world } from "../..";
+import { ObstacleTypes } from "../../constants";
 import { MapObstacleData, ObstacleData } from "../../types/data";
 import { LOOT_TABLES } from "../../types/loot_table";
 import { CircleHitbox } from "../../types/math";
@@ -14,16 +15,16 @@ class SpawnerSupplier extends ObstacleSupplier {
 
 class SpawnerMapSupplier extends MapObstacleSupplier {
 	make(data: MapObstacleData) {
-		return new Spawner(data.args ? data.args[0] : "");
+		return new Spawner(data.args ? data.args[0] : "crate");
 	}
 }
 
 export default class Spawner extends Obstacle {
-	static readonly TYPE = "spawner";
+	static readonly TYPE = ObstacleTypes.SPAWNER;
 	type = Spawner.TYPE;
 	lootTable: string;
 
-	constructor(lootTable="toilet") {
+	constructor(lootTable="crate") {
 		super(world, new CircleHitbox(0), new CircleHitbox(0), 0, 0);
 		this.discardable = true;
 		this.lootTable = lootTable;
@@ -41,6 +42,7 @@ export default class Spawner extends Obstacle {
 		if (entities) {
 			world.entities.push(...entities.map(e => {
 				e.position = this.position;
+				e.setBodies();
 				return e;
 			}));
 		}

@@ -1,11 +1,12 @@
 import * as fs from "fs";
+import { Bodies, Composite, Engine } from "matter-js";
 import Building from "./building";
 import { RedZoneDataEntry } from "./data";
 import { Entity } from "./entity";
 import { CircleHitbox, Vec2 } from "./math";
 import { Obstacle } from "./obstacle";
 import { Particle } from "./particle";
-import { PLAYER_THRESHOLD, TICKS_PER_SECOND } from "../constants";
+import { CollisionLayers, EntityTypes, MAP_WALL_PADDING, PLAYER_THRESHOLD, TICKS_PER_SECOND } from "../constants";
 import { Player } from "../store/entities";
 import { Terrain } from "./terrain";
 import { reset } from "..";
@@ -22,7 +23,7 @@ export class World {
 	dirtyObstacles: Obstacle[] = [];
 	defaultTerrain: Terrain;
 	terrains: Terrain[] = [];
-	lastSecond = 0;
+	lastSecond = Date.now();
 	playerCount = 0;
 
 	// Red zone stuff
@@ -41,7 +42,11 @@ export class World {
 	joinSounds: { path: string; position: Vec2; }[] = []; // Sent when player joins, e.g. music
 
 	//Kill feed storage
-	killFeeds: { killFeed: string; killer: string; }[] = [];
+	killFeeds: { weaponUsed: string; killer: string; killed: string; }[] = [];
+
+	// Matter.js Physics
+	engines: Engine[];
+
 	constructor(size: Vec2, defaultTerrain: Terrain) {
 		// Set the size of map
 		this.size = size;
@@ -61,6 +66,19 @@ export class World {
 			oPosition: this.size.scaleAll(0.5)
 		};
 		this.nextSafeZone = this.safeZone;
+
+		// Create physics engines for each collision layer
+		this.engines = Array((Object.keys(CollisionLayers).length / 2) - 1).fill(0).map(() => Engine.create({ gravity: { y: 0 } }));
+		// Create box
+		this.engines.forEach(engine => {
+			const box = [
+				Bodies.rectangle(this.size.x * 0.5, -MAP_WALL_PADDING, this.size.x + MAP_WALL_PADDING * 2, MAP_WALL_PADDING * 2, { isStatic: true }),
+				Bodies.rectangle(-MAP_WALL_PADDING, this.size.y * 0.5, MAP_WALL_PADDING * 2, this.size.y + MAP_WALL_PADDING * 2, { isStatic: true }),
+				Bodies.rectangle(this.size.x * 0.5, this.size.y + MAP_WALL_PADDING, this.size.x + MAP_WALL_PADDING * 2, MAP_WALL_PADDING * 2, { isStatic: true }),
+				Bodies.rectangle(this.size.x + MAP_WALL_PADDING, this.size.y * 0.5, MAP_WALL_PADDING * 2, this.size.y + MAP_WALL_PADDING * 2, { isStatic: true })
+			];
+			Composite.add(engine.world, box);
+		});
 	}
 
 	addPlayer(player: Player) {
@@ -73,7 +91,7 @@ export class World {
 	}
 
 	playerDied() {
-		this.playerCount = this.entities.filter(entity => entity.type === "player" && !entity.despawn).length;
+		this.playerCount = this.entities.filter(entity => entity.type == EntityTypes.PLAYER && !entity.despawn).length;
 		if (this.zoneActive || this.zoneTick > 0) return;
 		if (!this.playerCount) {
 			console.log("All players have died. Resetting game...");
@@ -85,13 +103,15 @@ export class World {
 		// Loop from last to first
 		for (let ii = this.terrains.length - 1; ii >= 0; ii--) {
 			const terrain = this.terrains[ii];
-			if (terrain.inside(position)) return terrain;
+			if (terrain.inside(position, false)) return terrain;
 		}
 		return this.defaultTerrain;
 	}
 
 	tick() {
 		this.ticks++;
+		const elapsed = Date.now() - this.lastSecond;
+		this.lastSecond += elapsed;
 		// TPS observer
 		/*if (!this.lastSecond) this.lastSecond = Date.now();
 		else if (Date.now() - this.lastSecond >= 1000) {
@@ -136,8 +156,8 @@ export class World {
 		// Remove all discardable obstacles
 		for (ii = removable.length - 1; ii >= 0; ii--) this.obstacles.splice(removable[ii], 1);
 
-		// Tick red zone
-		if (this.zoneActive) {
+		// Tick red zone [DISABLED]
+		/*if (this.zoneActive) {
 			this.zoneTick--;
 			if (!this.zoneTick) {
 				this.zoneMoving = !this.zoneMoving;
@@ -165,7 +185,9 @@ export class World {
 				this.safeZone.position = this.safeZone.oPosition.addVec(vec.scaleAll((this.zoneData[this.zoneStep].move * TICKS_PER_SECOND - this.zoneTick) / (this.zoneData[this.zoneStep].move * TICKS_PER_SECOND)));
 				this.safeZone.hitbox = new CircleHitbox((this.safeZone.oHitbox.radius - this.nextSafeZone.hitbox.radius) * this.zoneTick / (this.zoneData[this.zoneStep].move * TICKS_PER_SECOND) + this.nextSafeZone.hitbox.radius);
 			}
-		}
+		}*/
+	
+		this.engines.forEach(engine => Engine.update(engine, elapsed));
 	}
 
 	// Called after data are sent to clients

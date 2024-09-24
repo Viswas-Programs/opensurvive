@@ -39,18 +39,24 @@ export function twoDigits(num: number | string) {
 // Networking
 import { encode, decode } from "msgpack-lite";
 import { deflate, inflate } from "pako";
-import { ServerPacketResolvable, IPacket } from "./types/packet";
+import { ServerPacketResolvable, IPacketCLIENT } from "./types/packet";
 import { CommonAngles } from "./types/math";
 import axios from "axios";
+import { getConnected } from "./game";
 // Send packet
-export function send(socket: WebSocket, packet: IPacket) {
-  //socket.send(deflate(deflate(encode(packet).buffer)));
-	socket.send(deflate(encode(packet).buffer));
+export function send(socket: WebSocket, packet: IPacketCLIENT) {
+	//socket.send(deflate(deflate(encode(packet).buffer)));
+	if (!getConnected()) return;
+	packet.serialise();
+	socket.send(packet.getBuffer());
 }
 // Receive packet
 export function receive(msg: ArrayBuffer) {
   //return <ServerPacketResolvable>decode(inflate(inflate(new Uint8Array(msg))));
-	return <ServerPacketResolvable>decode(inflate(new Uint8Array(msg)));
+	try {
+		return <ServerPacketResolvable>decode(inflate(new Uint8Array(msg)));
+	}
+	catch { }
 }
 
 // Rendering

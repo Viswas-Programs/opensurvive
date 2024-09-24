@@ -25,6 +25,7 @@ export default class River extends PiecewiseTerrain implements BorderedTerrain {
 	static readonly ID = "river";
 	id = River.ID;
 	border = 2;
+	speed = 0.8;
 
 	constructor() {
 		super(0.8, 0, 0);

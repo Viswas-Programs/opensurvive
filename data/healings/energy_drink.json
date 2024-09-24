@@ -1,0 +1,6 @@
+{
+	"name": "Energy Drink",
+	"heal": 0,
+	"boost": 25,
+	"time": 3000
+}

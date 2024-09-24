@@ -1,3 +1,4 @@
+import { Vector } from "matter-js";
 import { MinCircleHitbox, MinHitbox, MinLine, MinRectHitbox, MinVec2 } from "./minimized";
 import { CollisionType } from "./misc";
 
@@ -13,6 +14,10 @@ export class Vec2 {
 
 	static fromArray(array: number[]) {
 		return new Vec2(array[0], array[1]);
+	}
+
+	static fromMatterVector(vec: Vector) {
+		return new Vec2(vec.x, vec.y);
 	}
 
 	readonly x: number;
@@ -33,6 +38,10 @@ export class Vec2 {
 
 	inverse() {
 		return new Vec2(-this.x, -this.y);
+	}
+
+	invert() {
+		return new Vec2(this.y, this.x);
 	}
 
 	unit() {
@@ -96,6 +105,10 @@ export class Vec2 {
 		return Math.sqrt(this.distanceSqrTo(vec));
 	}
 
+	interpolate(endVec: Vec2, factor: number) {
+		return this.scaleAll(1-factor).addVec(endVec.scaleAll(factor));
+	}
+
 	perpendicular() {
 		return new Vec2(this.y, -this.x);
 	}
@@ -106,6 +119,10 @@ export class Vec2 {
 
 	minimize() {
 		return <MinVec2>{ x: this.x, y: this.y };
+	}
+
+	toMatterVector() {
+		return Vector.create(this.x, this.y);
 	}
 }
 
@@ -283,8 +300,8 @@ export abstract class Hitbox {
 	abstract lineIntersects(line: Line, position: Vec2, direction: Vec2): boolean;
 	abstract inside(point: Vec2, position: Vec2, direction: Vec2): boolean;
 
-	abstract collideRect(position: Vec2, direction: Vec2, hitbox: RectHitbox, position1: Vec2, direction1: Vec2): CollisionType;
-	abstract collideCircle(position: Vec2, direction: Vec2, hitbox: CircleHitbox, position1: Vec2, direction1: Vec2): CollisionType;
+	abstract collideRect(position: Vec2, direction: Vec2, hitbox: Hitbox, position1: Vec2, direction1: Vec2): CollisionType;
+	abstract collideCircle(position: Vec2, direction: Vec2, hitbox: Hitbox, position1: Vec2, direction1: Vec2): CollisionType;
 
 	abstract minimize(): MinHitbox;
 }
@@ -429,7 +446,7 @@ export class RectHitbox extends Hitbox {
 
 // Circle hitbox with a radius
 export class CircleHitbox extends Hitbox {
-	static readonly ZERO = new RectHitbox(0, 0);
+	static readonly ZERO = new CircleHitbox(0);
 
 	static fromMinCircleHitbox(minCircleHitbox: MinCircleHitbox) {
 		return new CircleHitbox(minCircleHitbox.radius);

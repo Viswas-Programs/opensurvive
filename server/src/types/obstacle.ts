@@ -1,3 +1,4 @@
+import { Bodies, Body, Composite } from "matter-js";
 import { Player } from "../store/entities";
 import { Roof } from "../store/obstacles";
 import { ID } from "../utils";
@@ -6,17 +7,27 @@ import { Vec2, Hitbox, CircleHitbox, RectHitbox, CommonAngles } from "./math";
 import { MinMinObstacle, MinObstacle } from "./minimized";
 import { CollisionType } from "./misc";
 import { World } from "./world";
+import { CollisionLayers } from "../constants";
+import { world } from "..";
 
+function checkForObsZONEOBSCollision(world: World, position: Vec2): boolean {
+	let OBSCollided = false;
+	world.buildings.forEach(building => {
+		building.floors.forEach(floor => {
+			if (floor.terrain.inside(position, true )) OBSCollided = true
+		})
+	})
+	return OBSCollided
+}
 export class Obstacle {
 	id: string;
-	type = "";
+	type = 19;
 	position: Vec2;
 	direction: Vec2;
 	baseHitbox: Hitbox;
 	minHitbox: Hitbox;
 	hitbox: Hitbox;
-	noCollision = false;
-	collisionLayers = [-1]; // -1 means on all layers
+	collisionLayers = CollisionLayers.EVERYTHING;
 	vulnerable = true;
 	health: number;
 	maxHealth: number;
@@ -27,8 +38,13 @@ export class Obstacle {
 	dirty = true;
 	// Particle type to emit when damaged
 	damageParticle?: string;
+	surface = "normal";
+	_needToSendAnimations = false;
 
-	constructor(world: World, baseHitbox: Hitbox, minHitbox: Hitbox, health: number, maxHealth: number, direction?: Vec2) {
+	// Matter.js Physics
+	bodies: Body[] = [];
+
+	constructor(world: World, baseHitbox: Hitbox, minHitbox: Hitbox, health: number, maxHealth: number, collisionLayers?: CollisionLayers, direction?: Vec2) {
 		if (baseHitbox.type !== minHitbox.type) throw new Error("Hitboxes are not the same type!");
 		this.id = ID();
 		this.direction = direction || Vec2.UNIT_X.addAngle(Math.random() * CommonAngles.TWO_PI);
@@ -38,27 +54,74 @@ export class Obstacle {
 		this.maxHealth = maxHealth;
 		do {
 			this.position = world.size.scale(Math.random(), Math.random());
-		} while (world.terrainAtPos(this.position).id != world.defaultTerrain.id || world.obstacles.find(obstacle => obstacle.collided(this)) || world.buildings.some(b => b.obstacles.find(o => o.obstacle.type === Roof.ID)?.obstacle.collided(this)));
+		} while (world.terrainAtPos(this.position).id != world.defaultTerrain.id ||
+			world.obstacles.find(obstacle => obstacle.collided(this)) ||
+			world.buildings.some(b => b.obstacles.find(o => o.obstacle.type === Roof.ID)?.obstacle.collided(this)) || 
+			checkForObsZONEOBSCollision(world, this.position)
+		);
+		if (collisionLayers) this.collisionLayers = collisionLayers;
+		this.createBodies();
+	}
+
+	createBody() {
+		if (this.hitbox.type == "rect") return Bodies.rectangle(this.position.x, this.position.y, (<RectHitbox>this.hitbox).width, (<RectHitbox>this.hitbox).height, { isStatic: true });
+		else return Bodies.circle(this.position.x, this.position.y, this.hitbox.comparable, { isStatic: true });
+	}
+
+	createBodies() {
+		if (this.collisionLayers == CollisionLayers.EVERYTHING) world.engines.forEach(engine => {
+			const body = this.createBody();
+			Composite.add(engine.world, body);
+			this.bodies.push(body);
+		});
+		else {
+			for (let ii = 0; ii < Object.keys(CollisionLayers).length / 2; ii++) {
+				if (this.collisionLayers & (1 << ii)) {
+					const body = this.createBody();
+					Composite.add(world.engines[ii].world, body);
+					this.bodies.push(body);
+				}
+			}
+		}
+	}
+
+	removeBodies() {
+		if (this.collisionLayers == CollisionLayers.EVERYTHING) this.bodies.forEach((body, ii) => Composite.remove(world.engines[ii].world, body));
+		else
+			for (let ii = 0; ii < Object.keys(CollisionLayers).length / 2; ii++)
+				if (this.collisionLayers & (1 << ii))
+					Composite.remove(world.engines[ii].world, this.bodies.pop()!);
+	}
+
+	setBodies() {
+		this.bodies.forEach(body => {
+			Body.setPosition(body, this.position.toMatterVector());
+			Body.setAngle(body, this.direction.angle());
+		});
 	}
 
 	damage(dmg: number, damager?: string) {
 		if (this.despawn || this.health <= 0 || !this.vulnerable) return;
 		this.health -= dmg;
 		if (this.health <= 0) this.die(damager);
-		this.hitbox = this.baseHitbox.scaleAll(this.minHitbox.comparable / this.baseHitbox.comparable + (this.health / this.maxHealth) * (1 - this.minHitbox.comparable / this.baseHitbox.comparable));
+		const newHitbox = this.baseHitbox.scaleAll(this.minHitbox.comparable / this.baseHitbox.comparable + (this.health / this.maxHealth) * (1 - this.minHitbox.comparable / this.baseHitbox.comparable));
+		const hitboxScale = newHitbox.comparable / this.hitbox.comparable;
+		this.bodies.forEach(body => Body.scale(body, hitboxScale, hitboxScale));
+		this.hitbox = newHitbox;
 		this.markDirty();
 	}
 
 	die(killer?: string) {
 		this.despawn = true;
 		this.health = 0;
+		this.removeBodies();
 		this.markDirty();
 	}
 
 	// Hitbox collision check
 	collided(thing: Entity | Obstacle) {
 		if (this.id == thing.id || this.despawn) return CollisionType.NONE;
-		if (!this.collisionLayers.includes(-1) && !thing.collisionLayers.includes(-1) && !this.collisionLayers.some(layer => thing.collisionLayers.includes(layer))) return CollisionType.NONE;
+		if (this.collisionLayers != CollisionLayers.EVERYTHING && thing.collisionLayers != CollisionLayers.EVERYTHING && !(this.collisionLayers & thing.collisionLayers)) return CollisionType.NONE;
 		if (this.position.distanceTo(thing.position) > this.hitbox.comparable + thing.hitbox.comparable) return CollisionType.NONE;
 		// For circle it is distance < sum of radii
 		// Reason this doesn't require additional checking: Look up 2 lines
@@ -120,7 +183,8 @@ export class Obstacle {
 			direction: this.direction.minimize(),
 			hitbox: this.hitbox.minimize(),
 			despawn: this.despawn,
-			animations: this.animations
+			animations: this.animations,
+			_needToSendAnimations: this._needToSendAnimations
 		};
 	}
 

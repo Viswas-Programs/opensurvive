@@ -1,12 +1,14 @@
-import { GLOBAL_UNIT_MULTIPLIER } from "../../constants";
+import { Player } from ".";
+import { CollisionLayers, EntityTypes, GLOBAL_UNIT_MULTIPLIER } from "../../constants";
+import { IslandrBitStream } from "../../packets";
+import { standardEntitySerialiser, writeHitboxes } from "../../serialisers";
 import { TracerData } from "../../types/data";
 import { Entity } from "../../types/entity";
 import { CircleHitbox, Line, Vec2 } from "../../types/math";
 import { Obstacle } from "../../types/obstacle";
 
 export default class Bullet extends Entity {
-	type = "bullet";
-	collisionLayers = [0];
+	type = EntityTypes.BULLET;
 	shooter: Entity | Obstacle;
 	data: TracerData;
 	dmg: number;
@@ -15,8 +17,7 @@ export default class Bullet extends Entity {
 	distanceSqr = 0;
 
 	constructor(shooter: Entity | Obstacle, dmg: number, velocity: Vec2, ticks: number, falloff: number, data: TracerData) {
-		super();
-		this.hitbox = new CircleHitbox(data.width * GLOBAL_UNIT_MULTIPLIER * 0.5);
+		super(new CircleHitbox(data.width * GLOBAL_UNIT_MULTIPLIER * 0.5), CollisionLayers.GENERAL);
 		this.shooter = shooter;
 		this.data = data;
 		this.dmg = dmg;
@@ -25,22 +26,27 @@ export default class Bullet extends Entity {
 		this.discardable = true;
 		this.vulnerable = false;
 		this.falloff = falloff;
+		this.allocBytes += 44;
 	}
-
+	collisionCheck(entities: Entity[], obstacles: Obstacle[]) {
+		var combined: (Entity | Obstacle)[] = [];
+		combined = combined.concat(entities, obstacles);
+		if (!this.despawn)
+			for (const thing of combined) {
+				if (this.type != thing.type && thing.collided(this)) {
+					thing.damage(this.dmg, this.shooter.id);
+					if (thing.surface == "metal") { this.position = this.position.addVec(this.direction.invert()); this.setVelocity(this.direction.invert()); this.direction = this.direction.invert() }
+					else if (thing.collisionLayers != CollisionLayers.OVERLAY) this.die();
+					break;
+				}
+			}
+	}
 	tick(entities: Entity[], obstacles: Obstacle[]) {
 		const lastPos = this.position;
 		super.tick(entities, obstacles);
 		this.distanceSqr += this.position.addVec(lastPos.inverse()).magnitudeSqr();
 		if (this.distanceSqr >= 10000) this.dmg *= this.falloff;
-		var combined: (Entity | Obstacle)[] = [];
-		combined = combined.concat(entities, obstacles);
-		if (!this.despawn)
-			for (const thing of combined)
-				if (this.type != thing.type && thing.collided(this)) {
-					thing.damage(this.dmg, this.shooter.id);
-					if (!thing.noCollision) this.die();
-					break;
-				}
+		this.collisionCheck(entities, obstacles);
 		// In case the bullet is moving too fast, check for hitbox intersection
 		/*if (!this.despawn)
 			for (const thing of combined) {
@@ -66,5 +72,13 @@ export default class Bullet extends Entity {
 	minimize() {
 		const min = super.minimize();
 		return Object.assign(min, { tracer: this.data });
+	}
+	serialise(stream: IslandrBitStream, player: Player) {
+		standardEntitySerialiser(this.minimize(), stream, player)
+		stream.writeASCIIString(this.data.type);
+		stream.writeFloat64(this.data.length);
+		stream.writeFloat64(this.data.width);
+		writeHitboxes(this.hitbox.minimize(), stream)
+	//write the hitbox configuration
 	}
 }

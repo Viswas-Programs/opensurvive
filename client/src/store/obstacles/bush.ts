@@ -5,6 +5,7 @@ import { circleFromCenter } from "../../utils";
 import { ObstacleSupplier } from "../../types/supplier";
 import { OBSTACLE_SUPPLIERS } from ".";
 import { getMode } from "../../homepage"
+import { ObstacleTypes } from "../../constants";
 
 
 class BushSupplier implements ObstacleSupplier {
@@ -15,7 +16,7 @@ class BushSupplier implements ObstacleSupplier {
 
 // Bush
 export default class Bush extends Obstacle {
-	static readonly TYPE = "bush";
+	static readonly TYPE = ObstacleTypes.BUSH;
 	type = Bush.TYPE;
 	zIndex = 10;
 	static bushResidueImg = new Image()

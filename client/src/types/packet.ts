@@ -1,14 +1,31 @@
+import { OutPacketTypes, RecvPacketTypes } from "../constants";
+import { IslandrBitStream } from "../packets";
 import { Player } from "../store/entities";
 import { MinEntity, MinObstacle, MinMinObstacle, MinTerrain, MinVec2, MinBuilding, MinCircleHitbox, MinParticle } from "./minimized";
 import { MovementDirection } from "./misc";
 
 export interface IPacket {
-	type: string;
+	type: number;
+}
+
+export class IPacketCLIENT {
+	type!: number;
+	allocBytes!: number;
+	stream!: IslandrBitStream
+	serialise() {
+		this.stream = IslandrBitStream.alloc(this.allocBytes)
+		this.stream.writePacketType(this.type)
+	}
+	deserialise(stream: IslandrBitStream) { }
+	getBuffer() {
+		return this.stream.buffer
+	}
 }
 
 // Packet to respond the server Ack
-export class ResponsePacket implements IPacket {
-	type = "response";
+export class ResponsePacket extends IPacketCLIENT {
+	allocBytes = 25;
+	type = OutPacketTypes.RESPONSE;
 	id: string;
 	username: string;
 	skin: string | null;
@@ -17,122 +34,220 @@ export class ResponsePacket implements IPacket {
 	isMobile?: boolean;
 
 	constructor(id: string, username: string, skin: string | null, deathImg: string | null, isMobile: boolean, accessToken?: string) {
+		super()
 		this.id = id;
 		this.username = username;
 		this.skin = skin;
 		this.deathImg = deathImg;
 		this.accessToken = accessToken;
 		this.isMobile = isMobile
+		this.allocBytes += this.username.length + this.id.length + (this.accessToken?.length as number)
 	}
+	serialise() {
+		super.serialise()
+		const stream = this.stream
+		stream.writeId(this.id)
+		stream.writeUsername(this.username)
+		stream.writeSkinOrLoadout(this.skin as string)
+		stream.writeSkinOrLoadout(this.deathImg as string)
+		stream.writeAccessToken(this.accessToken as string)
+		stream.writeBoolean(this.isMobile as boolean)
+	}
+
 }
 
 // Packet to ping the server
-export class PingPacket implements IPacket {
-	type = "ping";
+export class PingPacket extends IPacketCLIENT {
+	type = OutPacketTypes.PING;
+	allocBytes = 1
 }
 
 // Packet to notify movement key press
-export class MovementPressPacket implements IPacket {
-	type = "movementpress";
+export class MovementPressPacket extends IPacketCLIENT {
+	type = OutPacketTypes.MOV_PRESS;
 	direction: MovementDirection;
+	allocBytes = 2;
 
 	constructor(direction: MovementDirection) {
+		super()
 		this.direction = direction;
+	}
+	serialise() {
+		super.serialise()
+		this.stream.writePlayerDirection(this.direction)
 	}
 }
 
-export class MovementResetPacket implements IPacket {
-	type = "movementReset";
+export class MovementResetPacket extends IPacketCLIENT {
+	type = OutPacketTypes.MOV_RESET;
+	allocBytes = 1;
 }
 // Packet to notify movement key release
-export class MovementReleasePacket implements IPacket {
-	type = "movementrelease";
+export class MovementReleasePacket extends IPacketCLIENT {
+	type = OutPacketTypes.MOV_REL;
 	direction: MovementDirection;
+	allocBytes = 2;
 
 	constructor(direction: MovementDirection) {
+		super()
 		this.direction = direction;
 	}
+	serialise() {
+		super.serialise();
+		this.stream.writePlayerDirection(this.direction)
+	}
 }
-export class MovementPacket implements IPacket {
-	type = "mobilemovement"
+export class MovementPacket extends IPacketCLIENT {
+	type = OutPacketTypes.MOBILE_MOV;
+	allocBytes = 2;
 	direction: number;
 	constructor(direction: number) {
+		super()
 		this.direction = direction
+	}
+	serialise() {
+		super.serialise();
+		this.stream.writePlayerDirection(this.direction)
 	}
 }
 
-export class PlayerRotationDelta implements IPacket {
-	type = "playerRotation";
+export class PlayerRotationDelta extends IPacketCLIENT {
+	type = OutPacketTypes.PL_ROATION;
 	angle: number;
-	constructor(angle: number) { this.angle = angle }
+	allocBytes = 2;
+	constructor(angle: number) { super(); this.angle = angle }
+	serialise() {
+		super.serialise();
+		this.stream.writePlayerDirection(this.angle)
+	}
 }
 // Packet to notify mouse button press
-export class MousePressPacket implements IPacket {
-	type = "mousepress";
+export class MousePressPacket extends IPacketCLIENT {
+	type = OutPacketTypes.MOS_PRESS;
 	button: number;
+	allocBytes = 2;
 
 	constructor(button: number) {
+		super()
 		this.button = button;
+	}
+	serialise() {
+		super.serialise();
+		this.stream.writeInt8(this.button);
 	}
 }
 
 // Packet to notify mouse button release
-export class MouseReleasePacket implements IPacket {
-	type = "mouserelease";
+export class MouseReleasePacket extends IPacketCLIENT {
+	type = OutPacketTypes.MOS_REL;
 	button: number;
+	allocBytes = 2;
 
 	constructor(button: number) {
+		super()
 		this.button = button;
+	}
+	serialise() {
+		super.serialise();
+		this.stream.writeInt8(this.button)
 	}
 }
 
 // Packet to notify mouse movement
-export class MouseMovePacket implements IPacket {
-	type = "mousemove";
+export class MouseMovePacket extends IPacketCLIENT {
+	type = OutPacketTypes.MOUSEMOVE;
 	x: number;
 	y: number;
+	allocBytes = 5;
 
 	constructor(x: number, y: number) {
+		super()
 		this.x = x;
 		this.y = y;
+	}
+	serialise() {
+		super.serialise();
+		this.stream.writeInt16(this.x)
+		this.stream.writeInt16(this.y)
 	}
 }
 
 // Packet to notify interaction (e.g. pickup)
-export class InteractPacket implements IPacket {
-	type = "interact";
+export class InteractPacket extends IPacketCLIENT {
+	type = OutPacketTypes.INTERACT;
+	allocBytes = 1;
+	serialise() {
+		super.serialise()
+	}
 }
 
 // Packet to notify weapon switching
-export class SwitchWeaponPacket implements IPacket {
-	type = "switchweapon";
+export class SwitchWeaponPacket extends IPacketCLIENT {
+	type = OutPacketTypes.SW_WEAPON;
 	delta: number;
 	setMode: boolean;
+	allocBytes = 3;
 
 	constructor(delta: number, setMode = false) {
+		super()
 		this.delta = delta;
 		this.setMode = setMode;
+	}
+	serialise() {
+		super.serialise()
+		this.stream.writeInt8(this.delta)
+		this.stream.writeBoolean(this.setMode)
 	}
 }
 
 // Packet to notify weapon reloading
-export class ReloadWeaponPacket implements IPacket {
-	type = "reloadweapon";
-}
+export class ReloadWeaponPacket extends IPacketCLIENT {
+	type = OutPacketTypes.REL_WEAPON;
+	allocBytes = 1;
 
-// Packet to notify healing item usage
-export class UseHealingPacket implements IPacket {
-	type = "usehealing";
-	item: string;
-
-	constructor(item: string) {
-		this.item = item;
+	serialise() {
+		super.serialise()
 	}
 }
 
+//notify to cancel any actions going on 
+export class CancelActionsPacket extends IPacketCLIENT {
+	type = OutPacketTypes.CANCEL_ACT;
+	allocBytes = 1;
+}
+
+// Packet to notify healing item usage
+export class UseHealingPacket extends IPacketCLIENT {
+	type = OutPacketTypes.HEAL;
+	item: string;
+	allocBytes = 16
+
+	constructor(item: string) {
+		super()
+		this.item = item;
+	}
+	serialise() {
+		super.serialise()
+		this.stream.writeHealingItem(this.item)
+	}
+}
+
+export class ServerScopeUpdatePacket extends IPacketCLIENT {
+	type = OutPacketTypes.SR_SCOPE_UPD;
+	scope!: number;
+	allocBytes = 2;
+	constructor(scope: number) {
+		super()
+		this.scope = scope
+	}
+	serialise() {
+		super.serialise();
+		this.stream.writeInt8(this.scope)
+	}
+}
 /// Packet from server acknowledgement
 export class AckPacket implements IPacket {
-	type = "ack";
+	type = RecvPacketTypes.ACK;
 	id!: string;
 	tps!: number;
 	size!: number[];
@@ -141,7 +256,7 @@ export class AckPacket implements IPacket {
 
 /// Packet from server containing game data
 export class GamePacket implements IPacket {
-	type = "game";
+	type = RecvPacketTypes.GAME;
 	entities!: MinEntity[];
 	obstacles!: MinObstacle[];
 	player!: any;
@@ -154,7 +269,7 @@ export class GamePacket implements IPacket {
 
 /// Packet from server containing map data
 export class MapPacket implements IPacket {
-	type = "map";
+	type = RecvPacketTypes.MAP;
 	obstacles!: MinMinObstacle[];
 	buildings!: MinBuilding[];
 	terrains!: MinTerrain[];
@@ -162,19 +277,26 @@ export class MapPacket implements IPacket {
 
 /// Packet from server about sound and its location
 export class SoundPacket implements IPacket {
-	type = "sound";
+	type = RecvPacketTypes.SOUND;
 	path!: string;
 	position!: MinVec2;
 }
 
 export class ParticlesPacket implements IPacket {
-	type = "particles";
+	type = RecvPacketTypes.PARTICLES;
 	particles!: MinParticle[];
 }
 
 export class AnnouncementPacket implements IPacket {
-	type = "announce";
-	announcement!: string;
+	type = RecvPacketTypes.ANNOUNCE;
+	weaponUsed!: string;
 	killer!: string;
+	killed!: string;
 }
-export type ServerPacketResolvable = AckPacket | GamePacket | MapPacket | SoundPacket | ParticlesPacket | AnnouncementPacket;
+
+export class ScopeUpdatePacket implements IPacket {
+	type = RecvPacketTypes.SCOPEUPD;
+	scope!: number;
+
+}
+export type ServerPacketResolvable = AckPacket | GamePacket | MapPacket | SoundPacket | ParticlesPacket | AnnouncementPacket | ScopeUpdatePacket;

@@ -1,0 +1,47 @@
+{
+	"name": "MK18 CQBR",
+	"color": 3,
+	"ammo": 120,
+	"dual": false,
+	"auto": true,
+	"length": 2.665,
+	"droppable": true,
+	"normal": {
+		"capacity": 30,
+		"reload": {
+			"time": 2400
+		},
+		"delay": {
+			"switch": 700,
+			"firing": 70
+		},
+		"spread": {
+			"still": 10,
+			"move": 12
+		},
+		"bullets": 1,
+		"speed": {
+			"equip": 13,
+			"attack": 7
+		},
+		"headshot": 2,
+		"bullet": {
+			"damage": 11,
+			"falloff": 0.85,
+			"speed": 95,
+			"range": [150, 150],
+			"suppressed": false
+		}
+	},
+	"visuals": {
+		"tracer": {
+			"type": "556mm",
+			"width": 0.1,
+			"length": 0.9
+		},
+		"animations": [ "medium_recoil" ],
+		"hasBarrelImage": true,
+		"particleToDisplay": "case_med"
+	},
+	"fistPositions": [ 0.1, 0.38 ]
+}

@@ -1,0 +1,47 @@
+{
+	"name": "STF 12",
+	"color": 1,
+	"ammo": 16,
+	"dual": false,
+	"length": 2.8,
+	"droppable": true,
+	"normal": {
+		"capacity": 6,
+		"reload": {
+			"bullets": 1,
+			"time": 600
+		},
+		"delay": {
+			"switch": 500,
+			"firing": 780
+		},
+		"spread": {
+			"still": 6,
+			"move": 8
+		},
+		"bullets": 9,
+		"speed": {
+			"equip": 12,
+			"attack": 6
+		},
+		"headshot": 1.5,
+		"bullet": {
+			"damage": 12.5,
+			"falloff": 0,
+			"speed": 80,
+			"range": [65, 65],
+			"suppressed": false
+		}
+	},
+	"visuals": {
+		"tracer": {
+			"type": "12gauge",
+			"width": 0.1,
+			"length": 0.8
+		},
+		"animations": [ "large_recoil" ],
+		"hasBarrelImage": true,
+		"particleToDisplay":  "case_12ga"
+	},
+	"fistPositions":  [0.4, 0.7]
+}

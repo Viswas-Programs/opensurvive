@@ -61,6 +61,7 @@ if (window.location.href!.includes("/loadout")) {
         const overlay = document.getElementById('overlay');
         (<HTMLElement>container).style.display = 'none';
         (<HTMLElement>overlay).style.display = 'none';
+        window.location.replace(window.location.href.replace("loadout", ""))
     }
 
     // Function to show container2
@@ -123,7 +124,7 @@ if (window.location.href!.includes("/loadout")) {
         selectButtons.forEach(button => { _selectButtonForEachFunction(button)
             
         });
-
+        document.getElementById("close-button")!.addEventListener("click", closeLoadout)
         // Retrieve the last selected skin from localStorage and display it on page load
         const lastSelectedSVG = localStorage.getItem('loadoutSkinTexture');
         if (lastSelectedSVG) {

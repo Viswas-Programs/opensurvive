@@ -1,0 +1,47 @@
+{
+	"name": "MP9",
+	"color": 0,
+	"ammo": 120,
+	"dual": false,
+	"auto": true,
+	"length": 2.5,
+	"droppable": true,
+	"normal": {
+		"capacity": 30,
+		"reload": {
+			"time": 2200
+		},
+		"delay": {
+			"switch": 500,
+			"firing": 60
+		},
+		"spread": {
+			"still": 13,
+			"move": 18
+		},
+		"bullets": 1,
+		"speed": {
+			"equip": 14,
+			"attack": 10
+		},
+		"headshot": 2,
+		"bullet": {
+			"damage": 10,
+			"falloff": 0,
+			"speed": 93,
+			"range": [25, 25],
+			"suppressed": false
+		}
+	},
+	"visuals": {
+		"tracer": {
+			"type": "9mm",
+			"width": 0.1,
+			"length": 0.3
+		},
+		"animations": [ "medium_recoil" ],
+		"hasBarrelImage": true,
+		"particleToDisplay": "case_small"
+	},
+	"fistPositions": [0, 0.2]
+}

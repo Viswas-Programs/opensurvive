@@ -1,7 +1,7 @@
 import { ENTITY_SUPPLIERS, Healing } from ".";
-import { LANG } from "../../constants";
+import { EntityTypes, LANG } from "../../constants";
 import { translate } from "../../languages";
-import { getWeaponImagePath } from "../../textures";
+import { getWeaponHUDImagePath } from "../../textures";
 import { Entity, Inventory, PartialInventory } from "../../types/entity";
 import { MinEntity, MinInventory } from "../../types/minimized";
 import { EntitySupplier } from "../../types/supplier";
@@ -9,6 +9,8 @@ import { GunWeapon, WeaponType } from "../../types/weapon";
 import { circleFromCenter } from "../../utils";
 import { castCorrectWeapon, WEAPON_SUPPLIERS } from "../weapons";
 import { getMode } from "../../homepage";
+import { Vec2 } from "../../types/math";
+import { getTPS } from "../../game";
 
 const weaponPanelDivs: HTMLDivElement[] = [];
 const weaponNameDivs: HTMLDivElement[] = [];
@@ -45,9 +47,20 @@ class PlayerSupplier implements EntitySupplier {
 		return new PartialPlayer(minEntity);
 	}
 }
-
+const helmetImgs = new Map<number, HTMLImageElement>()
+const backpackImgs = new Map<number, HTMLImageElement>()
+function loadProcItemImages(type: string) {
+	for (let ii = 1; ii < 4; ii++) {
+		const path = `assets/${getMode()}/images/game/proc-items/${type}/${ii}.svg`
+		const itemImage = new Image()
+		itemImage.src = path
+		if (type == "helmet") helmetImgs.set(ii, itemImage)
+		else backpackImgs.set(ii, itemImage)
+	}
+}
+["helmet", "backpack"].forEach(type => loadProcItemImages(type))
 export default class Player extends Entity {
-	static readonly TYPE = "player";
+	static readonly TYPE = EntityTypes.PLAYER;
 	type = Player.TYPE;
 	id!: string;
 	username!: string;
@@ -59,7 +72,8 @@ export default class Player extends Entity {
 	currentDeathImg = new Image();
 	interactMessage: string | null = null;
 	currentHealItem: string | null = null;
-	
+	_lastPosChange = Date.now();
+	_lastDirectionChng = Date.now();
 
 	constructor(minEntity: MinEntity & AdditionalEntity) {
 		super(minEntity);
@@ -85,7 +99,7 @@ export default class Player extends Entity {
 				if (ii == inventory.holding) weaponPanelDivs[ii].classList.add("selected");
 				else weaponPanelDivs[ii].classList.remove("selected");
 				weaponNameDivs[ii].innerHTML = inventory.weapons[ii]?.nameId ? translate(LANG, `hud.weapon.${inventory.weapons[ii]?.nameId}`) : "&nbsp;";
-				const path = getWeaponImagePath(inventory.weapons[ii]?.nameId);
+				const path = getWeaponHUDImagePath(inventory.weapons[ii]?.nameId);
 				if (weaponImages[ii].path != path) {
 					weaponImages[ii].path = path;
 					weaponImages[ii].src = path;
@@ -103,35 +117,63 @@ export default class Player extends Entity {
 	}
 
 	render(you: Player, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scale: number) {
+		you.position = you.oldPos.interpolate(you.position, Math.min((Date.now() - you._lastPosChange) / getTPS()));
+		you._lastPosChange = Date.now()
+		you.oldPos = you.position
+		this.position = this.oldPos.interpolate(this.position, Math.min((Date.now() - this._lastPosChange) / getTPS())); 
+		this._lastPosChange = Date.now()
+		this.oldPos = this.position
+		/*you.direction = Vec2.interpolate(you.oldDir, you.direction, Math.min((Date.now() - you._lastPosChange) / getTPS()));
+		you._lastPosChange = Date.now()
+		you.oldDir = you.direction
+		this.direction = Vec2.interpolate(this.oldDir, this.direction, Math.min((Date.now() - this._lastPosChange) / getTPS()));
+		this._lastPosChange = Date.now()
+		this.oldDir = this.direction*/
 		const relative = this.position.addVec(you.position.inverse());
 		const radius = scale * this.hitbox.comparable;
 		ctx.translate(canvas.width / 2 + relative.x * scale, canvas.height / 2 + relative.y * scale);
 		if (!this.despawn) {
 			ctx.rotate(this.direction.angle());
-
 			if (this.inventory.backpackLevel) {
-				ctx.fillStyle = "#675230";
-				ctx.lineWidth = radius / 6;
-				ctx.strokeStyle = "#000000";
-				circleFromCenter(ctx, -radius * 0.2 * (1 + this.inventory.backpackLevel), 0, radius * 0.9, true, true);
+				if (getMode() == "classic") {
+					ctx.fillStyle = "#675230";
+					ctx.lineWidth = radius / 6;
+					ctx.strokeStyle = "#000000";
+					circleFromCenter(ctx, -radius * 0.2 * (1 + this.inventory.backpackLevel), 0, radius * 0.9, true, true);
+				}
+				else {
+					ctx.save()
+					ctx.rotate(90 * Math.PI / 180)
+					ctx.drawImage(backpackImgs.get(this.inventory.backpackLevel)!, -2 * radius * 0.2 * 2.1, 0, radius * 1.7, radius * 1.7)
+					ctx.restore()
+				}
 			}
 			if (this.inventory.vestLevel) {
 				ctx.fillStyle = "#675230";
-				ctx.lineWidth = radius / (7-this.inventory.vestLevel);
+				ctx.lineWidth = radius / (6-this.inventory.vestLevel);
 				ctx.strokeStyle = "#000000";
 				circleFromCenter(ctx, 0, 0, radius, true, true);
 			}
 			
 			if (this.currentSkinImg.complete) ctx.drawImage(this.currentSkinImg, -radius, -radius, radius * 2, radius * 2);
 			if (this.inventory.helmetLevel) {
-				if (this.inventory.helmetLevel == 1) ctx.fillStyle = "#0000FF";
-				else if (this.inventory.helmetLevel == 2) ctx.fillStyle = "#808080";
-				else if (this.inventory.helmetLevel == 3) ctx.fillStyle = "#A9A9A9";
-				else if (this.inventory.helmetLevel == 4) ctx.fillStyle = "#000000";
-				else ctx.fillStyle = "#ff00ff";
-				ctx.lineWidth = 2;
-				ctx.strokeStyle = "#000000";
-				circleFromCenter(ctx, 0, 0, radius * 0.7, true, true);
+				if (getMode() == "classic") {
+					if (this.inventory.helmetLevel == 1) ctx.fillStyle = "#0000FF";
+					else if (this.inventory.helmetLevel == 2) ctx.fillStyle = "#808080";
+					else if (this.inventory.helmetLevel == 3) ctx.fillStyle = "#A9A9A9";
+					else if (this.inventory.helmetLevel == 4) ctx.fillStyle = "#000000";
+					else ctx.fillStyle = "#ff00ff";
+					ctx.lineWidth = 2;
+					ctx.strokeStyle = "#000000";
+					circleFromCenter(ctx, 0, 0, radius * 0.7, true, true);
+				}
+				else {
+					ctx.save()
+					ctx.rotate(-90 * Math.PI / 180)
+					ctx.drawImage(helmetImgs.get(this.inventory.helmetLevel)!, -radius + (scale / 2.98), -radius + (scale / 2.98), radius * 1.3, radius * 1.3)
+					ctx.restore()
+				}
+				/**/
 			}
 			// We will leave the transform for the weapon
 			// If player is holding nothing, render fist
@@ -174,8 +216,9 @@ export class FullPlayer extends Player {
 	maxHealTicks!: number;
 	interactMessage!: string | null;
 	currentHealItem!: string | null;
-
 	copy(minEntity: MinEntity & AdditionalEntity) {
+		this.position = this.oldPos = Vec2.fromMinVec2(minEntity.position)
+		this.direction = this.oldDir = Vec2.fromMinVec2(minEntity.direction)
 		super.copy(minEntity);
 		this.health = minEntity.health;
 		this.maxHealth = minEntity.maxHealth;

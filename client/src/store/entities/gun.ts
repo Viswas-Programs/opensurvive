@@ -1,5 +1,6 @@
 import { Ammo, ENTITY_SUPPLIERS } from ".";
-import { GunColor } from "../../constants";
+import { EntityTypes, GunColor } from "../../constants";
+import { getMode } from "../../homepage";
 import { getWeaponImagePath } from "../../textures";
 import { Entity } from "../../types/entity";
 import { MinEntity } from "../../types/minimized";
@@ -20,7 +21,7 @@ class GunSupplier implements EntitySupplier {
 
 export default class Gun extends Entity {
 	static readonly gunImages = new Map<string, HTMLImageElement>();
-	static readonly TYPE = "gun";
+	static readonly TYPE = EntityTypes.GUN;
 	type = Gun.TYPE;
 	nameId!: string;
 	color!: GunColor;
@@ -46,11 +47,13 @@ export default class Gun extends Entity {
 		const radius = scale * this.hitbox.comparable;
 		ctx.translate(canvas.width / 2 + relative.x * scale, canvas.height / 2 + relative.y * scale);
 		ctx.rotate(-this.direction.angle());
-		ctx.strokeStyle = `#${Ammo.colorScheme[this.color][2]}`;
-		ctx.lineWidth = scale * 0.25;
-		circleFromCenter(ctx, 0, 0, radius, false, true);
-		ctx.fillStyle = `#${Ammo.colorScheme[this.color][2]}66`;
-		circleFromCenter(ctx, 0, 0, radius, true, false);
+		if (getMode() == "classic") {
+			ctx.strokeStyle = `#${Ammo.colorScheme[this.color][2]}`;
+			ctx.lineWidth = scale * 0.25;
+			circleFromCenter(ctx, 0, 0, radius, false, true);
+			ctx.fillStyle = `#${Ammo.colorScheme[this.color][2]}66`;
+			circleFromCenter(ctx, 0, 0, radius, true, false);
+		}
 		const img = Gun.gunImages.get(this.nameId);
 		if (!img?.complete) {
 			if (!img) {

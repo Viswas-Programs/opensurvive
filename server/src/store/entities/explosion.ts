@@ -1,10 +1,13 @@
+import { Player } from ".";
+import { CollisionLayers, EntityTypes } from "../../constants";
+import { IslandrBitStream } from "../../packets";
+import { standardEntitySerialiser, writeHitboxes } from "../../serialisers";
 import { Entity } from "../../types/entity";
 import { CircleHitbox, Vec2 } from "../../types/math";
 import { Obstacle } from "../../types/obstacle";
 
 export default class Explosion extends Entity {
-	type = "explosion";
-	hitbox: CircleHitbox;
+	type = EntityTypes.EXPLOSION;
 	exploder: Entity | Obstacle;
 	dmg: number;
 	minDmg: number;
@@ -13,18 +16,18 @@ export default class Explosion extends Entity {
 	damaged = new Set<string>();
 
 	constructor(exploder: Entity | Obstacle, dmg: number, minDmg: number, position: Vec2, radius: number, inflation: number, duration: number) {
-		super();
+		super(new CircleHitbox(radius), CollisionLayers.SPECIAL);
 		this.exploder = exploder;
 		this.position = position;
-		this.hitbox = new CircleHitbox(radius);
 		this.dmg = dmg;
 		this.minDmg = minDmg;
 		this.radius = radius;
 		this.inflation = inflation;
 		this.maxHealth = this.health = duration; // ticks
 		this.discardable = true;
-		this.noCollision = true;
 		this.vulnerable = false;
+		this.allocBytes += 11;
+		this.setBodies();
 	}
 
 	tick(entities: Entity[], obstacles: Obstacle[]) {
@@ -44,11 +47,18 @@ export default class Explosion extends Entity {
 		const slope = (this.radius * this.inflation - this.radius) / this.maxHealth;
 		// y = mx + radius
 		this.hitbox = new CircleHitbox(slope * (this.maxHealth - this.health) + this.radius);
-		this.health--;
+		this.health-=2;
 		if (this.health <= 0) this.die();
 	}
 
 	minimize() {
 		return Object.assign(super.minimize(), { health: this.health, maxHealth: this.maxHealth });
+	}
+	serialise(stream: IslandrBitStream, player: Player) {
+		standardEntitySerialiser(this.minimize(), stream, player)
+		stream.writeInt8(this.health)
+		stream.writeInt8(this.maxHealth)
+		writeHitboxes(this.hitbox.minimize(), stream)
+	//write the hitbox configuration
 	}
 }

@@ -1,6 +1,9 @@
 // Note: This is the gun item
 
 import { world } from "../..";
+import { EntityTypes } from "../../constants";
+import { IslandrBitStream } from "../../packets";
+import { standardEntitySerialiser } from "../../serialisers";
 import { CircleHitbox, CommonAngles, Vec2 } from "../../types/math";
 import { GunColor } from "../../types/misc";
 import { GunWeapon } from "../../types/weapon";
@@ -9,16 +12,18 @@ import Item from "./item";
 import Player from "./player";
 
 export default class Gun extends Item {
-	type = "gun";
-	hitbox = new CircleHitbox(2);
+	type = EntityTypes.GUN;
 	nameId: string; // Gun ID, but id was taken for entity already
 	color: GunColor;
 
 	constructor(nameId: string, color: GunColor) {
-		super();
+		super(new CircleHitbox(2));
 		if (!WEAPON_SUPPLIERS.has(nameId)) console.warn("Creating a gun entity that doesn't have a supplier for its type");
 		this.nameId = nameId;
 		this.color = color;
+		this.allocBytes += 15
+		this._needsToSendAnimations = true
+		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
 
 	picked(player: Player) {
@@ -41,6 +46,7 @@ export default class Gun extends Item {
 		const gun = new Gun(weapon.nameId, weapon.color);
 		gun.position = this.position;
 		gun.velocity = Vec2.UNIT_X.addAngle(Math.random() * CommonAngles.TWO_PI).scaleAll(0.025);
+		gun.setBodies();
 		world.entities.push(gun);
 		// Swap the player's weapon on hand with the one on ground
 		player.inventory.setWeapon(castCorrectWeapon(this.nameId));
@@ -54,5 +60,10 @@ export default class Gun extends Item {
 	minimize() {
 		const min = super.minimize();
 		return Object.assign(min, { nameId: this.nameId, color: this.color });
+	}
+	serialise(stream: IslandrBitStream, player: Player) {
+		standardEntitySerialiser(this.minimize(), stream, player)
+		stream.writeASCIIString(this.nameId);
+		stream.writeInt8(this.color)
 	}
 }

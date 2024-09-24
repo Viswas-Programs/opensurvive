@@ -1,5 +1,6 @@
 import { OBSTACLE_SUPPLIERS } from ".";
 import { world } from "../..";
+import { ObstacleTypes } from "../../constants";
 import { ObstacleData } from "../../types/data";
 import { CommonAngles, RectHitbox, Vec2 } from "../../types/math";
 import { Obstacle } from "../../types/obstacle";
@@ -12,7 +13,7 @@ class DoorSupplier extends ObstacleSupplier {
 }
 
 export default class Door extends Obstacle {
-	static readonly TYPE = "door";
+	static readonly TYPE = ObstacleTypes.DOOR;
 	type = Door.TYPE;
 	// Pivot is relative to the center of 
 	pivot: Vec2;

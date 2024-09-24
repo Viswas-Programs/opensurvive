@@ -5,6 +5,7 @@ import { LOOT_TABLES } from "../../types/loot_table";
 import { ObstacleSupplier } from "../../types/supplier";
 import { ObstacleData } from "../../types/data"; 
 import { OBSTACLE_SUPPLIERS } from ".";
+import { ObstacleTypes } from "../../constants";
 
 class ToiletMoreSupplier extends ObstacleSupplier {
 	make(data: ObstacleData) {
@@ -12,7 +13,7 @@ class ToiletMoreSupplier extends ObstacleSupplier {
 	}
 }
 export default class ToiletMore extends Obstacle {
-	static readonly TYPE = "toilet_more";
+	static readonly TYPE = ObstacleTypes.TOILET_MORE;
 	type = ToiletMore.TYPE;
 
 	constructor() {
@@ -35,6 +36,7 @@ export default class ToiletMore extends Obstacle {
 		if (entities) {
 			world.entities.push(...entities.map(e => {
 				e.position = this.position;
+				e.setBodies();
 				return e;
 			}));
 		}

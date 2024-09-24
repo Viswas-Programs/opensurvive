@@ -1,26 +1,26 @@
 [
 	{
-		"swiss_roll": 5,
-		"pie": 1,
-		"coffee": 2,
-		"chocolate": 1
+		"tourniquet": 5,
+		"medkit": 1,
+		"energy_drink": 2,
+		"syringe": 1
 	},
 	{
-		"swiss_roll": 10,
-		"pie": 2,
-		"coffee": 5,
-		"chocolate": 2
+		"tourniquet": 10,
+		"medkit": 2,
+		"energy_drink": 5,
+		"syringe": 2
 	},
 	{
-		"swiss_roll": 15,
-		"pie": 3,
-		"coffee": 10,
-		"chocolate": 3
+		"tourniquet": 15,
+		"medkit": 3,
+		"energy_drink": 10,
+		"syringe": 3
 	},
 	{
-		"swiss_roll": 30,
-		"pie": 4,
-		"coffee": 15,
-		"chocolate": 4
+		"tourniquet": 30,
+		"medkit": 4,
+		"energy_drink": 15,
+		"syringe": 4
 	}
 ]
