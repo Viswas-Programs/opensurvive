@@ -1,7 +1,7 @@
 import { castEntity, FullPlayer } from "../store/entities";
 import { Entity } from "./entity";
 import { CircleHitbox, Vec2 } from "./math";
-import { MinCircleHitbox, MinThing, MinThing, MinParticle, MinVec2 } from "./minimized";
+import { MinCircleHitbox, MinEntity, MinObstacle, MinParticle, MinVec2 } from "./minimized";
 import { Obstacle } from "./obstacle";
 import { castObstacle } from "../store/obstacles";
 import { Howl } from "howler";
@@ -37,7 +37,7 @@ export class World {
 		this.particles = this.particles.filter(p => !p.ended);
 	}
 
-	updateEntities(entities: MinThing[], discardEntities: string[] = []) {
+	updateEntities(entities: MinEntity[], discardEntities: string[] = []) {
 		const pending: Entity[] = [];
 		for (const entity of this.entities) {
 			if (discardEntities.includes(entity.id)) continue;
@@ -52,7 +52,7 @@ export class World {
 		this.entities = pending;
 	}
 
-	updateObstacles(obstacles: MinThing[], discardObstacles: string[] = []) {
+	updateObstacles(obstacles: MinObstacle[], discardObstacles: string[] = []) {
 		const pending: Obstacle[] = [];
 		for (const obstacle of this.obstacles) {
 			if (discardObstacles.includes(obstacle.id)) continue;

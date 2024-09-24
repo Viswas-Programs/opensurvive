@@ -1,36 +1,44 @@
-import { Body, Vector } from "matter-js";
 import { Player } from "../store/entities";
 import { Roof } from "../store/obstacles";
-import { minimizeVector } from "../utils";
+import { ID } from "../utils";
 import { Entity } from "./entity";
-import { Hitbox, CommonAngles } from "./math";
-import { MinMinObstacle } from "./minimized";
-import { Thing } from "./thing";
+import { Vec2, Hitbox, CircleHitbox, RectHitbox, CommonAngles } from "./math";
+import { MinMinObstacle, MinObstacle } from "./minimized";
+import { CollisionType } from "./misc";
 import { World } from "./world";
 
-export class Obstacle extends Thing {
+export class Obstacle {
+	id: string;
+	type = "";
+	position: Vec2;
+	direction: Vec2;
 	baseHitbox: Hitbox;
 	minHitbox: Hitbox;
+	hitbox: Hitbox;
 	noCollision = false;
 	collisionLayers = [-1]; // -1 means on all layers
 	vulnerable = true;
 	health: number;
 	maxHealth: number;
+	discardable = false;
+	despawn = false;
 	interactable = false;
 	animations: string[] = [];
+	dirty = true;
 	// Particle type to emit when damaged
 	damageParticle?: string;
 
-	constructor(world: World, baseHitbox: Hitbox, minHitbox: Hitbox, health: number, maxHealth: number, angle?: number) {
+	constructor(world: World, baseHitbox: Hitbox, minHitbox: Hitbox, health: number, maxHealth: number, direction?: Vec2) {
 		if (baseHitbox.type !== minHitbox.type) throw new Error("Hitboxes are not the same type!");
-		super(baseHitbox, "obstacle", angle === undefined ? Math.random() * CommonAngles.TWO_PI : angle);
+		this.id = ID();
+		this.direction = direction || Vec2.UNIT_X.addAngle(Math.random() * CommonAngles.TWO_PI);
 		this.baseHitbox = this.hitbox = baseHitbox;
 		this.minHitbox = minHitbox;
 		this.health = health;
 		this.maxHealth = maxHealth;
 		do {
-			Body.setPosition(this.body, Vector.create(world.size.x * Math.random(), world.size.y * Math.random()));
-		} while (world.terrainAtPos(this.body.position).id != world.defaultTerrain.id || world.things.find(obstacle => obstacle.thingType === "obstacle" && obstacle.collided(this)) || world.buildings.some(b => b.obstacles.find(o => o.obstacle.type === Roof.ID)?.obstacle.collided(this)));
+			this.position = world.size.scale(Math.random(), Math.random());
+		} while (world.terrainAtPos(this.position).id != world.defaultTerrain.id || world.obstacles.find(obstacle => obstacle.collided(this)) || world.buildings.some(b => b.obstacles.find(o => o.obstacle.type === Roof.ID)?.obstacle.collided(this)));
 	}
 
 	damage(dmg: number, damager?: string) {
@@ -38,17 +46,17 @@ export class Obstacle extends Thing {
 		this.health -= dmg;
 		if (this.health <= 0) this.die(damager);
 		this.hitbox = this.baseHitbox.scaleAll(this.minHitbox.comparable / this.baseHitbox.comparable + (this.health / this.maxHealth) * (1 - this.minHitbox.comparable / this.baseHitbox.comparable));
-		this.dirty = true;
+		this.markDirty();
 	}
 
 	die(killer?: string) {
 		this.despawn = true;
 		this.health = 0;
-		this.dirty = true;
+		this.markDirty();
 	}
 
 	// Hitbox collision check
-	/*collided(thing: Entity | Obstacle) {
+	collided(thing: Entity | Obstacle) {
 		if (this.id == thing.id || this.despawn) return CollisionType.NONE;
 		if (!this.collisionLayers.includes(-1) && !thing.collisionLayers.includes(-1) && !this.collisionLayers.some(layer => thing.collisionLayers.includes(layer))) return CollisionType.NONE;
 		if (this.position.distanceTo(thing.position) > this.hitbox.comparable + thing.hitbox.comparable) return CollisionType.NONE;
@@ -71,7 +79,7 @@ export class Obstacle extends Thing {
 			}
 			return rect.hitbox.collideCircle(rect.position, rect.direction, circle.hitbox, circle.position, circle.direction);
 		}
-	}*/
+	}
 
 	interact(_player: Player) { }
 
@@ -90,13 +98,33 @@ export class Obstacle extends Thing {
 		if (this.vulnerable && this.health <= 0 && !this.despawn) this.die();
 	}
 
-	rotateAround(pivot: Vector, angle: number) {
-		Body.setAngle(this.body, this.body.angle + angle);
-		Body.setPosition(this.body, Vector.rotateAbout(this.body.position, angle, pivot));
+	rotateAround(pivot: Vec2, angle: number) {
+		this.direction = this.direction.addAngle(angle);
+		this.position = pivot.addVec(this.position.addVec(pivot.inverse()).addAngle(angle));
+		this.markDirty();
+	}
+
+	markDirty() {
 		this.dirty = true;
 	}
 
+	unmarkDirty() {
+		this.dirty = false;
+	}
+
+	minimize() {
+		return <MinObstacle>{
+			id: this.id,
+			type: this.type,
+			position: this.position.minimize(),
+			direction: this.direction.minimize(),
+			hitbox: this.hitbox.minimize(),
+			despawn: this.despawn,
+			animations: this.animations
+		};
+	}
+
 	minmin() {
-		return <MinMinObstacle>{ id: this.id, type: this.type, position: minimizeVector(this.body.position) };
+		return <MinMinObstacle>{ id: this.id, type: this.type, position: this.position };
 	}
 }

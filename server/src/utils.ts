@@ -25,15 +25,6 @@ export function randomBoolean() {
 export function toRadians(degree: number) {
     return degree * Math.PI / 180;
 }
-export function distanceSqrTo(vec1: Vector, vec2: Vector) {
-    return Vector.magnitudeSquared(Vector.sub(vec1, vec2));
-}
-export function equalVec(vec1: Vector, vec2: Vector) {
-    return vec1.x == vec2.x && vec1.y == vec2.y;
-}
-export function vecFromArray(array: number[]) {
-    return Vector.create(array[0], array[1]);
-}
 
 // Networking
 import { encode, decode } from "msgpack-lite";
@@ -54,31 +45,31 @@ export function receive(msg: ArrayBuffer) {
 // Things that require game object imports
 import { world } from ".";
 import { Ammo, Gun, Grenade } from "./store/entities";
+import { Vec2 } from "./types/math";
 import { GunColor } from "./types/misc";
 import fetch from "node-fetch";
-import { Vector } from "matter-js";
 
 // Spawners
-export function spawnGun(id: string, color: GunColor, position: Vector, ammoAmount: number) {
+export function spawnGun(id: string, color: GunColor, position: Vec2, ammoAmount: number) {
     const gun = new Gun(id, color);
-    gun.body.position = Vector.clone(position);
-    world.spawn(gun);
+    gun.position = position;
+    world.entities.push(gun);
     var halfAmmo = Math.round(ammoAmount/2)
     spawnAmmo(halfAmmo, color, position);
     spawnAmmo(ammoAmount - halfAmmo, color, position)
 }
-export function spawnAmmo(amount: number, color: GunColor, position: Vector) {
+export function spawnAmmo(amount: number, color: GunColor, position: Vec2) {
     const ammo = new Ammo(amount, color);
-    ammo.body.position = Vector.clone(position);
-    world.spawn(ammo);
+    ammo.position = position;
+    world.entities.push(ammo);
 }
-export function spawnGrenade(id: string, amount: number, position: Vector){
+export function spawnGrenade(id: string, amount: number, position: Vec2){
     const grenade = new Grenade(id, amount);
-    grenade.body.position = Vector.clone(position);
-    world.spawn(grenade);
+    grenade.position = position;
+    world.entities.push(grenade);
 }
 //Overall spawner to spawn any type of loot
-export function spawnLoot(type: string, id: string, color: GunColor, position: Vector, amount: number){
+export function spawnLoot(type: string, id: string, color: GunColor, position: Vec2, amount: number){
     if(type == "ammo"){
         spawnAmmo(amount, color, position)
     }
@@ -92,21 +83,4 @@ export function changeCurrency(accessToken: string, delta: number) {
 export function addKillCounts(accessToken: string, delta: number) {
     fetch((process.env.API_URL || "http://localhost:8000") + "/api/killCount-delta", { method: "POST", headers: { "Authorization": "Bearer " + process.env.SERVER_DB_TOKEN, "Content-Type": "application/json" }, body: JSON.stringify({ accessToken, delta }) })
         .catch(console.error);
-}
-
-// Minimizer
-export function minimizeVector(vec: Vector) {
-    return { x: vec.x, y: vec.y };
-}
-
-// Math optimization
-export function vecDistCompare(a: Vector, b: Vector, dist: number, mode: "eq" | "ne" | "gt" | "ge" | "lt" | "le") {
-    switch (mode) {
-        case "eq": return Vector.magnitudeSquared(Vector.sub(a, b)) == dist * dist;
-        case "ne": return Vector.magnitudeSquared(Vector.sub(a, b)) != dist * dist;
-        case "gt": return Vector.magnitudeSquared(Vector.sub(a, b)) > dist * dist;
-        case "ge": return Vector.magnitudeSquared(Vector.sub(a, b)) >= dist * dist;
-        case "lt": return Vector.magnitudeSquared(Vector.sub(a, b)) < dist * dist;
-        case "le": return Vector.magnitudeSquared(Vector.sub(a, b)) <= dist * dist;
-    }
 }

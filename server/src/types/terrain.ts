@@ -1,7 +1,5 @@
-import { Vector } from "matter-js";
 import { Line, Vec2 } from "./math";
 import { MinTerrain } from "./minimized";
-import { distanceSqrTo } from "../utils";
 
 export abstract class Terrain {
 	id!: string;
@@ -19,10 +17,10 @@ export abstract class Terrain {
 		this.interval = interval;
 	}
 
-	abstract inside(position: Vector): boolean;
+	abstract inside(position: Vec2): boolean;
 
-	abstract setPosition(position: Vector): void;
-	abstract setAngle(angle: number): void;
+	abstract setPosition(position: Vec2): void;
+	abstract setDirection(direction: Vec2): void;
 
 	minimize() {
 		return <MinTerrain> { id: this.id };
@@ -36,46 +34,46 @@ export class DummyTerrain extends Terrain {
 		super(0, 0, 0);
 	}
 
-	inside(_position: Vector) {
+	inside(_position: Vec2) {
 		return false;
 	}
 
-	setPosition() { }
-	setAngle() { }
+	setPosition(_position: Vec2) { }
+	setDirection(_direction: Vec2) { }
 }
 
 export class FullTerrain extends Terrain {
 	type = "full";
 
-	inside(_position: Vector) {
+	inside(_position: Vec2) {
 		return true;
 	}
 
-	setPosition() { }
-	setAngle() { }
+	setPosition(_position: Vec2) { }
+	setDirection(_direction: Vec2) { }
 }
 
 export class DotTerrain extends Terrain {
 	type = "dot";
 	// Position of it on the map
-	position: Vector;
+	position: Vec2;
 	radius: number;
 
-	constructor(speed: number, damage: number, interval: number, position: Vector, radius: number) {
+	constructor(speed: number, damage: number, interval: number, position: Vec2, radius: number) {
 		super(speed, damage, interval);
 		this.position = position;
 		this.radius = radius;
 	}
 
-	inside(position: Vector) {
-		return distanceSqrTo(this.position, position) <= this.radius * this.radius;
+	inside(position: Vec2) {
+		return position.distanceSqrTo(this.position) <= this.radius * this.radius;
 	}
 
 	setPosition(position: Vec2) {
 		this.position = position;
 	}
 
-	setAngle() { }
+	setDirection(direction: Vec2) { }
 
 	minimize() {
 		return Object.assign(super.minimize(), { position: this.position, radius: this.radius });
@@ -115,9 +113,9 @@ export class LineTerrain extends Terrain {
 		this.line = line;
 	}
 
-	setAngle(angle: number) {
+	setDirection(direction: Vec2) {
 		const vec = this.line.toVec();
-		const delta = Vector.angle(vec, Vector.rotate(Vector.create(1, 0), angle));
+		const delta = vec.angleBetween(direction);
 		this.line = Line.fromPointVec(this.line.a, vec.addAngle(-delta));
 		this.boundary = { start: this.boundary.start.addAngle(-delta), end: this.boundary.end.addAngle(-delta) };
 	}
@@ -140,8 +138,8 @@ export class PiecewiseTerrain extends Terrain {
 		return false;
 	}
 
-	setPosition() { }
-	setAngle() { }
+	setPosition(_position: Vec2) { }
+	setDirection(_direction: Vec2) { }
 
 	minimize() {
 		return Object.assign(super.minimize(), { lines: this.lines.map(l => l.minimize()) });

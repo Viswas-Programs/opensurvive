@@ -3,7 +3,7 @@ import { getMode } from "../../homepage";
 import { getTexture } from "../../textures";
 import { TextureData } from "../../types/data";
 import { CircleHitbox, RectHitbox, Vec2 } from "../../types/math";
-import { MinThing } from "../../types/minimized";
+import { MinObstacle } from "../../types/minimized";
 import { Obstacle } from "../../types/obstacle";
 import { ObstacleSupplier } from "../../types/supplier";
 import { circleFromCenter, numToRGBA } from "../../utils";
@@ -16,7 +16,7 @@ interface AdditionalObstacle {
 }
 
 class RoofSupplier implements ObstacleSupplier {
-	create(minObstacle: MinThing & AdditionalObstacle) {
+	create(minObstacle: MinObstacle & AdditionalObstacle) {
 		return new Roof(minObstacle);
 	}
 }
@@ -35,7 +35,7 @@ export default class Roof extends Obstacle {
 		OBSTACLE_SUPPLIERS.set(Roof.ID, new RoofSupplier());
 	}
 
-	copy(minObstacle: MinThing & AdditionalObstacle) {
+	copy(minObstacle: MinObstacle & AdditionalObstacle) {
 		super.copy(minObstacle);
 		this.color = minObstacle.color;
 		this.roofless = new Set(minObstacle.roofless);

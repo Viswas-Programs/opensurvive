@@ -1,6 +1,6 @@
 import { OBSTACLE_SUPPLIERS } from ".";
 import { getMode } from "../../homepage";
-import { MinThing } from "../../types/minimized";
+import { MinObstacle } from "../../types/minimized";
 import { Obstacle } from "../../types/obstacle";
 import { ObstacleSupplier } from "../../types/supplier";
 import { circleFromCenter } from "../../utils";
@@ -11,7 +11,7 @@ interface AdditionObstacle {
 }
 
 class StoneSupplier implements ObstacleSupplier {
-	create(minObstacle: MinThing & AdditionObstacle) {
+	create(minObstacle: MinObstacle & AdditionObstacle) {
 		return new Stone(minObstacle);
 	}
 }
@@ -31,7 +31,7 @@ export default class Stone extends Obstacle {
 		this.ak47stoneImg.src = "assets/" + getMode() + "/images/game/objects/ak47_stone.svg";
 	}
 
-	copy(minObstacle: MinThing & AdditionObstacle) {
+	copy(minObstacle: MinObstacle & AdditionObstacle) {
 		super.copy(minObstacle);
 		this.special = minObstacle.special;
 	}

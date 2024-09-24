@@ -1,5 +1,5 @@
 import { Player } from "../store/entities";
-import { MinThing, MinThing, MinMinObstacle, MinTerrain, MinVec2, MinBuilding, MinCircleHitbox, MinParticle } from "./minimized";
+import { MinEntity, MinObstacle, MinMinObstacle, MinTerrain, MinVec2, MinBuilding, MinCircleHitbox, MinParticle } from "./minimized";
 import { MovementDirection } from "./misc";
 
 export interface IPacket {
@@ -142,10 +142,12 @@ export class AckPacket implements IPacket {
 /// Packet from server containing game data
 export class GamePacket implements IPacket {
 	type = "game";
-	things!: MinThing[];
+	entities!: MinEntity[];
+	obstacles!: MinObstacle[];
 	player!: any;
 	alivecount!: number;
-	discards?: string[];
+	discardEntities?: string[];
+	discardObstacles?: string[];
 	safeZone?: { hitbox: MinCircleHitbox, position: MinVec2 };
 	nextSafeZone?: { hitbox: MinCircleHitbox, position: MinVec2 };
 }

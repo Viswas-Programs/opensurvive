@@ -1,4 +1,3 @@
-import { Vector } from "matter-js";
 import { GLOBAL_UNIT_MULTIPLIER } from "../../constants";
 import { TracerData } from "../../types/data";
 import { Entity } from "../../types/entity";
@@ -16,11 +15,12 @@ export default class Bullet extends Entity {
 	distanceSqr = 0;
 
 	constructor(shooter: Entity | Obstacle, dmg: number, velocity: Vec2, ticks: number, falloff: number, data: TracerData) {
-		super(new CircleHitbox(data.width * GLOBAL_UNIT_MULTIPLIER * 0.5));
+		super();
+		this.hitbox = new CircleHitbox(data.width * GLOBAL_UNIT_MULTIPLIER * 0.5);
 		this.shooter = shooter;
 		this.data = data;
 		this.dmg = dmg;
-		this.velocity = velocity;
+		this.direction = this.velocity = velocity;
 		this.health = this.maxHealth = ticks;
 		this.discardable = true;
 		this.vulnerable = false;
@@ -28,9 +28,9 @@ export default class Bullet extends Entity {
 	}
 
 	tick(entities: Entity[], obstacles: Obstacle[]) {
-		const lastPos = this.body.position;
+		const lastPos = this.position;
 		super.tick(entities, obstacles);
-		this.distanceSqr += Vector.magnitudeSquared(Vector.add(this.body.position, Vector.neg(lastPos)));
+		this.distanceSqr += this.position.addVec(lastPos.inverse()).magnitudeSqr();
 		if (this.distanceSqr >= 10000) this.dmg *= this.falloff;
 		var combined: (Entity | Obstacle)[] = [];
 		combined = combined.concat(entities, obstacles);

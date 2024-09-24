@@ -1,7 +1,6 @@
-import { Vector } from "matter-js";
 import { TICKS_PER_SECOND } from "../../constants";
 import { Entity } from "../../types/entity";
-import { CommonAngles, Hitbox, Vec2 } from "../../types/math";
+import { CommonAngles, Vec2 } from "../../types/math";
 import { CollisionType } from "../../types/misc";
 import { Obstacle } from "../../types/obstacle";
 import Player from "./player";
@@ -14,8 +13,8 @@ export default abstract class Item extends Entity {
 	collisionLayers = [1];
 	repelExplosions = true;
 
-	constructor(hitbox: Hitbox) {
-		super(hitbox);
+	constructor() {
+		super();
 		this.randomVelocity();
 		this.discardable = true;
 		this.noCollision = true;
@@ -23,16 +22,16 @@ export default abstract class Item extends Entity {
 	}
 
 	// Terrible name lol
-	randomVelocity(direction = new Vector()) {
-		if (Vector.magnitudeSquared(direction) != 0) this.velocity = Vector.mult(Vector.normalise(direction), 0.01);
-		else this.velocity = Vector.mult(Vector.rotate(Vector.create(1, 0), Math.random() * CommonAngles.TWO_PI), 0.01);
+	randomVelocity(direction = Vec2.ZERO) {
+		if (direction.magnitudeSqr() != 0) this.velocity = Vec2.UNIT_X.addAngle(direction.angle()).scaleAll(0.01);
+		else this.velocity = Vec2.UNIT_X.addAngle(Math.random() * CommonAngles.TWO_PI).scaleAll(0.01);
 		this.markDirty();
 	}
 
 	tick(entities: Entity[], obstacles: Obstacle[]) {
 		super.tick(entities, obstacles);
 		var colliding = false;
-		/*for (const entity of entities.filter(e => e.id != this.id)) {
+		for (const entity of entities.filter(e => e.id != this.id)) {
 			if (this.collided(entity)) {
 				const movement = this.position.addVec(entity.position.inverse());
 				// Avoid doing sqrt more than once
@@ -41,9 +40,9 @@ export default abstract class Item extends Entity {
 				this.setVelocity(this.velocity.addVec(movement.scaleAll(((safeDistance - mag) / safeDistance) / (mag * TICKS_PER_SECOND * 20))));
 				colliding = true;
 			}
-		}*/
-		if (!colliding) this.setVelocity(Vector.mult(this.velocity, 1 - this.friction));
-		/*for (const obstacle of obstacles) {
+		}
+		if (!colliding) this.setVelocity(this.velocity.scaleAll(1 - this.friction));
+		for (const obstacle of obstacles) {
 			const collisionType = obstacle.collided(this);
 			if (collisionType) {
 				obstacle.onCollision(this);
@@ -59,7 +58,7 @@ export default abstract class Item extends Entity {
 					this.markDirty();
 				}
 			}
-		}*/
+		}
 	}
 
 	interact(player: Player) {

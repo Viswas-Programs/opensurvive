@@ -35,7 +35,7 @@ export abstract class MapTerrainSupplier implements Supplier<Terrain> {
 	create(data: MapTerrainData) {
 		const terrain = this.make(data);
 		if (data.position) terrain.setPosition(Vec2.fromArray(data.position));
-		if (data.direction) terrain.setAngle(Vec2.fromArray(data.direction));
+		if (data.direction) terrain.setDirection(Vec2.fromArray(data.direction));
 		return terrain;
 	}
 }
@@ -87,7 +87,7 @@ export class BuildingSupplier implements Supplier<Building> {
 				if (!terrain) continue;
 				building.addFloor(Vec2.fromArray(floor.position).addAngle(angle), terrain);
 			}
-		building.setAngle(direction);
+		building.setDirection(direction);
 		building.color = this.data.mapColor;
 		return building;
 	}

@@ -1,4 +1,3 @@
-import { Vector } from "matter-js";
 import { world } from "../..";
 import { CircleHitbox } from "../../types/math";
 import Item from "./item";
@@ -8,6 +7,7 @@ import * as fs from "fs";
 export default class Helmet extends Item {
 	static readonly HELMET_REDUCTION: number[] = [];
 	type = "helmet";
+	hitbox = new CircleHitbox(1);
 	level: number;
 
 	static {
@@ -15,22 +15,22 @@ export default class Helmet extends Item {
 		this.HELMET_REDUCTION.push(...data);
 	}
 	constructor(level: number) {
-		super(new CircleHitbox(1));
+		super();
 		this.level = level;
 	}
 
 	picked(player: Player) {
 		if (player.inventory.helmetLevel >= this.level) {
-			this.randomVelocity(Vector.add(this.body.position, Vector.neg(player.body.position)));
+			this.randomVelocity(this.position.addVec(player.position.inverse()));
 			return false;
 		}
 		if (player.inventory.helmetLevel != 0) {
 			const helmet = new Helmet(player.inventory.helmetLevel);
-			helmet.body.position = Vector.clone(player.body.position);
-			world.spawn(helmet);
+			helmet.position = player.position;
+			world.entities.push(helmet);
 		}
 		player.inventory.helmetLevel = this.level;
-		world.onceSounds.push({ path: "items/helmet_wear.mp3", position: this.body.position })
+		world.onceSounds.push({ "path": "items/helmet_wear.mp3", "position": this.position })
 		return true;
 	}
 

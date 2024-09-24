@@ -20,6 +20,7 @@ export default class Wall extends Obstacle {
 
 	constructor(hitbox: RectHitbox, health: number, vulnerable: boolean, color: number) {
 		super(world, hitbox, hitbox, health, health);
+		this.direction = Vec2.UNIT_X;
 		this.vulnerable = vulnerable;
 		this.color = color;
 	}

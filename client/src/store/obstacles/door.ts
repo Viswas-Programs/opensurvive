@@ -1,13 +1,13 @@
 import { OBSTACLE_SUPPLIERS } from ".";
 import { RenderableLayerN1 } from "../../types/extenstions";
 import { RectHitbox } from "../../types/math";
-import { MinThing } from "../../types/minimized";
+import { MinObstacle } from "../../types/minimized";
 import { Obstacle } from "../../types/obstacle";
 import { ObstacleSupplier } from "../../types/supplier";
 import { Player } from "../entities";
 
 class DoorSupplier implements ObstacleSupplier {
-	create(minObstacle: MinThing) {
+	create(minObstacle: MinObstacle) {
 		return new Door(minObstacle);
 	}
 }

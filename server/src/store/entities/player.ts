@@ -1,4 +1,3 @@
-import { Vector } from "matter-js";
 import { world } from "../..";
 import { GLOBAL_UNIT_MULTIPLIER, TICKS_PER_SECOND } from "../../constants";
 import { Entity, Inventory } from "../../types/entity";
@@ -18,6 +17,7 @@ export default class Player extends Entity {
 	type = "player";
 	currentHealItem: string | null;
 	interactMessage: string | null;
+	hitbox = new CircleHitbox(1);
 	id: string;
 	username: string;
 	collisionLayers = [0];
@@ -33,7 +33,7 @@ export default class Player extends Entity {
 	inventory: Inventory;
 	// Last held weapon. Used for tracking weapon change
 	lastHolding = "fists";
-	normalVelocity = new Vector();
+	normalVelocity = Vec2.ZERO;
 
 	// Track reloading ticks
 	reloadTicks = 0;
@@ -56,7 +56,7 @@ export default class Player extends Entity {
 	currencyChanged = false;
 
 	constructor(id: string, username: string, skin: string | null, deathImg: string | null, accessToken?: string, isMobile?: boolean) {
-		super(new CircleHitbox(1));
+		super();
 		this.id = id;
 		this.interactMessage = null;
 		this.username = username;
@@ -69,14 +69,14 @@ export default class Player extends Entity {
 		this.isMobile = isMobile!;
 	}
 
-	setVelocity(velocity?: Vector) {
+	setVelocity(velocity?: Vec2) {
 		if (!velocity) velocity = this.normalVelocity;
 		else this.normalVelocity = velocity;
 		// Also scale the velocity to boost by soda and pills, and weight by gun
 		const weapon = this.inventory.getWeapon()!;
-		velocity = Vector.mult(velocity, (this.attackLock > 0 ? weapon.attackSpeed : weapon.moveSpeed) + (this.boost >= 50 ? 1.85 : 0));
-		if (this.healTicks) velocity = Vector.mult(velocity, 0.5);
-		velocity = Vector.mult(velocity, GLOBAL_UNIT_MULTIPLIER / TICKS_PER_SECOND);
+		velocity = velocity.scaleAll((this.attackLock > 0 ? weapon.attackSpeed : weapon.moveSpeed) + (this.boost >= 50 ? 1.85 : 0));
+		if (this.healTicks) velocity = velocity.scaleAll(0.5);
+		velocity = velocity.scaleAll(GLOBAL_UNIT_MULTIPLIER / TICKS_PER_SECOND);
 		super.setVelocity(velocity);
 	}
 
@@ -118,12 +118,12 @@ export default class Player extends Entity {
 		}
 		super.tick(entities, obstacles);
 		// Terrain particle
-		const terrain = world.terrainAtPos(this.body.position);
+		const terrain = world.terrainAtPos(this.position);
 		if ([Pond.ID, River.ID, Sea.ID].includes(terrain.id)) {
 			if (this.rippleTicks <= 0) {
-				world.particles.push(new Particle("ripple", this.body.position, 0.5));
+				world.particles.push(new Particle("ripple", this.position, 0.5));
 				this.rippleTicks = 45;
-			} else if (Vector.magnitudeSquared(this.velocity) != 0) this.rippleTicks--;
+			} else if (this.velocity.magnitudeSqr() != 0) this.rippleTicks--;
 		}
 		// Check for entity hitbox intersection
 		let breaked = false;
@@ -175,7 +175,7 @@ export default class Player extends Entity {
 				setTimeout(() => { rooflessDel.add(building.id);  this.scope = this._scope }, 45 ) }
 		}
 		// Collision handling
-		/*for (const obstacle of obstacles) {
+		for (const obstacle of obstacles) {
 			const collisionType = obstacle.collided(this);
 			if (collisionType) {
 				obstacle.onCollision(this);
@@ -193,7 +193,7 @@ export default class Player extends Entity {
 				if (rooflessAdd.has(roof.buildingId)) roof.addRoofless(this.id)
 				if (rooflessDel.has(roof.buildingId) || rooflessAdd.size == 0 ) roof.delRoofless(this.id)
 			}
-		}*/
+		}
 
 		// Reloading check
 		if (this.reloadTicks) {

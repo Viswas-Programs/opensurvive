@@ -1,7 +1,7 @@
 import { ENTITY_SUPPLIERS } from ".";
 import { GunColor } from "../../constants";
 import { Entity } from "../../types/entity";
-import { MinThing } from "../../types/minimized";
+import { MinEntity } from "../../types/minimized";
 import { EntitySupplier } from "../../types/supplier";
 import { circleFromCenter } from "../../utils";
 import Player from "./player";
@@ -12,7 +12,7 @@ interface AdditionalEntity {
 }
 
 class AmmoSupplier implements EntitySupplier {
-	create(minEntity: MinThing & AdditionalEntity) {
+	create(minEntity: MinEntity & AdditionalEntity) {
 		return new Ammo(minEntity);
 	}
 }
@@ -25,7 +25,7 @@ export default class Ammo extends Entity {
 	color!: GunColor;
 	zIndex = 8;
 
-	constructor(minEntity: MinThing & AdditionalEntity) {
+	constructor(minEntity: MinEntity & AdditionalEntity) {
 		super(minEntity);
 		this.copy(minEntity);
 	}
@@ -35,7 +35,7 @@ export default class Ammo extends Entity {
 		fetch("data/colors/ammos.json").then(res => res.json()).then(x => this.colorScheme = x);
 	}
 
-	copy(minEntity: MinThing & AdditionalEntity) {
+	copy(minEntity: MinEntity & AdditionalEntity) {
 		super.copy(minEntity);
 		this.amount = minEntity.amount;
 		this.color = minEntity.color;

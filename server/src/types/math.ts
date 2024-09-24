@@ -1,19 +1,18 @@
-import { Vector } from "matter-js";
-import { MinCircleHitbox, MinHitbox, MinLine, MinRectHitbox, MinVector } from "./minimized";
+import { MinCircleHitbox, MinHitbox, MinLine, MinRectHitbox, MinVec2 } from "./minimized";
 import { CollisionType } from "./misc";
 
 // Linear algebra paid off! (2D vector)
-/*export class Vector {
-	static readonly ZERO = new Vector(0, 0);
-	static readonly UNIT_X = new Vector(1, 0);
-	static readonly UNIT_Y = new Vector(0, 1);
+export class Vec2 {
+	static readonly ZERO = new Vec2(0, 0);
+	static readonly UNIT_X = new Vec2(1, 0);
+	static readonly UNIT_Y = new Vec2(0, 1);
 
-	static fromMinVector(minVector: MinVector) {
-		return new Vector(minVector.x, minVector.y);
+	static fromMinVec2(minVec2: MinVec2) {
+		return new Vec2(minVec2.x, minVec2.y);
 	}
 
 	static fromArray(array: number[]) {
-		return new Vector(array[0], array[1]);
+		return new Vec2(array[0], array[1]);
 	}
 
 	readonly x: number;
@@ -33,20 +32,20 @@ import { CollisionType } from "./misc";
 	}
 
 	inverse() {
-		return new Vector(-this.x, -this.y);
+		return new Vec2(-this.x, -this.y);
 	}
 
 	unit() {
 		const mag = this.magnitude();
-		if (mag === 0) return Vector.ZERO;
-		return new Vector(this.x / mag, this.y / mag);
+		if (mag === 0) return Vec2.ZERO;
+		return new Vec2(this.x / mag, this.y / mag);
 	}
 
-	dot(vec: Vector) {
+	dot(vec: Vec2) {
 		return this.x * vec.x + this.y * vec.y;
 	}
 
-	angleBetween(vec: Vector) {
+	angleBetween(vec: Vec2) {
 		return vec.angle() - this.angle();
 	}
 
@@ -59,81 +58,81 @@ import { CollisionType } from "./misc";
 
 	addAngle(radian: number) {
 		const angle = this.angle();
-		if (isNaN(angle)) return new Vector(this.x, this.y);
+		if (isNaN(angle)) return new Vec2(this.x, this.y);
 		const newAngle = angle + radian;
 		const mag = this.magnitude();
-		return new Vector(mag * Math.cos(newAngle), mag * Math.sin(newAngle));
+		return new Vec2(mag * Math.cos(newAngle), mag * Math.sin(newAngle));
 	}
 
-	addVec(vec: Vector) {
-		return new Vector(this.x + vec.x, this.y + vec.y);
+	addVec(vec: Vec2) {
+		return new Vec2(this.x + vec.x, this.y + vec.y);
 	}
 
 	addX(x: number) {
-		return new Vector(this.x + x, this.y);
+		return new Vec2(this.x + x, this.y);
 	}
 
 	addY(y: number) {
-		return new Vector(this.x, this.y + y);
+		return new Vec2(this.x, this.y + y);
 	}
 
 	scale(x: number, y: number) {
-		return new Vector(this.x * x, this.y * y);
+		return new Vec2(this.x * x, this.y * y);
 	}
 
 	scaleAll(ratio: number) {
 		return this.scale(ratio, ratio);
 	}
 
-	projectTo(vec: Vector) {
+	projectTo(vec: Vec2) {
 		return vec.scaleAll(this.dot(vec) / vec.magnitudeSqr());
 	}
 
-	distanceSqrTo(vec: Vector) {
+	distanceSqrTo(vec: Vec2) {
 		return this.addVec(vec.inverse()).magnitudeSqr();
 	}
 
-	distanceTo(vec: Vector) {
+	distanceTo(vec: Vec2) {
 		return Math.sqrt(this.distanceSqrTo(vec));
 	}
 
 	perpendicular() {
-		return new Vector(this.y, -this.x);
+		return new Vec2(this.y, -this.x);
 	}
 
-	equals(vec: Vector) {
+	equals(vec: Vec2) {
 		return this.x === vec.x && this.y === vec.y;
 	}
 
 	minimize() {
-		return <MinVector>{ x: this.x, y: this.y };
+		return <MinVec2>{ x: this.x, y: this.y };
 	}
-}*/
+}
 
 export class Line {
 	static fromMinLine(minLine: MinLine) {
-		return new Line(Vector.fromMinVector(minLine.a), Vector.fromMinVector(minLine.b), minLine.segment);
+		return new Line(Vec2.fromMinVec2(minLine.a), Vec2.fromMinVec2(minLine.b), minLine.segment);
 	}
 
-	static fromPointSlope(p: Vector, m: number) {
+	static fromPointSlope(p: Vec2, m: number) {
 		const c = p.y - p.x * m;
-		const b = new Vector(p.x + 1, (p.x + 1) * m + c);
+		const b = new Vec2(p.x + 1, (p.x + 1) * m + c);
 		return new Line(p, b, false);
 	}
 
 	static fromArrays(arr: number[][]) {
-		return new Line(Vector.fromArray(arr[0]), Vector.fromArray(arr[1]));
+		return new Line(Vec2.fromArray(arr[0]), Vec2.fromArray(arr[1]));
 	}
 
-	static fromPointVec(p: Vector, vec: Vector) {
+	static fromPointVec(p: Vec2, vec: Vec2) {
 		return new Line(p, p.addVec(vec));
 	}
 
-	readonly a: Vector;
-	readonly b: Vector;
+	readonly a: Vec2;
+	readonly b: Vec2;
 	segment: boolean;
 
-	constructor(a: Vector, b: Vector, segment?: boolean) {
+	constructor(a: Vec2, b: Vec2, segment?: boolean) {
 		// Making sure b is always right of a
 		if (a.x < b.x) {
 			this.a = a;
@@ -146,11 +145,11 @@ export class Line {
 		else this.segment = segment;
 	}
 
-	direction(point: Vector) {
+	direction(point: Vec2) {
 		return (this.b.y - this.a.y) * (point.x - this.b.x) - (this.b.x - this.a.x) * (point.y - this.b.y);
 	}
 
-	distanceSqrTo(point: Vector) {
+	distanceSqrTo(point: Vec2) {
 		const ab = this.toVec();
 		const ae = point.addVec(this.a.inverse());
 		if (this.segment) {
@@ -169,7 +168,7 @@ export class Line {
 		} else return ae.projectTo(ab.perpendicular()).magnitudeSqr();
 	}
 
-	distanceTo(point: Vector) {
+	distanceTo(point: Vec2) {
 		return Math.sqrt(this.distanceSqrTo(point));
 	}
 
@@ -177,14 +176,14 @@ export class Line {
 		return !!this.intersection(line);
 	}
 
-	on(p: Vector) {
+	on(p: Vec2) {
 		if (p.x <= Math.max(this.a.x, this.b.x) && p.x <= Math.min(this.a.x, this.b.x) &&
 			(p.y <= Math.max(this.a.y, this.b.y) && p.y <= Math.min(this.a.y, this.b.y)))
 			return true;
 		return false;
 	}
 
-	passthrough(point: Vector) {
+	passthrough(point: Vec2) {
 		const m = this.slope();
 		// This is a vertical line
 		if (m === undefined) {
@@ -199,7 +198,7 @@ export class Line {
 		return true;
 	}
 
-	leftTo(point: Vector) {
+	leftTo(point: Vec2) {
 		const m = this.slope();
 		if (m === undefined)
 			return point.x < this.a.x;
@@ -210,7 +209,7 @@ export class Line {
 		return point.x < (point.y - c) / m;
 	}
 
-	rightTo(point: Vector) {
+	rightTo(point: Vec2) {
 		const m = this.slope();
 		if (m === undefined)
 			return point.x > this.a.x;
@@ -248,10 +247,10 @@ export class Line {
 	intersection(line: Line) {
 		if (this.a.equals(line.a) && this.b.equals(line.b)) return undefined;
 		if (this.yIntercept() === undefined && line.yIntercept() === undefined) return undefined;
-		else if (this.yIntercept() === undefined) return new Vector(this.a.x, line.slope()! * this.a.x + line.yIntercept()!);
-		else if (line.yIntercept() === undefined) return new Vector(line.a.x, this.slope()! * line.a.x + this.yIntercept()!);
+		else if (this.yIntercept() === undefined) return new Vec2(this.a.x, line.slope()! * this.a.x + line.yIntercept()!);
+		else if (line.yIntercept() === undefined) return new Vec2(line.a.x, this.slope()! * line.a.x + this.yIntercept()!);
 		const x = (line.yIntercept()! - this.yIntercept()!) / (this.slope()! - line.slope()!);
-		const point = new Vector(x, this.slope()! * x + this.yIntercept()!);
+		const point = new Vec2(x, this.slope()! * x + this.yIntercept()!);
 		if (this.segment && !this.passthrough(point) || line.segment && !line.passthrough(point)) return undefined;
 		return point;
 	}
@@ -261,15 +260,9 @@ export class Line {
 	}
 }
 
-// still needed for client rendering
 export abstract class Hitbox {
 	type: "rect" | "circle";
 	comparable: number;
-
-	static clone(hitbox: Hitbox) {
-		if (hitbox.type == "rect") return new RectHitbox((<RectHitbox>hitbox).width, (<RectHitbox>hitbox).height);
-		else return new CircleHitbox(hitbox.comparable);
-	}
 
 	static fromMinHitbox(minHitbox: MinHitbox) {
 		if (minHitbox.type === "rect") return RectHitbox.fromMinRectHitbox(<MinRectHitbox>minHitbox);
@@ -287,11 +280,11 @@ export abstract class Hitbox {
 	}
 
 	abstract scaleAll(ratio: number): Hitbox;
-	abstract lineIntersects(line: Line, position: Vector, direction: Vector): boolean;
-	abstract inside(point: Vector, position: Vector, direction: Vector): boolean;
+	abstract lineIntersects(line: Line, position: Vec2, direction: Vec2): boolean;
+	abstract inside(point: Vec2, position: Vec2, direction: Vec2): boolean;
 
-	abstract collideRect(position: Vector, direction: number, hitbox: RectHitbox, position1: Vector, direction1: Vector): CollisionType;
-	abstract collideCircle(position: Vector, direction: number, hitbox: CircleHitbox, position1: Vector, direction1: Vector): CollisionType;
+	abstract collideRect(position: Vec2, direction: Vec2, hitbox: RectHitbox, position1: Vec2, direction1: Vec2): CollisionType;
+	abstract collideCircle(position: Vec2, direction: Vec2, hitbox: CircleHitbox, position1: Vec2, direction1: Vec2): CollisionType;
 
 	abstract minimize(): MinHitbox;
 }
@@ -323,8 +316,8 @@ export class RectHitbox extends Hitbox {
 
 	// Don't ask me how this work
 	// https://www.tutorialspoint.com/Check-if-two-line-segments-intersect
-	lineIntersects(line: Line, position: Vector, direction: Vector) {
-		const startingPoint = position.addVec(new Vector(-this.width / 2, -this.height / 2));
+	lineIntersects(line: Line, position: Vec2, direction: Vec2) {
+		const startingPoint = position.addVec(new Vec2(-this.width / 2, -this.height / 2));
 		const points = [
 			startingPoint,
 			startingPoint.addX(this.width),
@@ -339,8 +332,8 @@ export class RectHitbox extends Hitbox {
 		return false;
 	}
 
-	inside(point: Vector, position: Vector, direction: Vector) {
-		const startingPoint = Vector.add(position, Vector.create(-this.width / 2, -this.height / 2));
+	inside(point: Vec2, position: Vec2, direction: Vec2) {
+		const startingPoint = position.addVec(new Vec2(-this.width / 2, -this.height / 2));
 		const points = [
 			startingPoint,
 			startingPoint.addX(this.width),
@@ -351,34 +344,34 @@ export class RectHitbox extends Hitbox {
 		return new Polygon(points).inside(point);
 	}
 
-	collideRect(position: Vector, direction: Vector, hitbox: RectHitbox, position1: Vector, direction1: Vector) {
+	collideRect(position: Vec2, direction: Vec2, hitbox: RectHitbox, position1: Vec2, direction1: Vec2) {
 		// https://math.stackexchange.com/questions/1278665/how-to-check-if-two-rectangles-intersect-rectangles-can-be-rotated
 		// Using the last answer
-		const thisStartingPoint = position.addVec(new Vector(-this.width / 2, -this.height / 2).addAngle(direction.angle()));
-		const thingStartingPoint = position1.addVec(new Vector(-hitbox.width / 2, -hitbox.height / 2).addAngle(direction1.angle()));
+		const thisStartingPoint = position.addVec(new Vec2(-this.width / 2, -this.height / 2).addAngle(direction.angle()));
+		const thingStartingPoint = position1.addVec(new Vec2(-hitbox.width / 2, -hitbox.height / 2).addAngle(direction1.angle()));
 		const thisPoints = [
 			thisStartingPoint,
-			thisStartingPoint.addVec(new Vector(this.width, 0).addAngle(direction.angle())),
-			thisStartingPoint.addVec(new Vector(0, this.height).addAngle(direction.angle())),
-			thisStartingPoint.addVec(new Vector(this.width, this.height).addAngle(direction.angle()))
+			thisStartingPoint.addVec(new Vec2(this.width, 0).addAngle(direction.angle())),
+			thisStartingPoint.addVec(new Vec2(0, this.height).addAngle(direction.angle())),
+			thisStartingPoint.addVec(new Vec2(this.width, this.height).addAngle(direction.angle()))
 		];
 		const thingPoints = [
 			thingStartingPoint,
-			thingStartingPoint.addVec(new Vector(hitbox.width, 0).addAngle(direction1.angle())),
-			thingStartingPoint.addVec(new Vector(0, hitbox.height).addAngle(direction1.angle())),
-			thingStartingPoint.addVec(new Vector(hitbox.width, hitbox.height).addAngle(direction1.angle()))
+			thingStartingPoint.addVec(new Vec2(hitbox.width, 0).addAngle(direction1.angle())),
+			thingStartingPoint.addVec(new Vec2(0, hitbox.height).addAngle(direction1.angle())),
+			thingStartingPoint.addVec(new Vec2(hitbox.width, hitbox.height).addAngle(direction1.angle()))
 		];
 		var results: boolean[] = Array(4);
 		var ii: number;
 
 		const thisVecs = [
-			new Vector(this.width, 0).addAngle(direction.angle()),
-			new Vector(0, this.height).addAngle(direction.angle())
+			new Vec2(this.width, 0).addAngle(direction.angle()),
+			new Vec2(0, this.height).addAngle(direction.angle())
 		];
 
 		const thingVecs = [
-			new Vector(hitbox.width, 0).addAngle(direction1.angle()),
-			new Vector(0, hitbox.height).addAngle(direction1.angle())
+			new Vec2(hitbox.width, 0).addAngle(direction1.angle()),
+			new Vec2(0, hitbox.height).addAngle(direction1.angle())
 		];
 
 		for (const mainVec of thisVecs) {
@@ -398,14 +391,14 @@ export class RectHitbox extends Hitbox {
 		return CollisionType.RECT_RECT;
 	}
 
-	collideCircle(position: Vector, direction: Vector, hitbox: CircleHitbox, position1: Vector, _direction1: Vector) {
-		const rectStartingPoint = position.addVec(new Vector(-this.width / 2, -this.height / 2).addAngle(direction.angle()));
+	collideCircle(position: Vec2, direction: Vec2, hitbox: CircleHitbox, position1: Vec2, _direction1: Vec2) {
+		const rectStartingPoint = position.addVec(new Vec2(-this.width / 2, -this.height / 2).addAngle(direction.angle()));
 
 		const rectPoints = [
 			rectStartingPoint,
-			rectStartingPoint.addVec(new Vector(this.width, 0).addAngle(direction.angle())),
-			rectStartingPoint.addVec(new Vector(this.width, this.height).addAngle(direction.angle())),
-			rectStartingPoint.addVec(new Vector(0, this.height).addAngle(direction.angle()))
+			rectStartingPoint.addVec(new Vec2(this.width, 0).addAngle(direction.angle())),
+			rectStartingPoint.addVec(new Vec2(this.width, this.height).addAngle(direction.angle())),
+			rectStartingPoint.addVec(new Vec2(0, this.height).addAngle(direction.angle()))
 		];
 
 		if (this.pointInRect(rectPoints[0], rectPoints[1], rectPoints[2], rectPoints[3], position1)) return CollisionType.CIRCLE_RECT_CENTER_INSIDE;
@@ -425,11 +418,11 @@ export class RectHitbox extends Hitbox {
 		return <MinRectHitbox>{ type: this.type, width: this.width, height: this.height };
 	}
 
-	private isLeft(a: Vector, b: Vector, c: Vector) {
+	private isLeft(a: Vec2, b: Vec2, c: Vec2) {
 		return ((b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y));
 	}
 
-	private pointInRect(a: Vector, b: Vector, c: Vector, d: Vector, p: Vector) {
+	private pointInRect(a: Vec2, b: Vec2, c: Vec2, d: Vec2, p: Vec2) {
 		return (this.isLeft(a, b, p) > 0 && this.isLeft(b, c, p) > 0 && this.isLeft(c, d, p) > 0 && this.isLeft(d, a, p) > 0);
 	}
 }
@@ -453,19 +446,19 @@ export class CircleHitbox extends Hitbox {
 		return new CircleHitbox(this.radius * ratio);
 	}
 
-	lineIntersects(line: Line, center: Vector) {
+	lineIntersects(line: Line, center: Vec2) {
 		return line.distanceSqrTo(center) < Math.pow(this.radius, 2);
 	}
 
-	inside(point: Vector, position: Vector, direction: Vector) {
+	inside(point: Vec2, position: Vec2, direction: Vec2) {
 		return position.addVec(point.inverse()).magnitudeSqr() < this.radius * this.radius;
 	}
 
-	collideRect(position: Vector, direction: Vector, hitbox: RectHitbox, position1: Vector, direction1: Vector) {
+	collideRect(position: Vec2, direction: Vec2, hitbox: RectHitbox, position1: Vec2, direction1: Vec2) {
 		return hitbox.collideCircle(position1, direction1, this, position, direction);
 	}
 
-	collideCircle(position: Vector, _direction: Vector, hitbox: CircleHitbox, position1: Vector, _direction1: Vector) {
+	collideCircle(position: Vec2, _direction: Vec2, hitbox: CircleHitbox, position1: Vec2, _direction1: Vec2) {
 		return position.distanceTo(position1) > this.comparable + hitbox.comparable ? CollisionType.NONE : CollisionType.CIRCLE_CIRCLE;
 	}
 
@@ -485,16 +478,16 @@ export enum CommonNumbers {
 }
 
 export class Polygon {
-	points: Vector[];
+	points: Vec2[];
 
-	constructor(points: Vector[], position = Vector.ZERO) {
+	constructor(points: Vec2[], position = Vec2.ZERO) {
 		if (points.length < 3) throw new Error("Polygon must have at least 3 points");
 		this.points = points.map(p => p.addVec(position));
 	}
 
-	inside(p: Vector) {
+	inside(p: Vec2) {
 		const n = this.points.length;
-		const exline = new Line(p, new Vector(9999, p.y)); // Create a point at infinity, y is same as point p
+		const exline = new Line(p, new Vec2(9999, p.y)); // Create a point at infinity, y is same as point p
 		var count = 0;
 		var i = 0;
 		do {

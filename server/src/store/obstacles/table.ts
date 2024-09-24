@@ -26,7 +26,7 @@ export default class Table extends Obstacle {
 	constructor() {
 		var hitbox = new RectHitbox(5, 2);
 		var health = 120;
-		super(world, hitbox, hitbox.scaleAll(0.75), health, health);
+		super(world, hitbox, hitbox.scaleAll(0.75), health, health, Vec2.UNIT_X);
 	}
 
 	static {
@@ -36,12 +36,12 @@ export default class Table extends Obstacle {
 
 	damage(dmg: number) {
 		super.damage(dmg);
-		world.onceSounds.push({ path: `obstacles/crate_hit.mp3`, position: this.body.position });
+		world.onceSounds.push({ path: `obstacles/crate_hit.mp3`, position: this.position });
 	}
 
 	die() {
 		super.die();
-		world.onceSounds.push({ path: "obstacles/wood_break.mp3", position: this.body.position });
+		world.onceSounds.push({ path: "obstacles/wood_break.mp3", position: this.position });
 	}
 
 	minimize() {

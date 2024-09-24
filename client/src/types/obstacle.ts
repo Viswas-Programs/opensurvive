@@ -1,6 +1,6 @@
 import { Player } from "../store/entities";
 import { CircleHitbox, Hitbox, RectHitbox, Vec2 } from "./math";
-import { MinCircleHitbox, MinThing, MinRectHitbox } from "./minimized";
+import { MinCircleHitbox, MinObstacle, MinRectHitbox } from "./minimized";
 import { Renderable, RenderableMap } from "./extenstions";
 import { DEFINED_ANIMATIONS } from "../store/animations";
 import { Animation } from "./animation";
@@ -16,11 +16,11 @@ export abstract class Obstacle implements Renderable, RenderableMap {
 	animations: Animation[] = [];
 	zIndex = 0;
 
-	constructor(minObstacle: MinThing) {
+	constructor(minObstacle: MinObstacle) {
 		this.copy(minObstacle);
 	}
 
-	copy(minObstacle: MinThing) {
+	copy(minObstacle: MinObstacle) {
 		this.id = minObstacle.id;
 		this.type = minObstacle.type;
 		this.position = new Vec2(minObstacle.position.x, minObstacle.position.y);

@@ -1,13 +1,13 @@
 import { Player } from "../entities";
 import { Obstacle } from "../../types/obstacle";
-import { MinThing } from "../../types/minimized";
+import { MinObstacle } from "../../types/minimized";
 import { circleFromCenter } from "../../utils";
 import { ObstacleSupplier } from "../../types/supplier";
 import { OBSTACLE_SUPPLIERS } from ".";
 import { getMode } from "../../homepage";
 
 class ToiletMoreSupplier implements ObstacleSupplier {
-	create(minObstacle: MinThing) {
+	create(minObstacle: MinObstacle) {
 		return new ToiletMore(minObstacle);
 	}
 }

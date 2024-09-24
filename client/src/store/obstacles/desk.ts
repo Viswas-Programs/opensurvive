@@ -1,13 +1,13 @@
 import { OBSTACLE_SUPPLIERS } from ".";
 import { getMode } from "../../homepage";
 import { RectHitbox } from "../../types/math";
-import { MinThing } from "../../types/minimized";
+import { MinObstacle } from "../../types/minimized";
 import { Obstacle } from "../../types/obstacle";
 import { ObstacleSupplier } from "../../types/supplier";
 import { Player } from "../entities";
 
 class DeskSupplier implements ObstacleSupplier {
-	create(minObstacle: MinThing) {
+	create(minObstacle: MinObstacle) {
 		return new Desk(minObstacle);
 	}
 }
@@ -27,7 +27,7 @@ export default class Desk extends Obstacle {
 		this.deskResidueImg.src = "assets/" + getMode() + "/images/game/objects/residues/desk.svg";
 	}
 
-	copy(minObstacle: MinThing) {
+	copy(minObstacle: MinObstacle) {
 		super.copy(minObstacle);
 	}
 

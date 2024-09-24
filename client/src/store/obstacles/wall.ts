@@ -1,7 +1,7 @@
 import { OBSTACLE_SUPPLIERS } from ".";
 import { RenderableLayerN1 } from "../../types/extenstions";
 import { RectHitbox } from "../../types/math";
-import { MinThing } from "../../types/minimized";
+import { MinObstacle } from "../../types/minimized";
 import { Obstacle } from "../../types/obstacle";
 import { ObstacleSupplier } from "../../types/supplier";
 import { numToRGBA } from "../../utils";
@@ -12,7 +12,7 @@ interface AdditionalObstacle {
 }
 
 class WallSupplier implements ObstacleSupplier {
-	create(minObstacle: MinThing & AdditionalObstacle) {
+	create(minObstacle: MinObstacle & AdditionalObstacle) {
 		return new Wall(minObstacle);
 	}
 }
@@ -27,7 +27,7 @@ export default class Wall extends Obstacle implements RenderableLayerN1 {
 		OBSTACLE_SUPPLIERS.set(Wall.TYPE, new WallSupplier());
 	}
 
-	copy(minObstacle: MinThing & AdditionalObstacle) {
+	copy(minObstacle: MinObstacle & AdditionalObstacle) {
 		super.copy(minObstacle);
 		this.color = minObstacle.color;
 	}

@@ -1,5 +1,5 @@
 import { Entity } from "./entity";
-import { MinThing, MinThing, MinParticle, MinTerrain } from "./minimized";
+import { MinEntity, MinObstacle, MinParticle, MinTerrain } from "./minimized";
 import { Obstacle } from "./obstacle";
 import { Particle } from "./particle";
 import { Terrain } from "./terrain";
@@ -10,11 +10,11 @@ interface Supplier<T> {
 }
 
 export interface EntitySupplier extends Supplier<Entity> {
-	create(minEntity: MinThing  & { [key: string]: any }): Entity;
+	create(minEntity: MinEntity  & { [key: string]: any }): Entity;
 }
 
 export interface ObstacleSupplier extends Supplier<Obstacle> {
-	create(minObstacle: MinThing  & { [key: string]: any }): Obstacle;
+	create(minObstacle: MinObstacle  & { [key: string]: any }): Obstacle;
 }
 
 export interface TerrainSupplier extends Supplier<Terrain> {

@@ -21,6 +21,7 @@ export default class Roof extends Obstacle {
 
 	constructor(hitbox: Hitbox, color: number, buildingId: string, texture?: TextureData) {
 		super(world, hitbox, hitbox, 1, 1);
+		this.direction = Vec2.UNIT_X;
 		this.color = color;
 		this.texture = texture;
 		this.buildingId = buildingId;
