@@ -14,6 +14,8 @@ export const PUSH_THRESHOLD = 1e-16;
 // Translate original surviv.io game units to suit this one
 export const GLOBAL_UNIT_MULTIPLIER = 1;
 export const PLAYER_THRESHOLD = 2;
+// Matter.js mappings to our game
+export const MATTER_SCALE = 10;
 
 export enum PlayerAnimationTypes { }
 export enum OutPacketTypes {

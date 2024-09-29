@@ -1,12 +1,12 @@
 import * as fs from "fs";
-import { Bodies, Composite, Engine } from "matter-js";
+import { Bodies, Body, Composite, Engine } from "matter-js";
 import Building from "./building";
 import { RedZoneDataEntry } from "./data";
 import { Entity } from "./entity";
-import { CircleHitbox, Vec2 } from "./math";
+import { CircleHitbox, RectHitbox, Vec2 } from "./math";
 import { Obstacle } from "./obstacle";
 import { Particle } from "./particle";
-import { CollisionLayers, EntityTypes, MAP_WALL_PADDING, PLAYER_THRESHOLD, TICKS_PER_SECOND } from "../constants";
+import { CollisionLayers, EntityTypes, MAP_WALL_PADDING, MATTER_SCALE, PLAYER_THRESHOLD, TICKS_PER_SECOND } from "../constants";
 import { Player } from "../store/entities";
 import { Terrain } from "./terrain";
 import { reset } from "..";
@@ -72,10 +72,10 @@ export class World {
 		// Create box
 		this.engines.forEach(engine => {
 			const box = [
-				Bodies.rectangle(this.size.x * 0.5, -MAP_WALL_PADDING, this.size.x + MAP_WALL_PADDING * 2, MAP_WALL_PADDING * 2, { isStatic: true }),
-				Bodies.rectangle(-MAP_WALL_PADDING, this.size.y * 0.5, MAP_WALL_PADDING * 2, this.size.y + MAP_WALL_PADDING * 2, { isStatic: true }),
-				Bodies.rectangle(this.size.x * 0.5, this.size.y + MAP_WALL_PADDING, this.size.x + MAP_WALL_PADDING * 2, MAP_WALL_PADDING * 2, { isStatic: true }),
-				Bodies.rectangle(this.size.x + MAP_WALL_PADDING, this.size.y * 0.5, MAP_WALL_PADDING * 2, this.size.y + MAP_WALL_PADDING * 2, { isStatic: true })
+				Bodies.rectangle((this.size.x * 0.5) * MATTER_SCALE, -MAP_WALL_PADDING * MATTER_SCALE, (this.size.x + MAP_WALL_PADDING * 2) * MATTER_SCALE, MAP_WALL_PADDING * 2 * MATTER_SCALE, { isStatic: true }),
+				Bodies.rectangle(-MAP_WALL_PADDING * MATTER_SCALE, this.size.y * 0.5 * MATTER_SCALE, MAP_WALL_PADDING * 2 * MATTER_SCALE, (this.size.y + MAP_WALL_PADDING * 2) * MATTER_SCALE, { isStatic: true }),
+				Bodies.rectangle(this.size.x * 0.5 * MATTER_SCALE, (this.size.y + MAP_WALL_PADDING) * MATTER_SCALE, (this.size.x + MAP_WALL_PADDING * 2) * MATTER_SCALE, MAP_WALL_PADDING * 2 * MATTER_SCALE, { isStatic: true }),
+				Bodies.rectangle((this.size.x + MAP_WALL_PADDING) * MATTER_SCALE, this.size.y * 0.5 * MATTER_SCALE, MAP_WALL_PADDING * 2 * MATTER_SCALE, (this.size.y + MAP_WALL_PADDING * 2) * MATTER_SCALE, { isStatic: true })
 			];
 			Composite.add(engine.world, box);
 		});
@@ -207,5 +207,28 @@ export class World {
 		this.discardObstacles = [];
 		this.dirtyEntities = [];
 		this.dirtyObstacles = [];
+	}
+
+	addBodiesFromThing(thing: Entity | Obstacle, collisionLayers: number) {
+		const factory = thing.hitbox.type == "rect" ?
+			() => Bodies.rectangle(thing.position.x * MATTER_SCALE, thing.position.y * MATTER_SCALE, (<RectHitbox>thing.hitbox).width * MATTER_SCALE, (<RectHitbox>thing.hitbox).height * MATTER_SCALE, { isStatic: thing instanceof Obstacle }) :
+			() => Bodies.circle(thing.position.x * MATTER_SCALE, thing.position.y * MATTER_SCALE, thing.hitbox.comparable * MATTER_SCALE, { isStatic: thing instanceof Obstacle });
+
+			const bodies: Body[] = [];
+			if (collisionLayers == CollisionLayers.EVERYTHING) this.engines.forEach(engine => {
+				const body = factory();
+				Composite.add(engine.world, body);
+				bodies.push(body);
+			});
+			else {
+				for (let ii = 0; ii < Object.keys(CollisionLayers).length / 2; ii++) {
+					if (collisionLayers & (1 << ii)) {
+						const body = factory();
+						Composite.add(this.engines[ii].world, body);
+						bodies.push(body);
+					}
+				}
+			}
+			return bodies;
 	}
 }
