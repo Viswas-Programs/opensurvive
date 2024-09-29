@@ -7,7 +7,7 @@ import { Vec2, Hitbox, CircleHitbox, RectHitbox, CommonAngles } from "./math";
 import { MinMinObstacle, MinObstacle } from "./minimized";
 import { CollisionType } from "./misc";
 import { World } from "./world";
-import { CollisionLayers } from "../constants";
+import { CollisionLayers, MATTER_SCALE } from "../constants";
 import { world } from "..";
 
 function checkForObsZONEOBSCollision(world: World, position: Vec2): boolean {
@@ -63,26 +63,13 @@ export class Obstacle {
 		this.createBodies();
 	}
 
-	createBody() {
+	/*createBody() {
 		if (this.hitbox.type == "rect") return Bodies.rectangle(this.position.x, this.position.y, (<RectHitbox>this.hitbox).width, (<RectHitbox>this.hitbox).height, { isStatic: true });
 		else return Bodies.circle(this.position.x, this.position.y, this.hitbox.comparable, { isStatic: true });
-	}
+	}*/
 
 	createBodies() {
-		if (this.collisionLayers == CollisionLayers.EVERYTHING) world.engines.forEach(engine => {
-			const body = this.createBody();
-			Composite.add(engine.world, body);
-			this.bodies.push(body);
-		});
-		else {
-			for (let ii = 0; ii < Object.keys(CollisionLayers).length / 2; ii++) {
-				if (this.collisionLayers & (1 << ii)) {
-					const body = this.createBody();
-					Composite.add(world.engines[ii].world, body);
-					this.bodies.push(body);
-				}
-			}
-		}
+		this.bodies = world.addBodiesFromThing(this, this.collisionLayers);
 	}
 
 	removeBodies() {
@@ -95,7 +82,7 @@ export class Obstacle {
 
 	setBodies() {
 		this.bodies.forEach(body => {
-			Body.setPosition(body, this.position.toMatterVector());
+			Body.setPosition(body, this.position.scaleAll(MATTER_SCALE).toMatterVector());
 			Body.setAngle(body, this.direction.angle());
 		});
 	}

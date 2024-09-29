@@ -7,7 +7,7 @@ import { WEAPON_SUPPLIERS } from "../store/weapons";
 import { MinEntity, MinInventory } from "./minimized";
 import { CollisionType, CountableString, GunColor } from "./misc";
 import { world } from "..";
-import { CollisionLayers, EntityTypes, PUSH_THRESHOLD } from "../constants";
+import { CollisionLayers, EntityTypes, MATTER_SCALE, PUSH_THRESHOLD } from "../constants";
 import { Player } from "../store/entities";
 import { IslandrBitStream } from "../packets";
 import { Bodies, Body, Composite, Vector } from "matter-js";
@@ -135,26 +135,13 @@ export class Entity {
 		this.createBodies();
 	}
 
-	createBody() {
+	/*createBody() {
 		if (this.hitbox.type == "rect") return Bodies.rectangle(this.position.x, this.position.y, (<RectHitbox>this.hitbox).width, (<RectHitbox>this.hitbox).height);
 		else return Bodies.circle(this.position.x, this.position.y, this.hitbox.comparable);
-	}
+	}*/
 
 	createBodies() {
-		if (this.collisionLayers == CollisionLayers.EVERYTHING) world.engines.forEach(engine => {
-			const body = this.createBody();
-			Composite.add(engine.world, body);
-			this.bodies.push(() => body);
-		});
-		else {
-			for (let ii = 0; ii < Object.keys(CollisionLayers).length / 2; ii++) {
-				if (this.collisionLayers & (1 << ii)) {
-					const body = this.createBody();
-					Composite.add(world.engines[ii].world, body);
-					this.bodies.push(() => body);
-				}
-			}
-		}
+		this.bodies = world.addBodiesFromThing(this, this.collisionLayers).map(body => (() => body));
 	}
 
 	removeBodies() {
@@ -167,7 +154,7 @@ export class Entity {
 
 	setBodies() {
 		this.bodies.forEach(body => {
-			Body.setPosition(body(), this.position.toMatterVector());
+			Body.setPosition(body(), this.position.scaleAll(MATTER_SCALE).toMatterVector());
 			Body.setAngle(body(), this.direction.angle());
 		});
 	}
@@ -199,9 +186,9 @@ export class Entity {
 			const averagePosition = totalPosition.scaleAll(1 / this.bodies.length);
 			this.bodies.forEach(body => {
 				Body.setPosition(body(), averagePosition.toMatterVector());
-				Body.setVelocity(body(), this.actualVelocity.toMatterVector());
+				Body.setVelocity(body(), this.actualVelocity.scaleAll(MATTER_SCALE).toMatterVector());
 			});
-			this.position = averagePosition;
+			this.position = averagePosition.scaleAll(1 / MATTER_SCALE);
 		}
 		//if (this.type == EntityTypes.PLAYER) console.log("player pos:", this.position.x, this.position.y);
 		if (this.position != lastPosition) this.markDirty();

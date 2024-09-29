@@ -41,9 +41,21 @@ let deathImg: string | null = localStorage.getItem("playerDeathImg");
 const isMobile = /Android/.test(navigator.userAgent) || /iPhone/.test(navigator.userAgent) || /iPad/.test(navigator.userAgent) || /Tablet/.test(navigator.userAgent)
 let player: FullPlayer | null;
 
-export function getId() { return id; }
-export function getPlayer() { return player; }
-export function getTPS() { return tps; }
+/**
+ * Getter of player ID
+ * @returns Player ID
+ */
+export function getId(): string | null { return id; }
+/**
+ * Getter of the client player object
+ * @returns Client Player object
+ */
+export function getPlayer(): FullPlayer | null { return player; }
+/**
+ * Getter of server TPS
+ * @returns Server TPS
+ */
+export function getTPS(): number { return tps; }
 
 let ws: WebSocket;
 let connected = false;
@@ -61,6 +73,11 @@ const aimHandle = document.getElementsByClassName('aimjoystick-handle')[0];
 let _selectedScope = 1;
 let data: any;
 declare type modeMapColourType = keyof typeof modeMapColours
+
+/**
+ * Initializes connection with a given address from the <input> tag
+ * @param address Websocket address from the <input> tag
+ */
 async function init(address: string) {
 	// Initialize the websocket
 	const protocol = "ws";
@@ -131,6 +148,8 @@ async function init(address: string) {
 				}
 			}
 			showMobileExclusiveBtns();
+	
+			// Ping server every second to ensure connection
 			const interval = setInterval(() => {
 				if (connected) send(ws, new PingPacket());
 				else clearInterval(interval);
@@ -148,7 +167,7 @@ async function init(address: string) {
 						world.obstacles = <Obstacle[]>mapPkt.obstacles.map(obs => castObstacle(castMinObstacle(obs))).filter(obs => !!obs);
 						world.buildings = mapPkt.buildings.map(bui => new Building(bui));
 						initMap();
-						//Show player count once game starts
+						// Show player count once game starts
 						(document.querySelector("#playercountcontainer") as HTMLInputElement).style.display = "block";
 						break;
 					}
@@ -298,6 +317,7 @@ document.getElementById("connect")?.addEventListener("click", async () => {
 	username = (<HTMLInputElement>document.getElementById("username")).value;
 	address = (<HTMLInputElement>document.getElementById("address")).value;
 	try {
+		// check if username and address are valid before initializing
 		check(username, address);
 		await init(address);
 		errorText.style.display = "none";
@@ -457,6 +477,12 @@ function showMobControls() {
 		}
 	}, 100);
 }}
+
+/**
+ * Validates username and address
+ * @param username <input> username
+ * @param address <input> address
+ */
 function check(username: string, address: string): Error | void {
 	if (!username)
 		throw new Error("Please provide a username.");
@@ -468,6 +494,7 @@ function check(username: string, address: string): Error | void {
 }
 
 document.getElementById("disconnect")?.addEventListener("click", () => {
+	// when disconnect is clicked, close the socket and return to home screen
 	ws.close();
 	document.getElementById("settings")?.classList.add("hidden");
 	(<HTMLElement>joystick).style.display = 'none';
