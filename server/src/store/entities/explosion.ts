@@ -16,7 +16,7 @@ export default class Explosion extends Entity {
 	damaged = new Set<string>();
 
 	constructor(exploder: Entity | Obstacle, dmg: number, minDmg: number, position: Vec2, radius: number, inflation: number, duration: number) {
-		super(new CircleHitbox(radius), CollisionLayers.SPECIAL);
+		super(new CircleHitbox(radius), CollisionLayers.GENERAL);
 		this.exploder = exploder;
 		this.position = position;
 		this.dmg = dmg;
