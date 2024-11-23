@@ -12,9 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setMode = setMode;
-exports.getMode = getMode;
-exports.checkLoggedIn = checkLoggedIn;
+exports.checkLoggedIn = exports.getMode = exports.setMode = void 0;
 const jquery_1 = __importDefault(require("jquery"));
 const cookies_utils_1 = require("cookies-utils");
 const markdown_it_1 = __importDefault(require("markdown-it"));
@@ -26,9 +24,11 @@ console.log("homepage ts called");
 function setMode(md) {
     mode = md;
 }
+exports.setMode = setMode;
 function getMode() {
     return mode;
 }
+exports.getMode = getMode;
 (0, jquery_1.default)(document).ready(function () {
     (0, jquery_1.default)('.arrow').click(function () {
         (0, jquery_1.default)('.box-selectable').toggle();
@@ -246,3 +246,4 @@ function checkLoggedIn() {
     else
         setLoggedOut();
 }
+exports.checkLoggedIn = checkLoggedIn;

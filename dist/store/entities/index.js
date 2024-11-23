@@ -3,8 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Helmet = exports.Vest = exports.Scope = exports.Backpack = exports.FullPlayer = exports.PartialPlayer = exports.Player = exports.Healing = exports.Gun = exports.Grenade = exports.Explosion = exports.Bullet = exports.Ammo = exports.ENTITY_SUPPLIERS = void 0;
-exports.castEntity = castEntity;
+exports.castEntity = exports.Helmet = exports.Vest = exports.Scope = exports.Backpack = exports.FullPlayer = exports.PartialPlayer = exports.Player = exports.Healing = exports.Gun = exports.Grenade = exports.Explosion = exports.Bullet = exports.Ammo = exports.ENTITY_SUPPLIERS = void 0;
 const entity_1 = require("../../types/entity");
 exports.ENTITY_SUPPLIERS = new Map();
 var ammo_1 = require("./ammo");
@@ -36,3 +35,4 @@ function castEntity(minEntity) {
     var _a;
     return ((_a = exports.ENTITY_SUPPLIERS.get(minEntity.type)) === null || _a === void 0 ? void 0 : _a.create(minEntity)) || new entity_1.DummyEntity(minEntity);
 }
+exports.castEntity = castEntity;

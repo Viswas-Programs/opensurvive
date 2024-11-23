@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.translate = translate;
+exports.translate = void 0;
 const LANGUAGE_MAP = new Map();
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const res = yield fetch("data/languages/.list.json");
@@ -37,3 +37,4 @@ function translate(lang, key, ...args) {
     }
     return key;
 }
+exports.translate = translate;

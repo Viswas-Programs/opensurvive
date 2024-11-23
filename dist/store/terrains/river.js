@@ -79,11 +79,11 @@ class RiverSegment extends terrain_1.LineTerrain {
         ctx.resetTransform();
     }
 }
-exports.RiverSegment = RiverSegment;
 RiverSegment.ID = "river_segment";
 (() => {
     _1.TERRAIN_SUPPLIERS.set(RiverSegment.ID, new RiverSegmentSupplier());
 })();
+exports.RiverSegment = RiverSegment;
 class River extends terrain_1.PiecewiseTerrain {
     constructor(minTerrain) {
         super(minTerrain);

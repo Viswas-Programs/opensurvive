@@ -12,8 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FragGrenade = exports.WEAPON_SUPPLIERS = void 0;
-exports.castCorrectWeapon = castCorrectWeapon;
+exports.castCorrectWeapon = exports.FragGrenade = exports.WEAPON_SUPPLIERS = void 0;
 const weapon_1 = require("../../types/weapon");
 exports.WEAPON_SUPPLIERS = new Map();
 var frag_grenade_1 = require("./grenades/frag_grenade");
@@ -22,6 +21,7 @@ function castCorrectWeapon(minWeapon, magazine = 0) {
     var _a;
     return ((_a = exports.WEAPON_SUPPLIERS.get(minWeapon.nameId)) === null || _a === void 0 ? void 0 : _a.create(magazine)) || exports.WEAPON_SUPPLIERS.get("fists").create();
 }
+exports.castCorrectWeapon = castCorrectWeapon;
 class MeleeSupplier {
     constructor(id, data) {
         this.id = id;

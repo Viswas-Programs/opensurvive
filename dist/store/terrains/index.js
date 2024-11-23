@@ -3,8 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Beach = exports.Floor = exports.Sea = exports.RiverSegment = exports.River = exports.Pond = exports.Plain = exports.TERRAIN_SUPPLIERS = void 0;
-exports.castTerrain = castTerrain;
+exports.castTerrain = exports.Beach = exports.Floor = exports.Sea = exports.RiverSegment = exports.River = exports.Pond = exports.Plain = exports.TERRAIN_SUPPLIERS = void 0;
 exports.TERRAIN_SUPPLIERS = new Map();
 const plain_1 = __importDefault(require("./plain"));
 var plain_2 = require("./plain");
@@ -24,3 +23,4 @@ function castTerrain(minTerrain) {
     var _a;
     return ((_a = exports.TERRAIN_SUPPLIERS.get(minTerrain.id)) === null || _a === void 0 ? void 0 : _a.create(minTerrain)) || new plain_1.default(minTerrain);
 }
+exports.castTerrain = castTerrain;

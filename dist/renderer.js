@@ -9,8 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.start = start;
-exports.stop = stop;
+exports.stop = exports.start = void 0;
 const constants_1 = require("./constants");
 const game_1 = require("./game");
 const hud_1 = require("./rendering/hud");
@@ -112,8 +111,8 @@ function animate(currentTime) {
         requestAnimationFrame(animate);
 }
 function start() {
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b;
         running = true;
         document.getElementById("menu-audio").pause();
         (_a = document.getElementById("menu")) === null || _a === void 0 ? void 0 : _a.classList.add("hidden");
@@ -122,6 +121,7 @@ function start() {
         animate(0);
     });
 }
+exports.start = start;
 function stop() {
     var _a, _b;
     running = false;
@@ -138,3 +138,4 @@ function stop() {
     }
     (0, homepage_1.checkLoggedIn)();
 }
+exports.stop = stop;

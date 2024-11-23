@@ -15,7 +15,7 @@ var CollisionType;
     CollisionType[CollisionType["CIRCLE_RECT_POINT_INSIDE"] = 4] = "CIRCLE_RECT_POINT_INSIDE";
     // Circle-rectangle intersection, with line(s) of the rectangle inside the circle
     CollisionType[CollisionType["CIRCLE_RECT_LINE_INSIDE"] = 5] = "CIRCLE_RECT_LINE_INSIDE";
-})(CollisionType || (exports.CollisionType = CollisionType = {}));
+})(CollisionType = exports.CollisionType || (exports.CollisionType = {}));
 // The 4 movement directions
 var MovementDirection;
 (function (MovementDirection) {
@@ -23,7 +23,7 @@ var MovementDirection;
     MovementDirection[MovementDirection["UP"] = 1] = "UP";
     MovementDirection[MovementDirection["LEFT"] = 2] = "LEFT";
     MovementDirection[MovementDirection["DOWN"] = 3] = "DOWN";
-})(MovementDirection || (exports.MovementDirection = MovementDirection = {}));
+})(MovementDirection = exports.MovementDirection || (exports.MovementDirection = {}));
 var GunColor;
 (function (GunColor) {
     GunColor[GunColor["YELLOW"] = 0] = "YELLOW";
@@ -40,4 +40,4 @@ var GunColor;
     GunColor[GunColor["PURE_BLACK"] = 11] = "PURE_BLACK";
     GunColor[GunColor["CURSED"] = 12] = "CURSED";
     GunColor[GunColor["BUGLE"] = 13] = "BUGLE";
-})(GunColor || (exports.GunColor = GunColor = {}));
+})(GunColor = exports.GunColor || (exports.GunColor = {}));

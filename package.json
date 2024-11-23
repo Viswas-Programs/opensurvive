@@ -2,7 +2,7 @@
   "name": "islandr",
   "version": "1.0.0",
   "description": "An open-source 2D browser shooter game inspired by surviv.io",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rimraf dist",
@@ -11,7 +11,7 @@
     "build-client": "cd client && npm run build",
     "deep-install": "npm i && cd server && npm i && cd ../client && npm i",
     "gameserv": "cd server && npm run build && npm start",
-    "webserv": "npm run build-client && npm run build && node dist/index.js",
+    "webserv": "npm run build-client && npm run build && node lib/index.js",
     "start": "concurrently \"npm run webserv\" \"npm run gameserv\""
   },
   "repository": {

@@ -22,8 +22,8 @@ class DummyParticle extends Particle {
     renderTick() { }
     render() { }
 }
-exports.DummyParticle = DummyParticle;
 DummyParticle.TYPE = "dummy";
+exports.DummyParticle = DummyParticle;
 class FadeParticle extends Particle {
     constructor(minParticle) {
         super(minParticle);
@@ -74,8 +74,8 @@ class TextureFadeParticle extends FadeParticle {
             ctx.drawImage(img, -this.size * 0.5, -this.size * 0.5, this.size, this.size);
     }
 }
-exports.TextureFadeParticle = TextureFadeParticle;
 TextureFadeParticle.particleImages = new Map();
+exports.TextureFadeParticle = TextureFadeParticle;
 class GrowFadeParticle extends FadeParticle {
     constructor(minParticle) {
         super(minParticle);

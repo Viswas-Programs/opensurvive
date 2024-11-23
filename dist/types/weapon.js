@@ -11,7 +11,7 @@ var WeaponType;
     WeaponType["MELEE"] = "melee";
     WeaponType["GUN"] = "gun";
     WeaponType["GRENADE"] = "grenade";
-})(WeaponType || (exports.WeaponType = WeaponType = {}));
+})(WeaponType = exports.WeaponType || (exports.WeaponType = {}));
 class Weapon {
     constructor(nameId) {
         this.nameId = nameId;
@@ -67,9 +67,9 @@ class MeleeWeapon extends Weapon {
             }
     }
 }
-exports.MeleeWeapon = MeleeWeapon;
 MeleeWeapon.fistImages = new Map();
 MeleeWeapon.FIST_ANIMATIONS = ["left_fist", "right_fist"];
+exports.MeleeWeapon = MeleeWeapon;
 class GunWeapon extends Weapon {
     constructor(nameId, data, magazine = 0) {
         super(nameId);
@@ -117,8 +117,8 @@ class GunWeapon extends Weapon {
             }
     }
 }
-exports.GunWeapon = GunWeapon;
 GunWeapon.barrelImages = new Map();
+exports.GunWeapon = GunWeapon;
 class GrenadeWeapon extends Weapon {
     constructor() {
         super(...arguments);

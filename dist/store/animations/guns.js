@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = init;
 const _1 = require(".");
 const animation_1 = require("../../types/animation");
 const math_1 = require("../../types/math");
@@ -12,3 +11,4 @@ function init() {
     _1.DEFINED_ANIMATIONS.set(MEDIUM_RECOIL.id, MEDIUM_RECOIL);
     _1.DEFINED_ANIMATIONS.set(LARGE_RECOIL.id, LARGE_RECOIL);
 }
+exports.default = init;

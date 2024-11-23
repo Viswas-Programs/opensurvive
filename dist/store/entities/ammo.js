@@ -12,7 +12,7 @@ class AmmoSupplier {
 class Ammo extends entity_1.Entity {
     constructor(minEntity) {
         super(minEntity);
-        this.type = _a.TYPE;
+        this.type = Ammo.TYPE;
         this.zIndex = 8;
         this.copy(minEntity);
     }
@@ -26,11 +26,11 @@ class Ammo extends entity_1.Entity {
         ctx.translate(canvas.width / 2 + relative.x * scale, canvas.height / 2 + relative.y * scale);
         ctx.rotate(-this.direction.angle());
         ctx.scale(scale, scale);
-        ctx.strokeStyle = `#${_a.colorScheme[this.color][0]}`;
+        ctx.strokeStyle = `#${Ammo.colorScheme[this.color][0]}`;
         ctx.lineWidth = 0.2;
-        ctx.fillStyle = `#${_a.colorScheme[this.color][1]}`;
+        ctx.fillStyle = `#${Ammo.colorScheme[this.color][1]}`;
         (0, utils_1.circleFromCenter)(ctx, 0, 0, this.hitbox.comparable * 2 / 3, true, true);
-        ctx.fillStyle = `#${_a.colorScheme[this.color][2]}`;
+        ctx.fillStyle = `#${Ammo.colorScheme[this.color][2]}`;
         (0, utils_1.circleFromCenter)(ctx, -this.hitbox.comparable / 8 + this.hitbox.comparable / 6, -this.hitbox.comparable / 4 + this.hitbox.comparable / 6, this.hitbox.comparable / 3);
         ctx.resetTransform();
     }
@@ -39,7 +39,7 @@ _a = Ammo;
 Ammo.TYPE = "ammo";
 Ammo.colorScheme = [];
 (() => {
-    _1.ENTITY_SUPPLIERS.set(_a.TYPE, new AmmoSupplier());
+    _1.ENTITY_SUPPLIERS.set(Ammo.TYPE, new AmmoSupplier());
     fetch("data/colors/ammos.json").then(res => res.json()).then(x => _a.colorScheme = x);
 })();
 exports.default = Ammo;

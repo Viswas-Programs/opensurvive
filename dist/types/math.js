@@ -85,10 +85,10 @@ class Vec2 {
         return { x: this.x, y: this.y };
     }
 }
-exports.Vec2 = Vec2;
 Vec2.ZERO = new Vec2(0, 0);
 Vec2.UNIT_X = new Vec2(1, 0);
 Vec2.UNIT_Y = new Vec2(0, 1);
+exports.Vec2 = Vec2;
 class Line {
     static fromMinLine(minLine) {
         return new Line(Vec2.fromMinVec2(minLine.a), Vec2.fromMinVec2(minLine.b), minLine.segment);
@@ -365,8 +365,8 @@ class RectHitbox extends Hitbox {
         return (this.isLeft(a, b, p) > 0 && this.isLeft(b, c, p) > 0 && this.isLeft(c, d, p) > 0 && this.isLeft(d, a, p) > 0);
     }
 }
-exports.RectHitbox = RectHitbox;
 RectHitbox.ZERO = new RectHitbox(0, 0);
+exports.RectHitbox = RectHitbox;
 // Circle hitbox with a radius
 class CircleHitbox extends Hitbox {
     static fromMinCircleHitbox(minCircleHitbox) {
@@ -395,18 +395,18 @@ class CircleHitbox extends Hitbox {
         return { type: this.type, radius: this.radius };
     }
 }
-exports.CircleHitbox = CircleHitbox;
 CircleHitbox.ZERO = new RectHitbox(0, 0);
+exports.CircleHitbox = CircleHitbox;
 var CommonAngles;
 (function (CommonAngles) {
     CommonAngles[CommonAngles["PI_FOUR"] = Math.PI / 4] = "PI_FOUR";
     CommonAngles[CommonAngles["PI_TWO"] = Math.PI / 2] = "PI_TWO";
     CommonAngles[CommonAngles["TWO_PI"] = Math.PI * 2] = "TWO_PI";
-})(CommonAngles || (exports.CommonAngles = CommonAngles = {}));
+})(CommonAngles = exports.CommonAngles || (exports.CommonAngles = {}));
 var CommonNumbers;
 (function (CommonNumbers) {
     CommonNumbers[CommonNumbers["SIN45"] = Math.sin(CommonAngles.PI_FOUR)] = "SIN45";
-})(CommonNumbers || (exports.CommonNumbers = CommonNumbers = {}));
+})(CommonNumbers = exports.CommonNumbers || (exports.CommonNumbers = {}));
 class Polygon {
     constructor(points, position = Vec2.ZERO) {
         if (points.length < 3)

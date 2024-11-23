@@ -1,8 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initMap = initMap;
-exports.drawMap = drawMap;
-exports.drawMinimap = drawMinimap;
+exports.drawMinimap = exports.drawMap = exports.initMap = void 0;
 const constants_1 = require("../constants");
 const game_1 = require("../game");
 const states_1 = require("../states");
@@ -45,6 +43,7 @@ function initMap() {
     obstacles.filter((obstacle) => !!obstacle["renderMapLayerN1"]).forEach(obstacle => obstacle.renderMapLayerN1(mapCanvas, mapCtx, scale));
     obstacles.forEach(obstacle => obstacle.renderMap(mapCanvas, mapCtx, scale));
 }
+exports.initMap = initMap;
 // Draw world map
 function drawMap(canvas, ctx) {
     // Determine the dimension
@@ -90,6 +89,7 @@ function drawMap(canvas, ctx) {
     (0, utils_1.circleFromCenter)(ctx, (canvas.width - width) / 2 + player.position.x * scale, (canvas.height - height) / 2 + player.position.y * scale, 8);
     (0, utils_1.circleFromCenter)(ctx, (canvas.width - width) / 2 + player.position.x * scale, (canvas.height - height) / 2 + player.position.y * scale, 12, false, true);
 }
+exports.drawMap = drawMap;
 // Draw minimap
 function drawMinimap(player, canvas, ctx) {
     // Determine the dimension
@@ -137,3 +137,4 @@ function drawMinimap(player, canvas, ctx) {
     (0, utils_1.circleFromCenter)(ctx, margin + side / 2, canvas.height - margin - side / 2, 8);
     (0, utils_1.circleFromCenter)(ctx, margin + side / 2, canvas.height - margin - side / 2, 12, false, true);
 }
+exports.drawMinimap = drawMinimap;

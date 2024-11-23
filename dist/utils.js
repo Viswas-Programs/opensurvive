@@ -1,19 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.wait = wait;
-exports.clamp = clamp;
-exports.toDegrees = toDegrees;
-exports.numToRGBA = numToRGBA;
-exports.twoDigits = twoDigits;
-exports.send = send;
-exports.receive = receive;
-exports.circleFromCenter = circleFromCenter;
-exports.strokeArc = strokeArc;
-exports.lineBetween = lineBetween;
-exports.roundRect = roundRect;
-exports.loadoutChange = loadoutChange;
+exports.loadoutChange = exports.roundRect = exports.lineBetween = exports.strokeArc = exports.circleFromCenter = exports.receive = exports.send = exports.twoDigits = exports.numToRGBA = exports.toDegrees = exports.clamp = exports.wait = void 0;
 // Promisified setTimeout
 function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+exports.wait = wait;
 // Maths
 // Capping value with limits
 function clamp(val, min, max) {
@@ -23,10 +13,12 @@ function clamp(val, min, max) {
         return max;
     return val;
 }
+exports.clamp = clamp;
 // Converts radian to degrees
 function toDegrees(radian) {
     return radian * 180 / Math.PI;
 }
+exports.toDegrees = toDegrees;
 // Colors
 // Converting number to RGBA
 function numToRGBA(num, overrideAlpha) {
@@ -36,6 +28,7 @@ function numToRGBA(num, overrideAlpha) {
     const r = (num >>> 24) % 256;
     return `#${twoDigits(r.toString(16))}${twoDigits(g.toString(16))}${twoDigits(b.toString(16))}${twoDigits(a.toString(16))}`;
 }
+exports.numToRGBA = numToRGBA;
 // Strings
 // Make numbers 2 digits
 function twoDigits(num) {
@@ -53,6 +46,7 @@ function twoDigits(num) {
             return num.toString();
     }
 }
+exports.twoDigits = twoDigits;
 // Networking
 const msgpack_lite_1 = require("msgpack-lite");
 const pako_1 = require("pako");
@@ -62,11 +56,13 @@ function send(socket, packet) {
     //socket.send(deflate(deflate(encode(packet).buffer)));
     socket.send((0, pako_1.deflate)((0, msgpack_lite_1.encode)(packet).buffer));
 }
+exports.send = send;
 // Receive packet
 function receive(msg) {
     //return <ServerPacketResolvable>decode(inflate(inflate(new Uint8Array(msg))));
     return (0, msgpack_lite_1.decode)((0, pako_1.inflate)(new Uint8Array(msg)));
 }
+exports.receive = receive;
 // Rendering
 // Draws circle with x, y center
 function circleFromCenter(ctx, x, y, radius, fill = true, stroke = false) {
@@ -78,12 +74,14 @@ function circleFromCenter(ctx, x, y, radius, fill = true, stroke = false) {
     if (stroke)
         ctx.stroke();
 }
+exports.circleFromCenter = circleFromCenter;
 function strokeArc(ctx, x, y, radius, start = 0, end = math_1.CommonAngles.TWO_PI, counter = false) {
     ctx.beginPath();
     ctx.arc(x, y, radius, start, end, counter);
     ctx.stroke();
     ctx.closePath();
 }
+exports.strokeArc = strokeArc;
 // Strokes a line between (x1, y1) and (x2, y2)
 function lineBetween(ctx, x1, y1, x2, y2, stroke = true) {
     ctx.beginPath();
@@ -93,6 +91,7 @@ function lineBetween(ctx, x1, y1, x2, y2, stroke = true) {
     if (stroke)
         ctx.stroke();
 }
+exports.lineBetween = lineBetween;
 // Draws a rounded rectangle
 function roundRect(ctx, x, y, width, height, radius, fill = true, stroke = false) {
     if (typeof radius === 'undefined') {
@@ -123,9 +122,11 @@ function roundRect(ctx, x, y, width, height, radius, fill = true, stroke = false
     if (stroke)
         ctx.stroke();
 }
+exports.roundRect = roundRect;
 function loadoutChange(accessToken, skin, delta) {
     fetch((process.env.API_URL || "http://localhost:8000") + "/api/currency-decrement", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accessToken, delta }) })
         .catch(console.error);
     fetch((process.env.API_URL || "http://localhost:8000") + "/api/addSkins", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accessToken, skin }) })
         .catch(console.error);
 }
+exports.loadoutChange = loadoutChange;

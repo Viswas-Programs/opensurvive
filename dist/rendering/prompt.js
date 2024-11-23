@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.drawPrompt = drawPrompt;
+exports.drawPrompt = void 0;
 const constants_1 = require("../constants");
 const game_1 = require("../game");
 const languages_1 = require("../languages");
@@ -11,6 +11,7 @@ function drawPrompt(player, canvas, ctx, scale) {
     drawReloading(player, canvas, ctx);
     drawHealing(player, canvas, ctx);
 }
+exports.drawPrompt = drawPrompt;
 function drawInteract(player, canvas, ctx) {
     var _a;
     if (player.despawn || !player.canInteract)

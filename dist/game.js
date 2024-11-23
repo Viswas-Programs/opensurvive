@@ -13,10 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.world = void 0;
-exports.getId = getId;
-exports.getPlayer = getPlayer;
-exports.getTPS = getTPS;
+exports.getTPS = exports.getPlayer = exports.getId = exports.world = void 0;
 const howler_1 = require("howler");
 const constants_1 = require("./constants");
 const renderer_1 = require("./renderer");
@@ -53,8 +50,11 @@ console.log(isMobile, navigator.userAgent);
 const _ammosToDisplay = ["9mm", "12 gauge", "7.62mm", "5.56mm", "5.7mm", ".308 subsonic"];
 var player;
 function getId() { return id; }
+exports.getId = getId;
 function getPlayer() { return player; }
+exports.getPlayer = getPlayer;
 function getTPS() { return tps; }
+exports.getTPS = getTPS;
 var ws;
 var connected = false;
 function getConnected() { return connected; }

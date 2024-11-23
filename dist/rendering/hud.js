@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.drawHud = drawHud;
+exports.drawHud = void 0;
 const entities_1 = require("../store/entities");
 const weapon_1 = require("../types/weapon");
 const utils_1 = require("../utils");
@@ -13,6 +13,7 @@ function drawHud(player, canvas, ctx) {
     drawVest(player, canvas, ctx);
     drawHelmet(player, canvas, ctx);
 }
+exports.drawHud = drawHud;
 // Draws the player's health
 function drawHealth(player, canvas, ctx) {
     //fixed height:width ratio

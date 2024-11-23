@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = init;
 const _1 = require(".");
 const animation_1 = require("../../types/animation");
 const math_1 = require("../../types/math");
@@ -10,3 +9,4 @@ function init() {
     _1.DEFINED_ANIMATIONS.set(LEFT_FIST.id, LEFT_FIST);
     _1.DEFINED_ANIMATIONS.set(RIGHT_FIST.id, RIGHT_FIST);
 }
+exports.default = init;
