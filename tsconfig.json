@@ -1,23 +1,24 @@
 {
     "compilerOptions": {
-        "target": "es6",
-        "module": "commonjs",
-        "declaration": true,
-        "outDir": "./lib",
-        "strict": true,
-        "esModuleInterop": true,
-        "moduleResolution": "node",
-        "resolveJsonModule": true,
-        "skipLibCheck": true,
-        "typeRoots": ["./node_modules/@types", "./src"]
+      "target": "es6",
+      "module": "commonjs",
+      "declaration": true,
+      "outDir": "./dist",
+      "rootDir": "./client/src",
+      "strict": true,
+      "esModuleInterop": true,
+      "moduleResolution": "node",
+      "resolveJsonModule": true,
+      "skipLibCheck": true,
+      "typeRoots": ["./node_modules/@types"]
     },
     "include": [
-        "api",
-        "src",
-        "global.d.ts"
+      "client/src/**/*.ts",
+      "global.d.ts"
     ],
     "exclude": [
-        "node_modules",
-        "**/__tests__/*"
+      "node_modules",
+      "**/__tests__/*"
     ]
-}
+  }
+  
