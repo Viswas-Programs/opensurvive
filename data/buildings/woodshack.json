@@ -51,12 +51,40 @@
 		{
 			"type": "crate",
 			"position": [ -0.25, -4 ],
+			"direction":  [0, 1],
 			"special": "woodpile"
 		},
 		{
 			"type": "crate",
 			"position": [ 6.75, -4 ],
 			"special": "woodpile"
+		},
+		{
+			"type": "log",
+			"position": [ -6.5, -4 ]
+		},
+		{
+			"type": "log",
+			"position": [ -7, -1 ],
+			"special": "1"
+		},
+		{
+			"type": "log",
+			"position": [ -6.5, 2 ],
+			"direction": [ 0, 1 ],
+			"special": "5"
+		},
+		{
+			"type": "log",
+			"position": [ -5, -0.8 ],
+			"direction": [ 0, 1 ],
+			"special": "3"
+		},
+		{
+			"type": "log",
+			"position": [ -0.25, -0.7 ],
+			"direction": [ 0, 1 ],
+			"special": "2"
 		}
 
 	],

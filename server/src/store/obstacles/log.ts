@@ -7,13 +7,13 @@ import { MapObstacleData, ObstacleData } from "../../types/data";
 import { MAP_OBSTACLE_SUPPLIERS, OBSTACLE_SUPPLIERS } from ".";
 import { ObstacleTypes } from "../../constants";
 
-class CrateSupplier extends ObstacleSupplier {
+class LogSupplier extends ObstacleSupplier {
 	make(data: ObstacleData) {
 		return new Log(data.special || "stump");
 	}
 }
 
-class CrateMapObstacleSupplier extends MapObstacleSupplier {
+class LogMapObstacleSupplier extends MapObstacleSupplier {
 	make(data: MapObstacleData) {
 		return new Log(data.args ? data.args[0] : "stump");
 	}
@@ -30,12 +30,12 @@ export default class Log extends Obstacle {
 		var health: number;
 		switch (special) {
 			case "stump":
-				hitbox = new CircleHitbox(2);
+				hitbox = new CircleHitbox(1.5);
 				health = 100;
 				break;
 			default:
-				hitbox = new CircleHitbox(1);
-				health = 80;
+				hitbox = new CircleHitbox(0.5);
+				health = 60;
 				break;
 		}
 		super(world, hitbox, hitbox.scaleAll(0.75), health, health, Vec2.UNIT_X);
@@ -43,8 +43,8 @@ export default class Log extends Obstacle {
 	}
 
 	static {
-		OBSTACLE_SUPPLIERS.set(Log.TYPE, new CrateSupplier());
-		MAP_OBSTACLE_SUPPLIERS.set(Log.TYPE, new CrateMapObstacleSupplier());
+		OBSTACLE_SUPPLIERS.set(Log.TYPE, new LogSupplier());
+		MAP_OBSTACLE_SUPPLIERS.set(Log.TYPE, new LogMapObstacleSupplier());
 	}
 
 	damage(dmg: number) {

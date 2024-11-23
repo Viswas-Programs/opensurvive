@@ -5,11 +5,11 @@
 		"weight": 10
 	},
 	"stf_12": {
-		"rarity": 0,
+		"rarity": 2,
 		"weight": 8
 	},
 	"cqbr": {
-		"rarity": 1,
+		"rarity": 2,
 		"weight": 7
 	},
 	"mp9": {
@@ -17,7 +17,7 @@
 		"weight": 6
 	},
 	"svd-m": {
-		"rarity": 2,
+		"rarity": 3,
 		"weight": 5
 	}
 }

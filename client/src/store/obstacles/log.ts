@@ -28,22 +28,24 @@ export default class Log extends Obstacle {
 	special!: "stump" | "1" | "2" | "3" | "4" | "5";
 	static images = new Map<string, HTMLImageElement>();
 	static imagesResidue = new Map<string, HTMLImageElement>();
-
 	static {
+		const specials = ["stump", "1", "2", "3", "4", "5"]
+		for (let ii = 0; ii < specials.length; ii++) {
+			Log.images.set(specials[ii], new Image())
+			Log.imagesResidue.set(specials[ii], new Image())
+		}
 		OBSTACLE_SUPPLIERS.set(Log.TYPE, new LogSupplier());
-		for (const spc in ["stump", "1", "2", "3", "4", "5"]) {
-			Log.images.set(spc, new Image())
-		}
-		for (const spc in ["stump", "1", "2", "3", "4", "5"]) {
-			Log.imagesResidue.set(spc, new Image())
-		}
 	}
 	static updateAssets() {
-		for (const spc in ["stump", "1", "2", "3", "4", "5"]) {
-			Log.images.get(spc)!.src = "assets/" + getMode() + "/images/game/objects/log_" + spc + ".svg"
-		}
-		for (const spc in ["stump", "1", "2", "3", "4", "5"]) {
-			Log.imagesResidue.get(spc)!.src = "assets/" + getMode() + "/images/game/objects/residues/log_" + spc + ".svg"
+		const specials = ["stump", "1", "2", "3", "4", "5"]
+		for (let ii = 0; ii < specials.length; ii++ ) {
+			const image = new Image()
+			image.src = "assets/" + getMode() + "/images/game/objects/log_" + specials[ii] + ".svg"
+			Log.images.set(specials[ii], image)
+
+			const RESimage = new Image()
+			RESimage.src = "assets/" + getMode() + "/images/game/objects/residues/log_" + specials[ii] + ".svg"
+			Log.imagesResidue.set(specials[ii], RESimage)
 		}
 	}
 
@@ -55,11 +57,19 @@ export default class Log extends Obstacle {
 	render(you: Player, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scale: number) {
 		const img = Log.images.get(this.special)!
 		if (!img.complete || !Log.imagesResidue.get(this.special)!) return;
-		const relative = this.position.addVec(you.position.inverse());
+		/*const relative = this.position.addVec(you.position.inverse());
 		const width = scale * (<RectHitbox>this.hitbox).width * (this.despawn ? 0.5 : 1), height = width * img.naturalWidth / Log.images.get(this.special)!.naturalHeight;
 		ctx.translate(canvas.width / 2 + relative.x * scale, canvas.height / 2 + relative.y * scale);
 		ctx.rotate(-this.direction.angle() );
 		ctx.drawImage(this.despawn ? Log.imagesResidue.get(this.special)! : img, -width / 2, -height / 2, width, height);
+		ctx.resetTransform();
+		*/
+		const relative = this.position.addVec(you.position.inverse());
+		ctx.translate(canvas.width / 2 + relative.x * scale, canvas.height / 2 + relative.y * scale);
+		ctx.rotate(-this.direction.angle());
+		// Times 2 because radius * 2 = diameter
+		const width = scale * this.hitbox.comparable * 2 * (this.despawn ? 0.5 : 1), height = width * img.naturalWidth / img.naturalHeight;
+		ctx.drawImage(img, -width / 2, -height / 2, width, height);
 		ctx.resetTransform();
 	}
 
