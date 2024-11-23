@@ -5,10 +5,16 @@
         "declaration": true,
         "outDir": "./lib",
         "strict": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "typeRoots": ["./node_modules/@types", "./src"]
     },
     "include": [
-        "api"
+        "api",
+        "src",
+        "global.d.ts"
     ],
     "exclude": [
         "node_modules",
