@@ -277,15 +277,15 @@ div#menu div#connection.panel {
     empty-cells: show;
 }
 
-#ammo-container{
+#ammo-container {
     position: absolute;
-    top: 50%;
-    left: 14%;
+    top: -50px;
+    right: 25px;
     height: 3vh;
-    width: 20vh;
+    width: 25vh;
 }
 .ammos {
-    background-color: rgba(5, 5, 5, 0.5);
+    background-color: rgba(51, 51, 51, 0.5);
     border-radius: 2px;
 }
 .healing-panel {
@@ -869,3 +869,14 @@ div#menu div.panel#account {
     cursor: pointer;
     display: none;
 }
+
+.ammo-color {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin-right: 8px;
+    background-color: transparent;
+    border: 2px solid black;
+}
+
