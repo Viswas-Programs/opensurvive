@@ -277,6 +277,7 @@ div#menu div#connection.panel {
     empty-cells: show;
 }
 
+<<<<<<< HEAD
 #ammo-container {
     position: absolute;
     top: -50px;
@@ -286,6 +287,17 @@ div#menu div#connection.panel {
 }
 .ammos {
     background-color: rgba(51, 51, 51, 0.5);
+=======
+#ammo-container{
+    position: absolute;
+    top: 50%;
+    left: 14%;
+    height: 3vh;
+    width: 20vh;
+}
+.ammos {
+    background-color: rgba(5, 5, 5, 0.5);
+>>>>>>> db9109cd1266338dce338184f07bca707dda481a
     border-radius: 2px;
 }
 .healing-panel {

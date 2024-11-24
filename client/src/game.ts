@@ -17,6 +17,15 @@ import { cookieExists, getCookieValue } from "cookies-utils";
 import { Obstacle } from "./types/obstacle";
 import { getMode } from "./homepage";
 import { translate } from "./languages";
+<<<<<<< HEAD
+=======
+
+//handle users that tried to go to old domain name, or direct ip
+var urlargs = new URLSearchParams(window.location.search);
+if(urlargs.get("from")){
+	alert("We have moved from " + urlargs.get("from") + " to islandr.io!")
+}
+>>>>>>> db9109cd1266338dce338184f07bca707dda481a
 
 export var world: World;
 
