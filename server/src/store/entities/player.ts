@@ -59,6 +59,8 @@ export default class Player extends Entity {
 	killCount = 0;
 	currencyChanged = false;
 	usernamesAndIDsSent = false;
+	damageTaken = 0;
+	damageDone = 0;
 
 	constructor(id: string, username: string, skin: string | null, deathImg: string | null, accessToken?: string, isMobile?: boolean) {
 		super();
@@ -265,6 +267,7 @@ export default class Player extends Entity {
 		if (Math.random() < 0.1) this.health -= dmg * (1 - Helmet.HELMET_REDUCTION[this.inventory.helmetLevel]);
 		else this.health -= dmg * (1 - Vest.VEST_REDUCTION[this.inventory.vestLevel]);
 		this.potentialKiller = damager;
+		this.damageTaken += dmg * (1 - Vest.VEST_REDUCTION[this.inventory.vestLevel]);
 		this.markDirty();
 	}
 

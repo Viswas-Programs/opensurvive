@@ -1,6 +1,6 @@
 import { world } from "..";
-import { GLOBAL_UNIT_MULTIPLIER, TICKS_PER_SECOND } from "../constants";
-import { Bullet } from "../store/entities";
+import { EntityTypes, GLOBAL_UNIT_MULTIPLIER, TICKS_PER_SECOND } from "../constants";
+import { Bullet, Player } from "../store/entities";
 import { GunColor } from "./misc";
 import { randomBetween, toRadians } from "../utils";
 import { Entity } from "./entity";
@@ -9,6 +9,7 @@ import { MinWeapon } from "./minimized";
 import { Obstacle } from "./obstacle";
 import { BulletStats, GunData, MeleeData, TracerData } from "./data";
 import { Particle } from "./particle";
+import Vest from "../store/entities/vest";
 
 export enum WeaponType {
 	MELEE = "melee",
@@ -85,7 +86,9 @@ export class MeleeWeapon extends Weapon {
 				if (thing.collided(dummy) && thing.id != attacker.id) {
 					thing.damage(this.damage, attacker.id);
 					if (thing.damageParticle) world.particles.push(new Particle(thing.damageParticle, position, 0.25));
-					
+					if (thing.type === EntityTypes.PLAYER && attacker.type === EntityTypes.PLAYER) {
+						(<Player>attacker).damageDone += this.damage * (1 - Vest.VEST_REDUCTION[(<Player>thing).inventory.vestLevel])
+					}
 					if (!this.cleave) break;
 				}
 		}, this.delay);
