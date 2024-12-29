@@ -36,6 +36,9 @@ export default class Bullet extends Entity {
 		if (!this.despawn)
 			for (const thing of combined) {
 				if (this.type != thing.type && thing.collided(this)) {
+					if (thing.type === EntityTypes.PLAYER && this.shooter.type === EntityTypes.PLAYER) {
+					(<any>this.shooter).damageDone += this.dmg;
+				}
 					thing.damage(this.dmg, this.shooter.id);
 					if (thing.surface == "metal") { this.position = this.position.addVec(this.direction.invert()); this.setVelocity(this.direction.invert()); this.direction = this.direction.invert() }
 					else if (!thing.noCollision) this.die();

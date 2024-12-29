@@ -1,6 +1,6 @@
 import { world } from "..";
 import { EntityTypes, GLOBAL_UNIT_MULTIPLIER, TICKS_PER_SECOND } from "../constants";
-import { Bullet, Player } from "../store/entities";
+import { Bullet } from "../store/entities";
 import { GunColor } from "./misc";
 import { randomBetween, toRadians } from "../utils";
 import { Entity } from "./entity";
@@ -9,7 +9,6 @@ import { MinWeapon } from "./minimized";
 import { Obstacle } from "./obstacle";
 import { BulletStats, GunData, MeleeData, TracerData } from "./data";
 import { Particle } from "./particle";
-import Vest from "../store/entities/vest";
 
 export enum WeaponType {
 	MELEE = "melee",
@@ -87,7 +86,7 @@ export class MeleeWeapon extends Weapon {
 					thing.damage(this.damage, attacker.id);
 					if (thing.damageParticle) world.particles.push(new Particle(thing.damageParticle, position, 0.25));
 					if (thing.type === EntityTypes.PLAYER && attacker.type === EntityTypes.PLAYER) {
-						(<Player>attacker).damageDone += this.damage * (1 - Vest.VEST_REDUCTION[(<Player>thing).inventory.vestLevel])
+						(<any>attacker).damageDone += this.damage;
 					}
 					if (!this.cleave) break;
 				}
@@ -144,7 +143,6 @@ export class GunWeapon extends Weapon {
 				angles = attacker.direction.angle() + toRadians((Math.random() - 0.5) * (attacker.velocity.magnitudeSqr() != 0 ? this.moveSpread : this.spread));
 				position = attacker.position.addVec(this.offset.addAngle(attacker.direction.angle()));
 				const bullet = new Bullet(attacker, this.bullet.damage, Vec2.UNIT_X.addAngle(angles).scaleAll(this.bullet.speed / TICKS_PER_SECOND), randomBetween(this.bullet.range[0], this.bullet.range[1]) / (this.bullet.speed / TICKS_PER_SECOND), this.bullet.falloff, this.tracer);
-				
 				bullet.position = position;
 				world.entities.push(bullet);
 				
