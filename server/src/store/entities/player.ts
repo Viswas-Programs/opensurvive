@@ -269,6 +269,7 @@ export default class Player extends Entity {
 	}
 
 	die() {
+		if (this.despawn) return;
 		super.die();
 		for (const weapon of this.inventory.weapons) {
 			if (weapon?.droppable) {

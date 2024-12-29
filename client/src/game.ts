@@ -60,6 +60,7 @@ const aimJoystick = document.getElementsByClassName('aimjoystick-container')[0];
 const aimHandle = document.getElementsByClassName('aimjoystick-handle')[0];
 let _selectedScope = 1;
 let data: any;
+let __finishedDeathCleanup = false;
 declare type modeMapColourType = keyof typeof modeMapColours
 async function init(address: string) {
 	// Initialize the websocket
@@ -75,24 +76,25 @@ async function init(address: string) {
 		}, TIMEOUT);
 
 		ws.onmessage = async (event) => {
+			__finishedDeathCleanup = false;
 			const stream = new IslandrBitStream(inflate(event.data).buffer)
 			const dataA = <AckPacket>{
-				type:stream.readPacketType(),
-				id:stream.readId(),
-				tps:stream.readInt8(),
-				size:[stream.readInt16(),stream.readInt16()],
-				terrain: <MinTerrain>{ id:stream.readId() }
+				type: stream.readPacketType(),
+				id: stream.readId(),
+				tps: stream.readInt8(),
+				size: [stream.readInt16(), stream.readInt16()],
+				terrain: <MinTerrain>{ id: stream.readId() }
 			}
 			id = dataA.id;
 			tps = dataA.tps;
 			world = new World(new Vec2(dataA.size[0], dataA.size[1]), castTerrain(dataA.terrain).setColour((modeMapColours[getMode() as modeMapColourType])));
 			const gameObjects = [Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table, Box, Log]
-			gameObjects.forEach(OBJ => {OBJ.updateAssets() })
-	
+			gameObjects.forEach(OBJ => { OBJ.updateAssets() })
+
 			// Call renderer start to setup
 			await start();
 			var currentCursor = localStorage.getItem("selectedCursor")
-			if (!currentCursor){localStorage.setItem("selectedCursor", "default"); currentCursor = localStorage.getItem("selectedCursor")}
+			if (!currentCursor) { localStorage.setItem("selectedCursor", "default"); currentCursor = localStorage.getItem("selectedCursor") }
 			if (currentCursor) { document.documentElement.style.cursor = currentCursor }
 			const responsePacket = new ResponsePacket(id, username!, skin!, deathImg!, isMobile!, (cookieExists("gave_me_cookies") ? getCookieValue("access_token") : getToken()) as string)
 			connected = true;
@@ -121,7 +123,7 @@ async function init(address: string) {
 			)
 			// Setup healing items click events
 			for (const element of document.getElementsByClassName("healing-panel")) {
-				const el = <HTMLElement> element;
+				const el = <HTMLElement>element;
 				console.log("Adding events for", el.id);
 				const ii = parseInt(<string>el.id.split("-").pop());
 				el.onmouseenter = el.onmouseleave = () => toggleMouseDisabled();
@@ -130,6 +132,26 @@ async function init(address: string) {
 					send(ws, new UseHealingPacket(Healing.mapping[ii]));
 				}
 			}
+			function cleanupAfterPlayerDeath() {
+				// Post-death (Post player.despawn at RecvPacketTypes.PLAYERTICK)
+				if (__finishedDeathCleanup) return;
+				const usableGunAmmoNames = ["9mm", "12 gauge", "7.62mm", "5.56mm", ".308 subsonic"];
+				const ammosElements = document.getElementsByClassName("ammos");
+				for (let ii = 0; ii < 4; ii++) {
+					const nameEle = document.getElementById("weapon-name-" + ii);
+					const imageEle = document.getElementById("weapon-image-" + ii);
+					if (nameEle) nameEle.innerHTML = "";
+					if (imageEle) (<HTMLImageElement>imageEle).src = "";
+				}
+				Healing.setupHud()
+				for (let ii = 0; ii < usableGunAmmoNames.length; ii++) {
+					(<HTMLElement>ammosElements.item(ii)).textContent = `${usableGunAmmoNames[ii]}: 0`
+				}
+				for (const scopeElement of document.getElementsByClassName("scopes")) {
+					(<HTMLElement>scopeElement).style.display = "none"
+				}
+				__finishedDeathCleanup = true;
+		}
 			showMobileExclusiveBtns();
 			const interval = setInterval(() => {
 				if (connected) send(ws, new PingPacket());
@@ -171,7 +193,6 @@ async function init(address: string) {
 					}
 					case RecvPacketTypes.PLAYERTICK: {
 						const playerSrvr = deserialisePlayer(stream as IslandrBitStream)
-						console.log(playerSrvr.inventory.ammos)
 						if (!player) player = new FullPlayer(playerSrvr);
 						else player.copy(playerSrvr);
 						const usableGunAmmoNames = ["9mm", "12 gauge", "7.62mm", "5.56mm", ".308 subsonic"];
@@ -185,6 +206,7 @@ async function init(address: string) {
 						for (let ii = 0; ii < usableGunAmmoNames.length; ii++) {
 							(<HTMLElement>ammosElements.item(ii)).textContent = `${usableGunAmmoNames[ii]}: ${usableGunAmmos[ii]}`
 						}
+						if (player.despawn) cleanupAfterPlayerDeath()
 						break;
 					}
 					case RecvPacketTypes.SOUND: {
@@ -279,13 +301,6 @@ async function init(address: string) {
 			player = null;
 			setUsrnameIdDeathImg([null, null, null])
 			res(undefined);
-			Healing.setupHud()
-			for (const ammoElement of document.getElementsByClassName("ammos")) {
-				ammoElement.textContent = "";
-			}
-			for (const scopeElement of document.getElementsByClassName("scopes")) {
-				(<HTMLElement>scopeElement).style.display = "none"
-			}
 			//remove playercount
 		}
 	

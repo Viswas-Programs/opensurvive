@@ -6,6 +6,7 @@ import { CommonAngles } from "../types/math";
 import { circleFromCenter, roundRect, strokeArc } from "../utils";
 
 export function drawPrompt(player: FullPlayer, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scale: number) {
+	if (player.despawn) return;
 	drawInteract(player, canvas, ctx);
 	drawReloading(player, canvas, ctx);
 	drawHealing(player, canvas, ctx);

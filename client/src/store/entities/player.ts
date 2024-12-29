@@ -88,7 +88,11 @@ export default class Player extends Entity {
 		this.skin = minEntity.skin;
 		this.deathImg = minEntity.deathImg;
 		this.interactMessage = minEntity.interactMessage;
-		
+		if (this.despawn) {
+			// Donot copy current player after death
+			this.zIndex = 7;
+			return;
+		}
 		if (typeof minEntity.inventory.holding === "number") {
 			const inventory = <Inventory>minEntity.inventory;
 			this.inventory = new Inventory(inventory.holding, inventory.slots, inventory.weapons.map(w => w ? castCorrectWeapon(w, w.type == WeaponType.GUN ? (<GunWeapon>w).magazine : 0) : w), inventory.ammos, inventory.utilities, inventory.healings);
@@ -113,7 +117,6 @@ export default class Player extends Entity {
 			this.inventory.scopes = inventory.scopes;
 			this.inventory.selectedScope = inventory.selectedScope;
 		} else this.inventory = new PartialInventory(<MinInventory>minEntity.inventory);
-		if (this.despawn) this.zIndex = 7;
 	}
 
 	render(you: Player, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scale: number) {
