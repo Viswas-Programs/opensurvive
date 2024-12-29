@@ -238,11 +238,11 @@ server.on("connection", async socket => {
 				const swPacket = new SwitchWeaponPacket();
 				swPacket.deserialise(stream)
 				if (swPacket.setMode) {
-					if (player.inventory.getWeapon(swPacket.delta))
-						player.inventory.holding = swPacket.delta;
+					if (player.inventory.getWeapon(swPacket.delta, false))
+						player.inventory.getWeapon(swPacket.delta, true)
 				} else {
 					const unitDelta = swPacket.delta < 0 ? -1 : 1;
-					var holding = player.inventory.holding + swPacket.delta;
+					let holding = player.inventory.holding + swPacket.delta;
 					if (holding < 0) holding += player.inventory.weapons.length;
 					else holding %= player.inventory.weapons.length;
 					while (!player.inventory.getWeapon(holding)) {

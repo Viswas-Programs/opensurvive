@@ -171,6 +171,7 @@ async function init(address: string) {
 					}
 					case RecvPacketTypes.PLAYERTICK: {
 						const playerSrvr = deserialisePlayer(stream as IslandrBitStream)
+						console.log(playerSrvr.inventory.ammos)
 						if (!player) player = new FullPlayer(playerSrvr);
 						else player.copy(playerSrvr);
 						const usableGunAmmoNames = ["9mm", "12 gauge", "7.62mm", "5.56mm", ".308 subsonic"];
@@ -281,6 +282,9 @@ async function init(address: string) {
 			Healing.setupHud()
 			for (const ammoElement of document.getElementsByClassName("ammos")) {
 				ammoElement.textContent = "";
+			}
+			for (const scopeElement of document.getElementsByClassName("scopes")) {
+				(<HTMLElement>scopeElement).style.display = "none"
 			}
 			//remove playercount
 		}

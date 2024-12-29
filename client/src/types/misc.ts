@@ -26,7 +26,7 @@ export enum GunColor {
 	RED = 1, // 12 gauge
 	BLUE = 2, // 7.62mm
 	GREEN = 3, // 5.56mm
-	OLIVE = 5, // .308 Subsonic
+	OLIVE = 4, // .308 Subsonic
 }
 
 export type CountableString = {

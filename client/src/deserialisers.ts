@@ -40,7 +40,7 @@ function _getAmmos(stream: IslandrBitStream): number[] {
     const ammos: number[] = []
     const size = stream.readInt8()
     for (let ii = 0; ii < size; ii++) {
-        const numofammo = stream.readInt8()
+        const numofammo = stream.readInt16()
         ammos[ii] = numofammo
     }
     return ammos

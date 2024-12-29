@@ -33,7 +33,7 @@ export class ResponsePacket extends IPacketCLIENT {
 	accessToken?: string;
 	isMobile?: boolean;
 
-	constructor(id: string, username: string, skin: string | null, deathImg: string | null, isMobile: boolean, accessToken?: string) {
+	constructor(id: string, username: string, skin: string | null, deathImg: string | null, isMobile: boolean, accessToken="") {
 		super()
 		this.id = id;
 		this.username = username;

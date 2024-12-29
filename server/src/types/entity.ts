@@ -46,8 +46,9 @@ export class Inventory {
 		this.maxHealings = (<any[]>JSON.parse(fs.readFileSync("../data/amount/healings.json", { encoding: "utf8" }))).map(x => new Map(Object.entries(x)));
 	}
 
-	getWeapon(index = -1) {
+	getWeapon(index = -1, setHolding=false) {
 		if (index < 0) index = this.holding;
+		if (setHolding) this.holding = index
 		if (index < this.weapons.length) return this.weapons[index];
 		const util = Object.keys(this.utilities)[index - this.weapons.length];
 		if (this.utilities[util]) return WEAPON_SUPPLIERS.get(util)!.create();

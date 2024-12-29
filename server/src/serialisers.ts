@@ -96,7 +96,7 @@ export function calculateAllocBytesForTickPkt(player: Player): number {
 	if (player.currentHealItem) allocBytes += player.currentHealItem.length
 	if (player.interactMessage) allocBytes += player.interactMessage.length
 	player.animations.forEach((animation) => allocBytes += animation.length)
-	for (let ii = 0; ii < player.inventory.ammos.length; ii++) {allocBytes++}
+	for (let ii = 0; ii < player.inventory.ammos.length; ii++) {allocBytes+=2}
 	for (let ii = 0; ii < 4; ii++) {
 		if (player.inventory.getWeapon(ii) != undefined) {
 			allocBytes ++;
@@ -175,7 +175,7 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 	}
 	stream.writeInt8(player.inventory.ammos.length)
 	for (let ii = 0; ii < player.inventory.ammos.length; ii++) {
-		stream.writeInt8(player.inventory.ammos[ii])
+		stream.writeInt16(player.inventory.ammos[ii])
 	}
 	stream.writeInt8(player.inventory.selectedScope)
 	//loadouts

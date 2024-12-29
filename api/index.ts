@@ -93,7 +93,6 @@ app.post("/api/validate", jsonParser, (req, res) => {
 });
 // Get player currency
 app.get("/api/currency", (req, res) => {
-	console.log("Came here :)")
 	if (!req.headers.authorization?.startsWith("Bearer")) return res.status(400).json({ success: false, error: "No access token provided" });
 	const token = req.headers.authorization.split(" ")[1];
 	db.get("SELECT currency FROM players WHERE access_token = ?", token, (err, row?: { currency: number }) => {
@@ -104,7 +103,6 @@ app.get("/api/currency", (req, res) => {
 		if (!row) return res.status(403).json({ success: false, error: "No user found" });
 		res.json({ success: true, currency: row.currency });
 	});
-	console.log("Finished :)")
 });
 // Add currency to player
 app.post("/api/delta-currency", jsonParser, (req, res) => {
