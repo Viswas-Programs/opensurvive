@@ -61,6 +61,7 @@ export default class Player extends Entity {
 	usernamesAndIDsSent = false;
 	damageTaken = 0;
 	damageDone = 0;
+	sentStuff = false;
 
 	constructor(id: string, username: string, skin: string | null, deathImg: string | null, accessToken?: string, isMobile?: boolean) {
 		super();

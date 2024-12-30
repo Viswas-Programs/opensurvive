@@ -870,3 +870,33 @@ div#menu div.panel#account {
     cursor: pointer;
     display: none;
 }
+div#gameover {
+    text-align: center;
+    z-index: 999;
+    display: none;
+}
+div#youDied {
+    font-size: 35px;
+    
+}
+div#KillsMenu {
+    text-align: left;
+    overflow-y: hidden;
+}
+div#DamageDoneMenu {
+    text-align: left;
+    overflow-y: hidden;
+}
+div#DamageTakenMenu {
+    text-align: left;
+    overflow-y: hidden;
+}
+div#damageDone {
+    text-align: right;
+}
+div#damageTaken {
+    text-align: right;
+}
+div#totalKills {
+    text-align: right;
+}

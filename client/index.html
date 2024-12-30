@@ -120,12 +120,13 @@
         <div class="joystick-handle"></div>
     </div>
     <div class="aimjoystick-container"> <div class="aimjoystick-handle"> </div> </div>
-    <div id="gameover" style="display: none;" > 
-        <div id="youDied">You Died</div>
-        <div id="totalKills">Kills: %%</div>
-        <div id="damageTaken">Damage Taken: %%</div>
-        <div id="damageDone">Damage Done: %%</div>
+    <div id="gameover" class="ingame-panel"> 
+        <div id="youDied">You %%</div>
+        <div id="KillsMenu"><div id="tKills">Kills: </div> <div id="totalKills">%%</div></div>
+        <div id="DamageTakenMenu"><div id="dTaken">Damage Taken: </div> <div id="damageTaken">%%</div></div>
+        <div id="DamageDoneMenu"><div id="dDone">Damage Done: </div> <div id="damageDone">%%</div></div>
         <div class="button" id="playAgain">Play Again</div>
+        <div class="button" id="mainMenu">Main Menu</div>
     </div>
     <canvas id="game"></canvas>
     <form id="hidden-form" class="hidden"></form>
@@ -216,7 +217,6 @@
         <table id="healing-container">
             <!-- We populate this with JS -->
         </table>
-        <div id="kill-feeds"></div>
         <div class="button" id="reload-btn">↻</div>
         <div class="button" id="menu-btn">≡</div>
         <div id="ammo-container">

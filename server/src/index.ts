@@ -3,7 +3,7 @@ import "dotenv/config";
 import { readFileSync } from "fs";
 import * as ws from "ws";
 import { ID, send, wait, sendBitstream, spawnGun} from "./utils";
-import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ScopeUpdatePacket, ServerSideScopeUpdate, PlayerTickPkt } from "./types/packet";
+import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ScopeUpdatePacket, ServerSideScopeUpdate, PlayerTickPkt, GameOverPkt } from "./types/packet";
 import { DIRECTION_VEC, EntityTypes, RecvPacketTypes, TICKS_PER_SECOND } from "./constants";
 import {  CommonAngles, RectHitbox, Vec2 } from "./types/math";
 import { Bullet, Player } from "./store/entities";
@@ -292,8 +292,8 @@ setInterval(() => {
 		if (world.particles.length) sendBitstream(socket, new ParticlesPacket(world.particles, player));
 		//for (const sound of world.onceSounds) sendBitstream(socket, new SoundPacket(sound.path, sound.position));
 		for (const killFeed of world.killFeeds) sendBitstream(socket, new AnnouncePacket(killFeed.weaponUsed, killFeed.killer, killFeed.killed))
-		if (player.changedScope) {
-			sendBitstream(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false; }
+		if (player.changedScope) { sendBitstream(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false; }
+		if (player.despawn && !player.sentStuff) { sendBitstream(socket, new GameOverPkt(false, player.damageDone, player.damageTaken, player.killCount)); player.sentStuff = true; }
 	});
 	world.postTick();
 }, 1000 / TICKS_PER_SECOND);

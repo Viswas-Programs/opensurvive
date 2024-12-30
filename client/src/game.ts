@@ -258,6 +258,36 @@ async function init(address: string) {
 						}, 5000);
 						break;
 					}
+					case RecvPacketTypes.GAMEOVER: {
+						const data = {
+							playerWon: stream?.readBoolean(),
+							damageDone: stream?.readInt16(),
+							damageTaken: stream?.readInt16(),
+							kills: stream?.readInt8()
+						}
+						let text = "Lost";
+						if (data.playerWon) text = "Won";
+						const elements = ["youDied", "totalKills", "damageTaken", "damageDone"];
+						const vertAllgnElMain = ["totalKills", "damageTaken", "damageDone"];
+						const vertAllgnElText = ["tKills", "dTaken", "dDone"];
+						const stuff = [text, data.kills, data.damageTaken, data.damageDone];
+						for (let ii = 0; ii < 4; ii++) {
+							document.getElementById(elements[ii])!.textContent = document.getElementById(elements[ii])!.textContent!.replace("%%", String(stuff[ii])); 
+							document.getElementById(elements[ii])!.style.color = "#ffffff";
+						}
+						for (let ii = 0; ii < 3; ii++) {
+							const textElement = document.getElementById(vertAllgnElText[ii])
+							const mainElement = document.getElementById(vertAllgnElMain[ii])
+							textElement!.style.float = "left";
+							textElement!.style.color = "#ffffff";
+							mainElement!.style.float = "right";
+							textElement!.style.margin = "auto";
+							mainElement!.style.margin = "auto";
+
+						}
+						document.getElementById("gameover")!.style.display="block";
+						break;
+					}
 					case RecvPacketTypes.SCOPEUPD: {
 						const data = {
 							type:packetType,
@@ -301,6 +331,7 @@ async function init(address: string) {
 			player = null;
 			setUsrnameIdDeathImg([null, null, null])
 			res(undefined);
+			document.getElementById("gameover")!.style.display = "none"
 			//remove playercount
 		}
 	
@@ -495,6 +526,13 @@ document.getElementById("disconnect")?.addEventListener("click", () => {
 	(<HTMLElement>aimHandle).style.display = 'none';
 	toggleMenu();
 });
+document.getElementById("playAgain")?.addEventListener("click", () => {
+	document.getElementById("disconnect")?.click()
+	document.getElementById("connect")?.click()
+})
+document.getElementById("mainMenu")?.addEventListener("click", () => {
+	document.getElementById("disconnect")?.click()
+})
 document.getElementById("resume")?.addEventListener('click', () => {
 	document.getElementById("settings")?.classList.add('hidden');
 	toggleMenu();

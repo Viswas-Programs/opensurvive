@@ -22,7 +22,8 @@ export enum OutPacketTypes {
 	PARTICLES = 4,
 	ANNOUNCE = 5,
 	SCOPEUPD = 6,
-	ACK = 7
+	ACK = 7,
+	GAMEOVER = 8
 }
 
 export enum RecvPacketTypes {

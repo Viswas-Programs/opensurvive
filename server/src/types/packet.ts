@@ -250,6 +250,29 @@ export class PlayerTickPkt extends IPacketSERVER {
 		serialisePlayer(this.player, this.stream);
 }
 }
+export class GameOverPkt extends IPacketSERVER {
+	type = OutPacketTypes.GAMEOVER;
+	playerWonGame: boolean;
+	damageDone: number;
+	damageTaken: number;
+	allocBytes = 7;
+	kills: number;
+	constructor(playerWonGame: boolean, damageDone: number, damageTaken: number, kills: number) {
+		super()
+		console.log('here')
+		this.playerWonGame = playerWonGame;
+		this.damageDone = damageDone;
+		this.damageTaken = damageTaken;
+		this.kills = kills
+	}
+	serialise() {
+		super.serialise()
+		this.stream.writeBoolean(this.playerWonGame)
+		this.stream.writeInt16(this.damageDone)
+		this.stream.writeInt16(this.damageTaken)
+		this.stream.writeInt8(this.kills)
+	}
+}
 export class AnnouncePacket extends IPacketSERVER {
 	type = OutPacketTypes.ANNOUNCE;
 	allocBytes = 1;
