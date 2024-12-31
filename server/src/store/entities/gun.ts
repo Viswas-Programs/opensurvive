@@ -1,5 +1,6 @@
 // Note: This is the gun item
 
+import { Ammo } from ".";
 import { world } from "../..";
 import { EntityTypes } from "../../constants";
 import { IslandrBitStream } from "../../packets";
@@ -47,6 +48,10 @@ export default class Gun extends Item {
 		const gun = new Gun(weapon.nameId, weapon.color);
 		gun.position = this.position;
 		gun.velocity = Vec2.UNIT_X.addAngle(Math.random() * CommonAngles.TWO_PI).scaleAll(0.025);
+		const ammo = new Ammo(weapon.magazine, weapon.color);
+		ammo.position = this.position;
+		world.entities.push(ammo);
+		ammo.interact(player);
 		world.entities.push(gun);
 		// Swap the player's weapon on hand with the one on ground
 		player.inventory.setWeapon(castCorrectWeapon(this.nameId));
