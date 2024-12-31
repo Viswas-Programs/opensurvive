@@ -10,6 +10,7 @@ const mousePressed = new Map<number, boolean>();
 export function isMousePressed(button: number) { return !!mousePressed.get(button); }
 export function addMousePressed(button: number) { mousePressed.set(button, true); }
 export function removeMousePressed(button: number) { mousePressed.delete(button); }
+export function cleanUpMouseAndKeyPressed() { keyPressed.clear(); mousePressed.clear() }
 
 var menuHidden = true;
 export function isMenuHidden() { return menuHidden; }

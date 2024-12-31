@@ -124,11 +124,11 @@ server.on("connection", async socket => {
 		connected = false;
 	});
 
-	var username = "";
-	var accessToken: string | undefined = undefined;
-	var skin = "default";
-	var deathImg = "default";
-	var isMobile = false;
+	let username = "";
+	let accessToken: string | undefined = undefined;
+	let skin = "default";
+	let deathImg = "default";
+	let isMobile = false;
 	// Communicate with the client by sending the ID and map size. The client should respond with ID and username, or else close the connection.
 	await Promise.race([wait(10000), new Promise<void>(resolve => {
 		sendBitstream(socket, new AckPacket(id, TICKS_PER_SECOND, world.size, world.defaultTerrain));

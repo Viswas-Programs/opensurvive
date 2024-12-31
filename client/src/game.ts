@@ -4,14 +4,14 @@ import { Howl, Howler } from "howler";
 import { GunColor, KeyBind, movementKeys, RecvPacketTypes, TIMEOUT } from "./constants";
 import { start, stop } from "./renderer";
 import { initMap } from "./rendering/map";
-import { addKeyPressed, addMousePressed, getToken, isKeyPressed, isMenuHidden, isMouseDisabled, removeKeyPressed, removeMousePressed, toggleBigMap, toggleHud, toggleMap, toggleMenu, toggleMinimap, toggleMouseDisabled } from "./states";
+import { addKeyPressed, addMousePressed, cleanUpMouseAndKeyPressed, getToken, isKeyPressed, isMenuHidden, isMouseDisabled, removeKeyPressed, removeMousePressed, toggleBigMap, toggleHud, toggleMap, toggleMenu, toggleMinimap, toggleMouseDisabled } from "./states";
 import { FullPlayer, Healing } from "./store/entities";
 import { castObstacle, castMinObstacle, Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table, Box, Log } from "./store/obstacles";
 import { castTerrain } from "./store/terrains";
 import { Vec2 } from "./types/math";
 import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta, ScopeUpdatePacket, ServerScopeUpdatePacket, ServerPacketResolvable, CancelActionsPacket } from "./types/packet";
 import { World } from "./types/world";
-import { receive, send } from "./utils";
+import { receive, send, wait } from "./utils";
 import Building from "./types/building";
 import { cookieExists, getCookieValue } from "cookies-utils";
 import { Obstacle } from "./types/obstacle";
@@ -20,7 +20,6 @@ import { IslandrBitStream } from "./packets";
 import { MinTerrain, MinVec2 } from "./types/minimized";
 import { deserialiseDiscardables, deserialiseMinEntities, deserialiseMinObstacles, deserialiseMinParticles, deserialisePlayer, setUsrnameIdDeathImg } from "./deserialisers";
 import { inflate } from "pako";
-import { type } from "os";
 //handle users that tried to go to old domain name, or direct ip
 var urlargs = new URLSearchParams(window.location.search);
 if(urlargs.get("from")){
@@ -47,6 +46,7 @@ export function getTPS() { return tps; }
 
 let ws: WebSocket;
 let connected = false;
+let clearUsrStuffAfterDiscon = true;
 export function getConnected() { return connected; }
 function setConnected(v: boolean) { connected = v; return connected; }
 enum modeMapColours {
@@ -93,10 +93,13 @@ async function init(address: string) {
 
 			// Call renderer start to setup
 			await start();
+			deathImg = localStorage.getItem("playerDeathImg")
+			skin = localStorage.getItem("playerSkin");
+			console.log(deathImg, username, skin )
 			var currentCursor = localStorage.getItem("selectedCursor")
 			if (!currentCursor) { localStorage.setItem("selectedCursor", "default"); currentCursor = localStorage.getItem("selectedCursor") }
 			if (currentCursor) { document.documentElement.style.cursor = currentCursor }
-			const responsePacket = new ResponsePacket(id, username!, skin!, deathImg!, isMobile!, (cookieExists("gave_me_cookies") ? getCookieValue("access_token") : getToken()) as string)
+			const responsePacket = new ResponsePacket(id, username!, skin!, deathImg!, isMobile!, String(cookieExists("gave_me_cookies") ? getCookieValue("access_token") : getToken()))
 			connected = true;
 			send(ws, responsePacket);
 			setConnected(true)
@@ -327,11 +330,12 @@ async function init(address: string) {
 			Howler.stop();
 			id = null;
 			tps = 1;
-			username = null;
+			if (clearUsrStuffAfterDiscon) { username = null;}
 			player = null;
 			setUsrnameIdDeathImg([null, null, null])
 			res(undefined);
 			document.getElementById("gameover")!.style.display = "none"
+			cleanUpMouseAndKeyPressed()
 			//remove playercount
 		}
 	
@@ -342,8 +346,7 @@ async function init(address: string) {
 		};
 	});
 }
-
-document.getElementById("connect")?.addEventListener("click", async () => {
+async function connect() {
 	const errorText = <HTMLDivElement>document.getElementById("error-div");
 	username = (<HTMLInputElement>document.getElementById("username")).value;
 	address = (<HTMLInputElement>document.getElementById("address")).value;
@@ -356,7 +359,8 @@ document.getElementById("connect")?.addEventListener("click", async () => {
 		errorText.style.display = "block";
 		return;
 	}
-});
+}
+document.getElementById("connect")?.addEventListener("click", connect)
 function showMobileExclusiveBtns() {
 	if (getConnected() && isMobile) {
 		function __sendPkt() { const rlpk = new ReloadWeaponPacket(); send(ws, rlpk); }
@@ -507,31 +511,36 @@ function showMobControls() {
 		}
 	}, 100);
 }}
-function check(username: string, address: string): Error | void {
-	if (!username)
+function check(usrName: string, addr: string): Error | void {
+	if (!usrName)
 		throw new Error("Please provide a username.");
-	else if (username.length > 50)
+	else if (usrName.length > 50)
 		throw new Error("Username too long! Try another username.");
-
-	if (!address)
+	username = usrName;
+	if (!addr)
 		throw new Error("Please provide an address.");
+	address = addr
 }
-
-document.getElementById("disconnect")?.addEventListener("click", () => {
+function cleanupAfterDisconnect() {
 	ws.close();
 	document.getElementById("settings")?.classList.add("hidden");
 	(<HTMLElement>joystick).style.display = 'none';
 	(<HTMLElement>handle).style.display = 'none';
 	(<HTMLElement>aimJoystick).style.display = 'none';
 	(<HTMLElement>aimHandle).style.display = 'none';
+	cleanUpMouseAndKeyPressed()
 	toggleMenu();
-});
+}
+document.getElementById("disconnect")?.addEventListener("click", cleanupAfterDisconnect);
 document.getElementById("playAgain")?.addEventListener("click", () => {
-	document.getElementById("disconnect")?.click()
-	document.getElementById("connect")?.click()
+	clearUsrStuffAfterDiscon = false;
+	cleanupAfterDisconnect()
+	toggleMenu();
+	wait(1000).then(connect)
 })
 document.getElementById("mainMenu")?.addEventListener("click", () => {
-	document.getElementById("disconnect")?.click()
+	cleanupAfterDisconnect()
+	toggleMenu();
 })
 document.getElementById("resume")?.addEventListener('click', () => {
 	document.getElementById("settings")?.classList.add('hidden');
