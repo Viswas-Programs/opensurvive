@@ -56,13 +56,16 @@ import { GunColor } from "./types/misc";
 import fetch from "node-fetch";
 
 // Spawners
-export function spawnGun(id: string, color: GunColor, position: Vec2, ammoAmount: number) {
+export function spawnGun(id: string, color: GunColor, position: Vec2, ammoAmount: number, normal=true) {
     const gun = new Gun(id, color);
     gun.position = position;
     world.entities.push(gun);
-    var halfAmmo = Math.round(ammoAmount/2)
-    spawnAmmo(halfAmmo, color, position);
-    spawnAmmo(ammoAmount - halfAmmo, color, position)
+    if (!normal) { spawnAmmo(ammoAmount, color, position); }
+    else {
+        const halfAmmo = Math.round(ammoAmount / 2)
+        spawnAmmo(halfAmmo, color, position);
+        spawnAmmo(ammoAmount - halfAmmo, color, position)
+    }
 }
 export function spawnAmmo(amount: number, color: GunColor, position: Vec2) {
     const ammo = new Ammo(amount, color);

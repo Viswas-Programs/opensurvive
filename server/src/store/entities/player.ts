@@ -4,7 +4,7 @@ import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
 import { Entity, Inventory } from "../../types/entity";
 import { CircleHitbox, Vec2 } from "../../types/math";
-import { CollisionType, GunColor } from "../../types/misc";
+import { CollisionType, GunColor, GunColorReverse } from "../../types/misc";
 import { Obstacle } from "../../types/obstacle";
 import { Particle } from "../../types/particle";
 import { GunWeapon, WeaponType } from "../../types/weapon";
@@ -14,6 +14,7 @@ import { Pond, River, Sea } from "../terrains";
 import Backpack from "./backpack";
 import Healing from "./healing";
 import Helmet from "./helmet";
+import Scope from "./scope";
 import Vest from "./vest";
 export default class Player extends Entity {
 	type = EntityTypes.PLAYER;
@@ -278,12 +279,16 @@ export default class Player extends Entity {
 		for (const weapon of this.inventory.weapons) {
 			if (weapon?.droppable) {
 				if (weapon instanceof GunWeapon) {
-					spawnGun(weapon.nameId, weapon.color, this.position, weapon.magazine);
+					spawnGun(weapon.nameId, weapon.color, this.position, weapon.magazine, false);
 					// spawnAmmo(weapon.magazine, weapon.color, this.position);
 				}
 			}
 		}
-
+		for (let ii = 0; ii < this.inventory.ammos.length; ii++) {
+			if (this.inventory.ammos[ii] > 0) {
+				spawnAmmo(this.inventory.ammos[ii], GunColorReverse.get(ii)!, this.position)
+			}
+		}
 		for (const healing of Object.keys(this.inventory.healings)) {
 			if (this.inventory.healings[healing]) {
 				const item = new Healing(healing, this.inventory.healings[healing]);
@@ -305,6 +310,13 @@ export default class Player extends Entity {
 			const item = new Backpack(this.inventory.backpackLevel);
 			item.position = this.position;
 			world.entities.push(item);
+		}
+		for (let ii = 1; ii < this.inventory.scopes.length; ii++) {
+			if (this.inventory.scopes[ii]) {
+				const scope = new Scope(this.inventory.scopes[ii]);
+				scope.position = this.position;
+				world.entities.push(scope)
+			}
 		}
 		world.playerDied();
 		// Add kill count to killer

@@ -17,7 +17,7 @@ export default class Ammo extends Item {
 		super();
 		this.amount = amount;
 		this.color = color;
-		this.allocBytes += 2;
+		this.allocBytes += 3;
 	}
 
 	picked(player: Player) {
@@ -42,7 +42,7 @@ export default class Ammo extends Item {
 	}
 	serialise(stream: IslandrBitStream, player: Player) {
 		standardEntitySerialiser(this.minimize(), stream, player)
-		stream.writeInt8(this.amount)
+		stream.writeInt16(this.amount)
 		stream.writeInt8(this.color)
 	}
 }

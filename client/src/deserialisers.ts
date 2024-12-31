@@ -196,7 +196,7 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
         }
         else if (type == EntityTypes.AMMO) {
             const minEntity = Object.assign(baseMinEntity, {
-                amount: stream.readInt8(), color: stream.readInt8(),
+                amount: stream.readInt16(), color: stream.readInt8(),
                 hitbox: <MinHitbox>{
                     type: "rect", width: 2, height: 2,
                 } })

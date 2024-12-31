@@ -68,7 +68,27 @@ async function init(address: string) {
 	// if ((<HTMLInputElement>document.getElementById("wss")).checked) protocol += "s";
 	ws = new WebSocket(`${protocol}://${address}`);
 	ws.binaryType = "arraybuffer";
-
+	function cleanupAfterPlayerDeath() {
+		// Post-death (Post player.despawn at RecvPacketTypes.PLAYERTICK)
+		if (__finishedDeathCleanup) return;
+		const usableGunAmmoNames = ["9mm", "12 gauge", "7.62mm", "5.56mm", ".308 subsonic"];
+		const ammosElements = document.getElementsByClassName("ammos");
+		for (let ii = 0; ii < 4; ii++) {
+			const nameEle = document.getElementById("weapon-name-" + ii);
+			const imageEle = document.getElementById("weapon-image-" + ii);
+			if (nameEle) nameEle.innerHTML = "";
+			if (imageEle) (<HTMLImageElement>imageEle).src = "";
+		}
+		Healing.setupHud()
+		for (let ii = 0; ii < usableGunAmmoNames.length; ii++) {
+			(<HTMLElement>ammosElements.item(ii)).textContent = `${usableGunAmmoNames[ii]}: 0`
+		}
+		for (const scopeElement of document.getElementsByClassName("scope")) {
+			console.log(scopeElement);
+			(<HTMLElement>scopeElement).style.display = "none";
+		}
+		__finishedDeathCleanup = true;
+	}
 	await new Promise((res, rej) => {
 		const timer = setTimeout(() => {
 			rej(new Error("Failed finding game"));
@@ -108,6 +128,7 @@ async function init(address: string) {
 			const scopes = document.getElementById(`scopes`);
 			const scopeList = [1, 2, 4, 8, 15];
 			const x1scope = scopes?.children.item(0) as HTMLElement
+			x1scope.style.display = "block"
 			x1scope.style.background = "rgba(55, 55, 55, 1.5)"
 			x1scope.addEventListener("click", () => {
 				if (_selectedScope == 1) return;
@@ -135,26 +156,6 @@ async function init(address: string) {
 					send(ws, new UseHealingPacket(Healing.mapping[ii]));
 				}
 			}
-			function cleanupAfterPlayerDeath() {
-				// Post-death (Post player.despawn at RecvPacketTypes.PLAYERTICK)
-				if (__finishedDeathCleanup) return;
-				const usableGunAmmoNames = ["9mm", "12 gauge", "7.62mm", "5.56mm", ".308 subsonic"];
-				const ammosElements = document.getElementsByClassName("ammos");
-				for (let ii = 0; ii < 4; ii++) {
-					const nameEle = document.getElementById("weapon-name-" + ii);
-					const imageEle = document.getElementById("weapon-image-" + ii);
-					if (nameEle) nameEle.innerHTML = "";
-					if (imageEle) (<HTMLImageElement>imageEle).src = "";
-				}
-				Healing.setupHud()
-				for (let ii = 0; ii < usableGunAmmoNames.length; ii++) {
-					(<HTMLElement>ammosElements.item(ii)).textContent = `${usableGunAmmoNames[ii]}: 0`
-				}
-				for (const scopeElement of document.getElementsByClassName("scopes")) {
-					(<HTMLElement>scopeElement).style.display = "none"
-				}
-				__finishedDeathCleanup = true;
-		}
 			showMobileExclusiveBtns();
 			const interval = setInterval(() => {
 				if (connected) send(ws, new PingPacket());
@@ -198,18 +199,20 @@ async function init(address: string) {
 						const playerSrvr = deserialisePlayer(stream as IslandrBitStream)
 						if (!player) player = new FullPlayer(playerSrvr);
 						else player.copy(playerSrvr);
-						const usableGunAmmoNames = ["9mm", "12 gauge", "7.62mm", "5.56mm", ".308 subsonic"];
-						const usableGunAmmos = [
-							player.inventory.ammos[GunColor.YELLOW],
-							player.inventory.ammos[GunColor.RED],
-							player.inventory.ammos[GunColor.BLUE],
-							player.inventory.ammos[GunColor.GREEN],
-							player.inventory.ammos[GunColor.OLIVE]];
-						const ammosElements = document.getElementsByClassName("ammos");
-						for (let ii = 0; ii < usableGunAmmoNames.length; ii++) {
-							(<HTMLElement>ammosElements.item(ii)).textContent = `${usableGunAmmoNames[ii]}: ${usableGunAmmos[ii]}`
-						}
 						if (player.despawn) cleanupAfterPlayerDeath()
+						else {
+							const usableGunAmmoNames = ["9mm", "12 gauge", "7.62mm", "5.56mm", ".308 subsonic"];
+							const usableGunAmmos = [
+								player.inventory.ammos[GunColor.YELLOW],
+								player.inventory.ammos[GunColor.RED],
+								player.inventory.ammos[GunColor.BLUE],
+								player.inventory.ammos[GunColor.GREEN],
+								player.inventory.ammos[GunColor.OLIVE]];
+							const ammosElements = document.getElementsByClassName("ammos");
+							for (let ii = 0; ii < usableGunAmmoNames.length; ii++) {
+								(<HTMLElement>ammosElements.item(ii)).textContent = `${usableGunAmmoNames[ii]}: ${usableGunAmmos[ii]}`
+							}
+						}
 						break;
 					}
 					case RecvPacketTypes.SOUND: {
@@ -288,7 +291,8 @@ async function init(address: string) {
 							mainElement!.style.margin = "auto";
 
 						}
-						document.getElementById("gameover")!.style.display="block";
+						document.getElementById("gameover")!.style.display = "block";
+						cleanupAfterPlayerDeath()
 						break;
 					}
 					case RecvPacketTypes.SCOPEUPD: {
@@ -317,6 +321,7 @@ async function init(address: string) {
 								}
 							}
 						})
+						break;
 					}
 				}
 			}
@@ -324,6 +329,7 @@ async function init(address: string) {
 	
 		// Reset everything when connection closes
 		ws.onclose = () => {
+			cleanupAfterPlayerDeath()
 			connected = false;
 			setConnected(false)
 			stop();

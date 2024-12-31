@@ -29,6 +29,14 @@ export enum GunColor {
 	OLIVE = 4, // .308 Subsonic
 }
 
+export const GunColorReverse = new Map<number, GunColor>([
+	[0, GunColor.YELLOW],
+	[1, GunColor.RED],
+	[2, GunColor.BLUE],
+	[3, GunColor.GREEN],
+	[4, GunColor.OLIVE]
+])
+
 export type CountableString = {
 	[key: string]: number;
 }
