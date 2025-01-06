@@ -84,6 +84,11 @@ export default class Crate extends Obstacle {
 				ctx.fillStyle = "#46502d";
 				ctx.fillRect(-1.5 * scale, -1.5 * scale, 3 * scale, 3 * scale);
 				break;
+			case "soviet": {
+				ctx.fillStyle = "#3C6400"
+				ctx.fillRect(-2 * scale, -2 * scale, 4 * scale, 4 * scale)
+				break;
+			}
 			default:
 				ctx.fillStyle = "#683c05";
 				ctx.fillRect(-2 * scale, -2 * scale, 4 * scale, 4 * scale);

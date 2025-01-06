@@ -36,7 +36,7 @@ export default class Gun extends Item {
 				// If player is holding a melee weapon, automatically switch to the gun
 				if (player.inventory.holding == 2)
 					player.inventory.holding = ii;
-				player.reload()
+				player.weaponsScheduledToReload.push(this.nameId)
 				return true;
 			}
 		}
@@ -55,6 +55,7 @@ export default class Gun extends Item {
 		world.entities.push(gun);
 		// Swap the player's weapon on hand with the one on ground
 		player.inventory.setWeapon(castCorrectWeapon(this.nameId));
+		player.weaponsScheduledToReload.push(this.nameId)
 		return true;
 	}
 

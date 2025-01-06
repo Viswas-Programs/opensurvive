@@ -182,6 +182,19 @@ export class InteractPacket extends IPacketCLIENT {
 }
 
 // Packet to notify weapon switching
+export class DropWeaponPacket extends IPacketCLIENT {
+	type = OutPacketTypes.DROP_WEAPON;
+	index: number;
+	allocBytes = 2;
+	constructor(index: number) {
+		super()
+		this.index=index
+	}
+	serialise() {
+		super.serialise()
+		this.stream.writeInt8(this.index)
+	}
+}
 export class SwitchWeaponPacket extends IPacketCLIENT {
 	type = OutPacketTypes.SW_WEAPON;
 	delta: number;

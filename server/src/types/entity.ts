@@ -18,7 +18,7 @@ export class Inventory {
 	static maxHealings: Map<string, number>[];
 
 	holding: number;
-	weapons: Weapon[];
+	weapons: Weapon[] | undefined[];
 	// Indices are colors. Refer to GunColor
 	ammos: number[];
 	// Utilities. Maps ID to amount of util.
@@ -34,7 +34,7 @@ export class Inventory {
 	constructor(holding: number, weapons?: Weapon[], ammos?: number[], utilities: CountableString = {}, healings: CountableString = {}) {
 		this.holding = holding;
 		// Hardcoding slots
-		this.weapons = weapons || Array(4);
+		this.weapons = weapons || [undefined, undefined, undefined, undefined];
 		this.ammos = ammos || Array(Object.keys(GunColor).length / 2).fill(0);
 		this.utilities = utilities;
 		this.healings = healings;
@@ -55,7 +55,7 @@ export class Inventory {
 		return undefined;
 	}
 
-	setWeapon(weapon: Weapon, index = -1) {
+	setWeapon(weapon: Weapon | undefined, index = -1) {
 		if (index < 0) index = this.holding;
 		if (index < 3) {this.weapons[index] = weapon; }
 	}
@@ -79,7 +79,7 @@ export class Inventory {
 	}
 
 	minimize() {
-		return <MinInventory> { holding: this.weapons[this.holding].minimize(), backpackLevel: this.backpackLevel, vestLevel: this.vestLevel, helmetLevel: this.helmetLevel };
+		return <MinInventory> { holding: this.weapons[this.holding]!.minimize(), backpackLevel: this.backpackLevel, vestLevel: this.vestLevel, helmetLevel: this.helmetLevel };
 		//If the player isn't holding anything no need to minimize it
 	}
 

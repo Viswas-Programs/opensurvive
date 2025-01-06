@@ -6,7 +6,7 @@ import { ID, send, wait, sendBitstream, spawnGun} from "./utils";
 import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ScopeUpdatePacket, ServerSideScopeUpdate, PlayerTickPkt, GameOverPkt } from "./types/packet";
 import { DIRECTION_VEC, EntityTypes, RecvPacketTypes, TICKS_PER_SECOND } from "./constants";
 import {  CommonAngles, RectHitbox, Vec2 } from "./types/math";
-import { Bullet, Player } from "./store/entities";
+import { Ammo, Bullet, Gun, Player } from "./store/entities";
 import { World } from "./types/world";
 import { Plain, castMapTerrain } from "./store/terrains";
 import { castMapObstacle } from "./store/obstacles";
@@ -17,6 +17,7 @@ import { GunColor } from "./types/misc";
 import Building from "./types/building";
 import Scope from "./store/entities/scope";
 import Healing from "./store/entities/healing";
+import { GunWeapon, Weapon, WeaponType } from "./types/weapon";
 export var ticksElapsed = 0;
 
 const server = new ws.Server({ port: 8080 });
@@ -268,6 +269,25 @@ server.on("connection", async socket => {
 			case RecvPacketTypes.CANCEL_ACT:
 				player.healTicks = 0;
 				player.reloadTicks = 0;
+				player.healItem = player.currentHealItem = undefined;
+				break;
+			case RecvPacketTypes.DROP_WEAPON:
+				const index = stream.readInt8();
+				const weaponToDrop = player.inventory.getWeapon(index);
+				if (weaponToDrop && weaponToDrop.droppable) {
+					if (weaponToDrop.type == WeaponType.GUN) {
+						if (weaponToDrop.nameId in player.weaponsScheduledToReload) {player.weaponsScheduledToReload.splice(player.weaponsScheduledToReload.indexOf(weaponToDrop.nameId), 1) }
+						const gun = new Gun(weaponToDrop.nameId, (<GunWeapon>weaponToDrop).color)
+						gun.position = player.position;
+						const newAmmo = new Ammo((<GunWeapon>weaponToDrop).magazine, (<GunWeapon>weaponToDrop).color)
+						newAmmo.position = player.position;
+						world.entities.push(newAmmo)
+						newAmmo.interact(player);
+						world.entities.push(gun)
+						player.inventory.setWeapon(undefined, index)
+						player.inventory.holding = 2
+					}
+				}
 		}
 	});
 });
@@ -290,7 +310,7 @@ setInterval(() => {
 		//for (const sound of world.onceSounds) sendBitstream(socket, new SoundPacket(sound.path, sound.position));
 		for (const killFeed of world.killFeeds) sendBitstream(socket, new AnnouncePacket(killFeed.weaponUsed, killFeed.killer, killFeed.killed))
 		if (player.changedScope) { sendBitstream(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false; }
-		if (player.despawn && !player.sentStuff) { sendBitstream(socket, new GameOverPkt(false, player.damageDone, player.damageTaken, player.killCount)); player.sentStuff = true; }
+		if ((player.despawn || player.shouldSendStuff) && !player.sentStuff) { sendBitstream(socket, new GameOverPkt(player.won, player.damageDone, player.damageTaken, player.killCount)); player.sentStuff = true; }
 	});
 	world.postTick();
 }, 1000 / TICKS_PER_SECOND);

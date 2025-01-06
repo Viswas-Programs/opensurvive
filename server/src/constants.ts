@@ -43,6 +43,7 @@ export enum RecvPacketTypes {
 	CANCEL_ACT = 13,
 	HEAL = 14,
 	SR_SCOPE_UPD = 15,
+	DROP_WEAPON = 16
 }
 export const TSCONFIG = JSON.parse(fs.readFileSync("./tsconfig.json", { encoding: "utf8" }));
 

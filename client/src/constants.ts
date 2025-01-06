@@ -44,6 +44,7 @@ export enum OutPacketTypes {
 	CANCEL_ACT = 13,
 	HEAL = 14,
 	SR_SCOPE_UPD = 15,
+	DROP_WEAPON = 16
 }
 export const movementKeys = [KeyBind.RIGHT, KeyBind.UP, KeyBind.LEFT, KeyBind.DOWN].map(k => <string> k);
 

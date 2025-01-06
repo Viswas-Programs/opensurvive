@@ -59,7 +59,7 @@ export default class Barrel extends Obstacle {
 	}
 
 	renderMap(_canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scale: number) {
-		ctx.fillStyle = "#005f00";
+		ctx.fillStyle = "#0000f5";
 		circleFromCenter(ctx, this.position.x * scale, this.position.y * scale, 2 * scale);
 	}
 }

@@ -9,7 +9,7 @@ import { FullPlayer, Healing } from "./store/entities";
 import { castObstacle, castMinObstacle, Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table, Box, Log } from "./store/obstacles";
 import { castTerrain } from "./store/terrains";
 import { Vec2 } from "./types/math";
-import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta, ScopeUpdatePacket, ServerScopeUpdatePacket, ServerPacketResolvable, CancelActionsPacket } from "./types/packet";
+import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta, ScopeUpdatePacket, ServerScopeUpdatePacket, ServerPacketResolvable, CancelActionsPacket, DropWeaponPacket } from "./types/packet";
 import { World } from "./types/world";
 import { receive, send, wait } from "./utils";
 import Building from "./types/building";
@@ -33,6 +33,7 @@ let tps = 1; // Default should be 1, so even if no TPS detail from server, we wi
 let username: string | null;
 let address: string | null;
 let skin: string | null = localStorage.getItem("playerSkin");
+let gameEnded = true;
 if (!localStorage.getItem("playerDeathImg")) localStorage.setItem("playerDeathImg", "default")
 
 let deathImg: string | null = localStorage.getItem("playerDeathImg");
@@ -113,6 +114,7 @@ async function init(address: string) {
 
 			// Call renderer start to setup
 			await start();
+			gameEnded = false;
 			deathImg = localStorage.getItem("playerDeathImg")
 			skin = localStorage.getItem("playerSkin");
 			console.log(deathImg, username, skin )
@@ -272,6 +274,7 @@ async function init(address: string) {
 							kills: stream?.readInt8()
 						}
 						let text = "Lost";
+						gameEnded = true;
 						if (data.playerWon) text = "Won";
 						const elements = ["youDied", "totalKills", "damageTaken", "damageDone"];
 						const vertAllgnElMain = ["totalKills", "damageTaken", "damageDone"];
@@ -342,6 +345,7 @@ async function init(address: string) {
 			res(undefined);
 			document.getElementById("gameover")!.style.display = "none"
 			cleanUpMouseAndKeyPressed()
+			gameEnded = true;
 			//remove playercount
 		}
 	
@@ -553,7 +557,7 @@ document.getElementById("resume")?.addEventListener('click', () => {
 	toggleMenu();
 })
 window.onkeydown = (event) => {
-	if (!connected || isKeyPressed(event.key)) return;
+	if (!connected || isKeyPressed(event.key) || !player || player.despawn || gameEnded) return;
 	event.stopPropagation();
 	addKeyPressed(event.key);
 	const settingsElem = document.getElementById("settings");
@@ -581,7 +585,7 @@ window.onkeydown = (event) => {
 }
 
 window.onkeyup = (event) => {
-	if (!connected) return;
+	if (!connected || !player || player.despawn || gameEnded) return;
 	event.stopPropagation();
 	removeKeyPressed(event.key);
 	const index = movementKeys.indexOf(event.key);
@@ -590,27 +594,27 @@ window.onkeyup = (event) => {
 }
 
 window.onmousemove = (event) => {
-	if (!connected || isMobile) return;
+	if (!connected || isMobile || !player || player.despawn || gameEnded) return;
 	event.stopPropagation();
 	send(ws, new MouseMovePacket(event.x - window.innerWidth / 2, event.y - window.innerHeight / 2));
 }
 
 window.onmousedown = (event) => {
-	if (!connected || isMouseDisabled() || isMobile) return;
+	if (!connected || isMouseDisabled() || isMobile || !player || player.despawn || gameEnded) return;
 	event.stopPropagation();
 	addMousePressed(event.button);
 	send(ws, new MousePressPacket(event.button));
 }
 
 window.onmouseup = (event) => {
-	if (!connected || isMobile) return;
+	if (!connected || isMobile || !player || player.despawn || gameEnded) return;
 	event.stopPropagation();
 	removeMousePressed(event.button);
 	send(ws, new MouseReleasePacket(event.button));
 }
 
 window.onwheel = (event) => {
-	if (!connected || !player) return;
+	if (!connected || !player || player.despawn || gameEnded) return;
 	event.stopPropagation();
 	const delta = event.deltaY < 0 ? -1 : 1;
 	send(ws, new SwitchWeaponPacket(delta));
@@ -628,8 +632,14 @@ window.ondblclick = (event) => {
 for (let ii = 0; ii < 3; ii++) {
 	const panel = <HTMLElement> document.getElementById("weapon-panel-" + ii);
 	panel.onmouseenter = panel.onmouseleave = () => toggleMouseDisabled();
-	panel.onclick = () => {
-		if (!connected || !player) return;
-		send(ws, new SwitchWeaponPacket(ii, true));
+	panel.onmouseup = (ev: MouseEvent) => {
+		if (!connected || !player || player.despawn || gameEnded) return;
+
+		if (ev.button == 0) {
+			send(ws, new SwitchWeaponPacket(ii, true));
+		}
+		else {
+			send(ws, new DropWeaponPacket(ii))
+		}
 	}
 }

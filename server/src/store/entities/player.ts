@@ -18,7 +18,7 @@ import Scope from "./scope";
 import Vest from "./vest";
 export default class Player extends Entity {
 	type = EntityTypes.PLAYER;
-	currentHealItem: string | null;
+	currentHealItem: string | undefined;
 	interactMessage: string | null;
 	hitbox = new CircleHitbox(1);
 	id: string;
@@ -63,6 +63,9 @@ export default class Player extends Entity {
 	damageTaken = 0;
 	damageDone = 0;
 	sentStuff = false;
+	shouldSendStuff = false;
+	won = false;
+	weaponsScheduledToReload: string[] = [];
 
 	constructor(id: string, username: string, skin: string | null, deathImg: string | null, accessToken?: string, isMobile?: boolean) {
 		super();
@@ -231,6 +234,7 @@ export default class Player extends Entity {
 					delta -= gun.magazine;
 					this.inventory.setWeapon(gun);
 					this.inventory.ammos[gun.color] += delta;
+					this.weaponsScheduledToReload.splice(this.weaponsScheduledToReload.indexOf(weapon.nameId), 1)
 				}
 			}
 			this.markDirty();
@@ -261,6 +265,9 @@ export default class Player extends Entity {
 				this.damage(world.zoneDamage);
 			}
 		}*/
+		if (this.weaponsScheduledToReload.length) {
+			this.weaponsScheduledToReload.forEach(weapon => { if (this.inventory.getWeapon(this.inventory.holding)?.nameId == weapon) { this.reload() }  })
+		}
 	}
 
 	damage(dmg: number, damager?: string) {
@@ -325,6 +332,7 @@ export default class Player extends Entity {
 			if (entity?.type === this.type) {
 				(<Player>entity).killCount++;
 				world.killFeeds.push({ weaponUsed: (<Player>entity).lastHolding, killer: `${(<Player>entity).username}#${(<Player>entity).id}`, killed: `${this.username}#${this.id}` });
+				if (world.playerCount == 1) { (<Player>entity).won = true; (<Player>entity).shouldSendStuff = true; }
 			}
 		}
 		// Add currency to user if they are logged in and have kills
@@ -337,7 +345,7 @@ export default class Player extends Entity {
 		const weapon = this.inventory.getWeapon();
 		if (weapon?.type != WeaponType.GUN) return;
 		const gun = <GunWeapon>weapon;
-		world.onceSounds.push({ path: `guns/${gun.nameId}_reload.mp3`, position: this.position })
+		//world.onceSounds.push({ path: `guns/${gun.nameId}_reload.mp3`, position: this.position })
 		if (!this.inventory.ammos[gun.color] || gun.magazine == gun.capacity) return;
 		this.maxReloadTicks = this.reloadTicks = gun.reloadTicks;
 		this.markDirty();
