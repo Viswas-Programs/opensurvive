@@ -11,7 +11,7 @@ import { castTerrain } from "./store/terrains";
 import { Vec2 } from "./types/math";
 import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta, ScopeUpdatePacket, ServerScopeUpdatePacket, ServerPacketResolvable, CancelActionsPacket, DropWeaponPacket } from "./types/packet";
 import { World } from "./types/world";
-import { receive, send, wait } from "./utils";
+import { receive, send, wait, parseSettingsStuff } from "./utils";
 import Building from "./types/building";
 import { cookieExists, getCookieValue } from "cookies-utils";
 import { Obstacle } from "./types/obstacle";
@@ -35,7 +35,6 @@ let address: string | null;
 let skin: string | null = localStorage.getItem("playerSkin");
 let gameEnded = true;
 if (!localStorage.getItem("playerDeathImg")) localStorage.setItem("playerDeathImg", "default")
-
 let deathImg: string | null = localStorage.getItem("playerDeathImg");
 
 const isMobile = /Android/.test(navigator.userAgent) || /iPhone/.test(navigator.userAgent) || /iPad/.test(navigator.userAgent) || /Tablet/.test(navigator.userAgent)
@@ -45,6 +44,8 @@ export function getId() { return id; }
 export function getPlayer() { return player; }
 export function getTPS() { return tps; }
 
+
+export let Settings = new Map<string, number>(parseSettingsStuff())
 let ws: WebSocket;
 let connected = false;
 let clearUsrStuffAfterDiscon = true;
@@ -62,6 +63,8 @@ const aimHandle = document.getElementsByClassName('aimjoystick-handle')[0];
 let _selectedScope = 1;
 let data: any;
 let __finishedDeathCleanup = false;
+let ping = 0;
+let pingTimer = 0;
 declare type modeMapColourType = keyof typeof modeMapColours
 async function init(address: string) {
 	// Initialize the websocket
@@ -69,16 +72,19 @@ async function init(address: string) {
 	// if ((<HTMLInputElement>document.getElementById("wss")).checked) protocol += "s";
 	ws = new WebSocket(`${protocol}://${address}`);
 	ws.binaryType = "arraybuffer";
+	Settings = new Map<string, number>(parseSettingsStuff())
 	function cleanupAfterPlayerDeath() {
 		// Post-death (Post player.despawn at RecvPacketTypes.PLAYERTICK)
 		if (__finishedDeathCleanup) return;
 		const usableGunAmmoNames = ["9mm", "12 gauge", "7.62mm", "5.56mm", ".308 subsonic"];
 		const ammosElements = document.getElementsByClassName("ammos");
 		for (let ii = 0; ii < 4; ii++) {
+			const divEle = document.getElementById("weapon-panel-" + ii);
 			const nameEle = document.getElementById("weapon-name-" + ii);
 			const imageEle = document.getElementById("weapon-image-" + ii);
 			if (nameEle) nameEle.innerHTML = "";
 			if (imageEle) (<HTMLImageElement>imageEle).src = "";
+			divEle!.style.background = "transparent";
 		}
 		Healing.setupHud()
 		for (let ii = 0; ii < usableGunAmmoNames.length; ii++) {
@@ -97,6 +103,7 @@ async function init(address: string) {
 		}, TIMEOUT);
 
 		ws.onmessage = async (event) => {
+			pingTimer = Date.now()
 			__finishedDeathCleanup = false;
 			const stream = new IslandrBitStream(inflate(event.data).buffer)
 			const dataA = <AckPacket>{
@@ -130,6 +137,9 @@ async function init(address: string) {
 			const scopes = document.getElementById(`scopes`);
 			const scopeList = [1, 2, 4, 8, 15];
 			const x1scope = scopes?.children.item(0) as HTMLElement
+			if (Settings.get("pingMeter")) {
+				document.getElementById("ping-meter")!.style.display = "block";
+			}
 			x1scope.style.display = "block"
 			x1scope.style.background = "rgba(55, 55, 55, 1.5)"
 			x1scope.addEventListener("click", () => {
@@ -164,6 +174,9 @@ async function init(address: string) {
 				else clearInterval(interval);
 			}, 1000);
 			ws.onmessage = (event) => {
+				ping = Date.now() - pingTimer
+				pingTimer = Date.now()
+				if (Settings.get("pingMeter")) { document.getElementById("pingNum")!.textContent = String(ping) }
 				let bitstream = true;
 				let stream;
 				let packetType: number;
@@ -308,7 +321,6 @@ async function init(address: string) {
 							(<HTMLElement>scopes?.children.item(ii)).style.background = "rgba(55, 55, 55, 0.5)";
 						}
 						const scopeElement = (scopes?.children.item(scopeList.indexOf(Number(scopeChangePkt.scope))) as HTMLElement);
-						console.log(scopeElement)
 						scopeElement.style.display = "block";
 						scopeElement.style.background = "rgba(55, 55, 55, 1.5)"
 						
@@ -562,13 +574,15 @@ window.onkeydown = (event) => {
 	addKeyPressed(event.key);
 	const settingsElem = document.getElementById("settings");
 	if (event.key == KeyBind.MENU) {
-		if (isMenuHidden()) settingsElem?.classList.remove("hidden");
-		else settingsElem?.classList.add("hidden");
+		console.log("bruh")
+		if (isMenuHidden()) { settingsElem?.classList.remove("hidden"); console.log("bruh1") }
+		else { settingsElem?.classList.add("hidden"); console.log("bruh2")}
 		toggleMenu();
 	} else if (event.key == KeyBind.HIDE_HUD) toggleHud();
 	else if (event.key == KeyBind.WORLD_MAP) toggleMap();
 	else if (event.key == KeyBind.HIDE_MAP) toggleMinimap();
 	else if (event.key == KeyBind.BIG_MAP) toggleBigMap();
+	console.log(isMenuHidden())
 	if (isMenuHidden()) {
 		const index = movementKeys.indexOf(event.key);
 		if (index >= 0)

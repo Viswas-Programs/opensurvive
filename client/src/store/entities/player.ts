@@ -1,4 +1,4 @@
-import { ENTITY_SUPPLIERS, Healing } from ".";
+import { ENTITY_SUPPLIERS, Gun, Healing } from ".";
 import { EntityTypes, LANG } from "../../constants";
 import { translate } from "../../languages";
 import { getWeaponHUDImagePath } from "../../textures";
@@ -10,7 +10,8 @@ import { circleFromCenter } from "../../utils";
 import { castCorrectWeapon, WEAPON_SUPPLIERS } from "../weapons";
 import { getMode } from "../../homepage";
 import { Vec2 } from "../../types/math";
-import { getTPS } from "../../game";
+import { getTPS, Settings } from "../../game";
+import { GunColor } from "../../types/misc";
 
 const weaponPanelDivs: HTMLDivElement[] = [];
 const weaponNameDivs: HTMLDivElement[] = [];
@@ -59,6 +60,13 @@ function loadProcItemImages(type: string) {
 	}
 }
 ["helmet", "backpack"].forEach(type => loadProcItemImages(type))
+const colorToRGBA = new Map<GunColor, string>([
+	[GunColor.YELLOW, "rgba(255, 255, 0, 0.5)"],
+	[GunColor.RED, "rgba(255, 0, 0, 0.5)"],
+	[GunColor.BLUE, "rgba(0, 0, 255, 0.5)"],
+	[GunColor.GREEN, "rgba(0, 255, 0, 0.5)"],
+	[GunColor.OLIVE, "rgba(128, 128, 0, 0.5)"]
+])
 export default class Player extends Entity {
 	static readonly TYPE = EntityTypes.PLAYER;
 	type = Player.TYPE;
@@ -107,6 +115,12 @@ export default class Player extends Entity {
 				if (weaponImages[ii].path != path) {
 					weaponImages[ii].path = path;
 					weaponImages[ii].src = path;
+				}
+				if (Settings.get("coloredWeaponSlots") && (inventory.weapons[ii]?.type == WeaponType.GUN)) {
+					weaponPanelDivs[ii].style.background = colorToRGBA.get((<GunWeapon>inventory.weapons[ii])?.color)!
+				}
+				else if (Settings.get("coloredWeaponSlots")){
+					weaponPanelDivs[ii].style.background = "rgba(51, 51, 51, 0.5)"
 				}
 			}
 			for (const key of Object.keys(this.inventory.healings)) {

@@ -161,6 +161,7 @@ server.on("connection", async socket => {
 	send(socket, new GamePacket(world.entities, world.obstacles.concat(...world.buildings.map(b => b.obstacles.map(o => o.obstacle))), player, world.playerCount, true));
 	playerInitialPacketsSent.set(socket, true);
 	sendBitstream(socket, new PlayerTickPkt(player));
+	//spawnGun("stf_12", GunColor.RED, player.position, 16, true)
 	// If the client doesn't ping for 30 seconds, we assume it is a disconnection.
 	const timeout = setTimeout(() => {
 		try {socket.close(); } catch (err) { }
@@ -276,16 +277,16 @@ server.on("connection", async socket => {
 				const weaponToDrop = player.inventory.getWeapon(index);
 				if (weaponToDrop && weaponToDrop.droppable) {
 					if (weaponToDrop.type == WeaponType.GUN) {
-						if (weaponToDrop.nameId in player.weaponsScheduledToReload) {player.weaponsScheduledToReload.splice(player.weaponsScheduledToReload.indexOf(weaponToDrop.nameId), 1) }
+						if (weaponToDrop.nameId in player.weaponsScheduledToReload) { player.weaponsScheduledToReload.splice(player.weaponsScheduledToReload.indexOf(weaponToDrop.nameId), 1) }
 						const gun = new Gun(weaponToDrop.nameId, (<GunWeapon>weaponToDrop).color)
 						gun.position = player.position;
 						const newAmmo = new Ammo((<GunWeapon>weaponToDrop).magazine, (<GunWeapon>weaponToDrop).color)
 						newAmmo.position = player.position;
 						world.entities.push(newAmmo)
-						newAmmo.interact(player);
+						//newAmmo.interact(player);
 						world.entities.push(gun)
-						player.inventory.setWeapon(undefined, index)
 						player.inventory.holding = 2
+						player.inventory.setWeapon(undefined, index)
 					}
 				}
 		}

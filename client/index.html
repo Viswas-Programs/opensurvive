@@ -29,9 +29,24 @@
         <div class="loading-text">Loading<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
         </div>
     </div>
-
-    <div id="volume-icon"></div>
-
+     
+    <div id="volume-icon" class="button"></div>
+    <div id="control-panel" class="panel" style="hidden">
+        <div id="settings-top-frame">
+            <div id="settings-text">Control Panel</div>
+            <div id="settings-close" class="button-close"> X </div>
+        </div>
+        <div id="settings-frame">
+            <div id="sidebar">
+                <div id="gameUI-Btn" class="sidebarButtons">Game UI</div>
+                <div id="version-Btn" class="sidebarButtons">Version</div>
+            </div>
+            <div id="main-content">
+                <!-- Auto populate from JS -->
+            </div>
+        </div>
+        <div id="settings-saveChangesBtn" class="button">Save Changes</div>
+    </div>
     <div id="volume-slider">
         <input type="range" min="0" max="100" value="50" step="1" id="volume-range">
     </div>
@@ -204,16 +219,22 @@
     <div id="hud" class="hidden">
         <div id="playercountcontainer">
             <span id="playercount">1</span>
-            <div id="scopes" class="scopes">
-                <div id="scope">1x </div>
-                <div id="scope" class="scope" style="display: none">2x</div>
-                <div id="scope" class="scope" style="display: none">4x</div>
-                <div id="scope" class="scope" style="display: none">8x</div>
-                <div id="scope" class="scope" style="display: none">15x</div>
-            </div>
             <br />
             <span id="alive">Alive</span>
         </div>
+        <div id="scopes" class="scopes">
+            <div id="scope">1x </div>
+            <div id="scope" class="scope" style="display: none">2x</div>
+            <div id="scope" class="scope" style="display: none">4x</div>
+            <div id="scope" class="scope" style="display: none">8x</div>
+            <div id="scope" class="scope" style="display: none">15x</div>
+        </div>
+        <div id="ping-meter">
+            <span id="pingNum"></span> <span id="pingTxt">ms</span>
+            <br />
+            <span id="pingTxt">Ping</span>
+        </div>
+
         <table id="healing-container">
             <!-- We populate this with JS -->
         </table>

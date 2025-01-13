@@ -5,6 +5,7 @@ import { createHash } from "crypto";
 import "./loadout";
 import { getToken, setToken, setUsername } from "./states";
 import { wait } from "./utils";
+import "./settings";
 let mode = "normal"
 let pageLoaded = false
 wait(10000).then(() => {
@@ -88,6 +89,16 @@ if (!window.location.href!.includes("/loadout")) {
 		closeBox();
 	}
 	document.getElementById("button-close")!.onclick = closeBox;
+}
+if (!localStorage.getItem("version")) { localStorage.setItem("version", "0.3") }
+let version = parseFloat(localStorage.getItem("version")!);
+const currentVersion = 0.3
+if (!localStorage.getItem("settings") || currentVersion > version) {
+	localStorage.setItem("settings", "``coloredWeaponSlots:0;pingMeter:0");
+	if (currentVersion > version) {
+		localStorage.setItem("version", String(currentVersion))
+		version = currentVersion
+	}
 }
 const modes = ["normal", "suroi_collab", "classic"]
 modes.forEach(md => {

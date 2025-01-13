@@ -76,7 +76,7 @@ export default class Player extends Entity {
 		this.deathImg = deathImg
 		console.log("from player.ts server skin > " + this.skin + " and death image = " + this.deathImg)
 		this.inventory = Inventory.defaultEmptyInventory();
-		this.currentHealItem = null;
+		this.currentHealItem = undefined;
 		this.accessToken = accessToken;
 		this.isMobile = isMobile!;
 		this.allocBytes += 35 + this.username.length + 1 + 1; //last +1 is for animation length byte

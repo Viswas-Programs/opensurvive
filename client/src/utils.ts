@@ -115,3 +115,18 @@ export function loadoutChange(accessToken: string, skin: string, delta: number) 
 	fetch((process.env.API_URL || "http://localhost:8000") + "/api/addSkins", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accessToken, skin }) })
 		.catch(console.error);
 }
+
+export function parseSettingsStuff() {
+	const arr: Array<[string, number]> = []
+	if (localStorage.getItem("settings")) {
+		const settingsRawList = localStorage.getItem("settings")!.split("``");
+		for (let ii = 1; ii < settingsRawList.length; ii++) {
+			const perSettingRawList = settingsRawList[ii].split(";")
+			for (let i = 0; i < perSettingRawList.length; i++) {
+				const perSettingList = perSettingRawList[i].split(":")
+				arr.push([perSettingList[0], (Number(perSettingList[1]))])
+			}
+		}
+	}
+	return arr
+}

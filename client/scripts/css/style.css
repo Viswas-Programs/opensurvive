@@ -594,6 +594,8 @@ input[type="text"], input[type="password"] {
     background-repeat: no-repeat;
     background-size: contain;
     cursor: pointer;
+    z-index: 15;
+    pointer-events: all;
 }
 
 #volume-slider {
@@ -872,7 +874,7 @@ div#menu div.panel#account {
 }
 div#gameover {
     text-align: center;
-    z-index: 999;
+    z-index: 15;
     display: none;
 }
 div#youDied {
@@ -899,4 +901,58 @@ div#damageTaken {
 }
 div#totalKills {
     text-align: right;
+}
+div#control-panel {
+    background: rgba(51, 51, 51, 0.9);
+    position:absolute;
+    text-align: center;
+    z-index: 100;
+    top:20%;
+    left:22%;
+    width:50%;
+    height:50%;
+}
+div#settings-frame{
+    width:100%;
+    height: 75%
+}
+div#settings-top-frame{
+    padding-bottom: 2%;
+}
+div#settings-text {
+    font-size: 25px;
+    overflow-y: hidden;
+    text-align: left;
+}
+div#sidebar {
+    display: inline-block;
+    text-align:left;
+    overflow-y: hidden;
+    width: 20%;
+    height: 95%;
+    float: left;
+}
+div#main-content {
+    overflow-y: hidden;
+    height: 95%;
+    width: 80%;
+    display: inline-block;
+    text-align: left;
+}
+div#settings-close{
+    text-align: right;
+    overflow-y: hidden;
+}
+div#settings-saveChangesBtn {
+    float: right;
+    overflow-y: hidden;
+}
+.sidebarButtons {
+    padding-bottom: 2%;
+    font-size: 20px;
+    cursor: pointer;
+}
+.mainContent{
+    text-align: left;
+    font-size: 20px;
 }
