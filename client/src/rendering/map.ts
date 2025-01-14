@@ -23,7 +23,7 @@ export function initMap() {
 	mapCanvas.height = minScreen * size.y / maxSide;
 	constScale = minScreen / maxSide;
 	const scale = mapCanvas.width / world.size.x;
-	mapCtx = <CanvasRenderingContext2D> mapCanvas.getContext("2d");
+	mapCtx = <CanvasRenderingContext2D>mapCanvas.getContext("2d", {willReadFrequently: true});
 
 	// Fill map background
 	mapCtx.fillStyle = world.defaultTerrain.colorToHex();
@@ -72,7 +72,7 @@ export function drawMap(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D
 	const zoneCanvas = document.createElement("canvas");
 	zoneCanvas.width = width;
 	zoneCanvas.height = height;
-	const zoneCtx = zoneCanvas.getContext("2d")!;
+	const zoneCtx = zoneCanvas.getContext("2d", { willReadFrequently: true })!;
 	zoneCtx.fillStyle = "#fff";
 	circleFromCenter(zoneCtx, world.safeZone.position.x * scale, world.safeZone.position.y * scale, world.safeZone.hitbox.radius * scale);
 	zoneCtx.globalCompositeOperation = "source-out";

@@ -127,6 +127,6 @@ export function stop() {
 		if (nameEle) nameEle.innerHTML = "";
 		if (imageEle) (<HTMLImageElement>imageEle).src = "";
 	}
-
+	document.getElementById('volume-icon')!.style.display = "block";
 	checkLoggedIn();
 }

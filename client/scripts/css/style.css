@@ -31,7 +31,7 @@ div#scopes {
     transform: translateX(-50%);
 }
 
-#scope {
+.scope {
     pointer-events: all;
     border-width: 0;
     border-radius: 50%;
@@ -43,9 +43,10 @@ div#scopes {
     width: 35px;
     height: 35px;
     vertical-align: middle;
+    text-align: center;
 }
 
-#scope:hover {
+.scope:hover {
     border-width: 2px;
     transition: all ease .5s;
 }
@@ -955,4 +956,16 @@ div#settings-saveChangesBtn {
 .mainContent{
     text-align: left;
     font-size: 20px;
+}
+
+div#ping-meter {
+    position: absolute;
+    display: none;
+    border-radius: 20%;
+    border: solid 0.5vh black;
+    width: 10vh;
+    height: 6vh;
+    vertical-align: middle;
+    text-align: center;
+    background-color: rgba(51, 51, 51, 0.5);
 }

@@ -73,6 +73,7 @@ async function init(address: string) {
 	ws = new WebSocket(`${protocol}://${address}`);
 	ws.binaryType = "arraybuffer";
 	Settings = new Map<string, number>(parseSettingsStuff())
+	document.getElementById("volume-icon")!.style.display = 'none';
 	function cleanupAfterPlayerDeath() {
 		// Post-death (Post player.despawn at RecvPacketTypes.PLAYERTICK)
 		if (__finishedDeathCleanup) return;
@@ -91,9 +92,9 @@ async function init(address: string) {
 			(<HTMLElement>ammosElements.item(ii)).textContent = `${usableGunAmmoNames[ii]}: 0`
 		}
 		for (const scopeElement of document.getElementsByClassName("scope")) {
-			console.log(scopeElement);
 			(<HTMLElement>scopeElement).style.display = "none";
 		}
+		document.getElementById("ping-meter")!.style.display = "none";
 		__finishedDeathCleanup = true;
 	}
 	await new Promise((res, rej) => {
@@ -134,9 +135,9 @@ async function init(address: string) {
 			setConnected(true)
 			showMobControls();
 			clearTimeout(timer);
-			const scopes = document.getElementById(`scopes`);
+			const scopes = document.getElementsByClassName(`scope`);
 			const scopeList = [1, 2, 4, 8, 15];
-			const x1scope = scopes?.children.item(0) as HTMLElement
+			const x1scope = scopes?.item(0) as HTMLElement
 			if (Settings.get("pingMeter")) {
 				document.getElementById("ping-meter")!.style.display = "block";
 			}
@@ -148,10 +149,10 @@ async function init(address: string) {
 				send(ws, new ServerScopeUpdatePacket(1));
 				for (let ii = 0; ii < scopeList.length; ii++) {
 					if (_selectedScope == scopeList[ii]) {
-						(scopes?.children.item(ii) as HTMLElement).style.background = "rgba(55, 55, 55, 1.5)"
+						(scopes?.item(ii) as HTMLElement).style.background = "rgba(55, 55, 55, 1.5)"
 					}
 					else {
-						(scopes?.children.item(ii) as HTMLElement).style.background = "rgba(51, 51, 51, 0.5)"
+						(scopes?.item(ii) as HTMLElement).style.background = "rgba(51, 51, 51, 0.5)"
 					}
 				}
 			}
@@ -176,7 +177,7 @@ async function init(address: string) {
 			ws.onmessage = (event) => {
 				ping = Date.now() - pingTimer
 				pingTimer = Date.now()
-				if (Settings.get("pingMeter")) { document.getElementById("pingNum")!.textContent = String(ping) }
+				if (Settings.get("pingMeter")) { (document.querySelector("#pingNum") as HTMLElement)!.innerText = String(ping) }
 				let bitstream = true;
 				let stream;
 				let packetType: number;
@@ -217,15 +218,9 @@ async function init(address: string) {
 						if (player.despawn) cleanupAfterPlayerDeath()
 						else {
 							const usableGunAmmoNames = ["9mm", "12 gauge", "7.62mm", "5.56mm", ".308 subsonic"];
-							const usableGunAmmos = [
-								player.inventory.ammos[GunColor.YELLOW],
-								player.inventory.ammos[GunColor.RED],
-								player.inventory.ammos[GunColor.BLUE],
-								player.inventory.ammos[GunColor.GREEN],
-								player.inventory.ammos[GunColor.OLIVE]];
 							const ammosElements = document.getElementsByClassName("ammos");
 							for (let ii = 0; ii < usableGunAmmoNames.length; ii++) {
-								(<HTMLElement>ammosElements.item(ii)).textContent = `${usableGunAmmoNames[ii]}: ${usableGunAmmos[ii]}`
+								(<HTMLElement>ammosElements.item(ii)).textContent = `${usableGunAmmoNames[ii]}: ${player.inventory.ammos[ii]}`
 							}
 						}
 						break;
@@ -317,22 +312,23 @@ async function init(address: string) {
 							scope: (stream as IslandrBitStream).readInt8()
 						}
 						const scopeChangePkt = <ScopeUpdatePacket>data;
-						for (let ii = 0; ii < scopes!.children.length; ii++) {
-							(<HTMLElement>scopes?.children.item(ii)).style.background = "rgba(55, 55, 55, 0.5)";
+						for (let ii = 0; ii < scopes!.length; ii++) {
+							(<HTMLElement>scopes?.item(ii)).style.background = "rgba(55, 55, 55, 0.5)";
 						}
-						const scopeElement = (scopes?.children.item(scopeList.indexOf(Number(scopeChangePkt.scope))) as HTMLElement);
+						const scopeElement = (scopes?.item(scopeList.indexOf(Number(scopeChangePkt.scope))) as HTMLElement);
 						scopeElement.style.display = "block";
 						scopeElement.style.background = "rgba(55, 55, 55, 1.5)"
 						
 						scopeElement.addEventListener("click", () => {
 							_selectedScope = scopeChangePkt.scope
+							console.log(Number(scopeElement.textContent?.replace("x", "") as unknown)))
 							send(ws, new ServerScopeUpdatePacket(Number(scopeElement.textContent?.replace("x", "") as unknown)))
 							for (let ii = 0; ii < scopeList.length; ii++) {
 								if (_selectedScope == scopeList[ii]) {
-									(scopes?.children.item(ii) as HTMLElement).style.background = "rgba(55, 55, 55, 1.5)"
+									(scopes?.item(ii) as HTMLElement).style.background = "rgba(55, 55, 55, 1.5)"
 								}
 								else {
-									(scopes?.children.item(ii) as HTMLElement).style.background = "rgba(51, 51, 51, 0.5)"
+									(scopes?.item(ii) as HTMLElement).style.background = "rgba(51, 51, 51, 0.5)"
 								}
 							}
 						})
@@ -574,15 +570,13 @@ window.onkeydown = (event) => {
 	addKeyPressed(event.key);
 	const settingsElem = document.getElementById("settings");
 	if (event.key == KeyBind.MENU) {
-		console.log("bruh")
-		if (isMenuHidden()) { settingsElem?.classList.remove("hidden"); console.log("bruh1") }
-		else { settingsElem?.classList.add("hidden"); console.log("bruh2")}
+		if (isMenuHidden()) { settingsElem?.classList.remove("hidden"); }
+		else { settingsElem?.classList.add("hidden")}
 		toggleMenu();
 	} else if (event.key == KeyBind.HIDE_HUD) toggleHud();
 	else if (event.key == KeyBind.WORLD_MAP) toggleMap();
 	else if (event.key == KeyBind.HIDE_MAP) toggleMinimap();
 	else if (event.key == KeyBind.BIG_MAP) toggleBigMap();
-	console.log(isMenuHidden())
 	if (isMenuHidden()) {
 		const index = movementKeys.indexOf(event.key);
 		if (index >= 0)
