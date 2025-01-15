@@ -306,10 +306,4 @@ export class AnnouncementPacket implements IPacket {
 	killer!: string;
 	killed!: string;
 }
-
-export class ScopeUpdatePacket implements IPacket {
-	type = RecvPacketTypes.SCOPEUPD;
-	scope!: number;
-
-}
-export type ServerPacketResolvable = AckPacket | GamePacket | MapPacket | SoundPacket | ParticlesPacket | AnnouncementPacket | ScopeUpdatePacket;
+export type ServerPacketResolvable = AckPacket | GamePacket | MapPacket | SoundPacket | ParticlesPacket | AnnouncementPacket;

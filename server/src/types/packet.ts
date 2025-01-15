@@ -312,18 +312,6 @@ export class ParticlesPacket extends IPacketSERVER {
 	}
 }
 
-export class ScopeUpdatePacket extends IPacketSERVER {
-	type = OutPacketTypes.SCOPEUPD;
-	scope!: number;
-	allocBytes = 2
-
-	constructor(scope: number) { super(); this.scope = scope }
-	serialise() {
-		super.serialise();
-		this.stream.writeInt8(this.scope)
-	}
-}
-
 export class SoundPacket extends IPacketSERVER {
 	type = OutPacketTypes.SOUND;
 	// No need to include "client/assets/sounds"

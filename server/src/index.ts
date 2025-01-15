@@ -3,7 +3,7 @@ import "dotenv/config";
 import { readFileSync } from "fs";
 import * as ws from "ws";
 import { ID, send, wait, sendBitstream, spawnGun} from "./utils";
-import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ScopeUpdatePacket, ServerSideScopeUpdate, PlayerTickPkt, GameOverPkt } from "./types/packet";
+import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ServerSideScopeUpdate, PlayerTickPkt, GameOverPkt } from "./types/packet";
 import { DIRECTION_VEC, EntityTypes, RecvPacketTypes, TICKS_PER_SECOND } from "./constants";
 import {  CommonAngles, RectHitbox, Vec2 } from "./types/math";
 import { Ammo, Bullet, Gun, Player } from "./store/entities";
@@ -162,6 +162,10 @@ server.on("connection", async socket => {
 	playerInitialPacketsSent.set(socket, true);
 	sendBitstream(socket, new PlayerTickPkt(player));
 	//spawnGun("stf_12", GunColor.RED, player.position, 16, true)
+	const e = new Scope(8);
+	e.position = player.position; world.entities.push(e);
+	const f = new Scope(4);
+	f.position = player.position; world.entities.push(f);
 	// If the client doesn't ping for 30 seconds, we assume it is a disconnection.
 	const timeout = setTimeout(() => {
 		try {socket.close(); } catch (err) { }
@@ -265,7 +269,6 @@ server.on("connection", async socket => {
 				data.deserialise(stream);
 				player.inventory.selectScope(Number(data.scope))
 				player.changedScope = true;
-				sendBitstream(socket, new ScopeUpdatePacket(Number(data.scope)))
 				break;
 			case RecvPacketTypes.CANCEL_ACT:
 				player.healTicks = 0;
@@ -310,7 +313,7 @@ setInterval(() => {
 		if (world.particles.length) sendBitstream(socket, new ParticlesPacket(world.particles, player));
 		//for (const sound of world.onceSounds) sendBitstream(socket, new SoundPacket(sound.path, sound.position));
 		for (const killFeed of world.killFeeds) sendBitstream(socket, new AnnouncePacket(killFeed.weaponUsed, killFeed.killer, killFeed.killed))
-		if (player.changedScope) { sendBitstream(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false; }
+		//if (player.changedScope) { sendBitstream(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false; }
 		if ((player.despawn || player.shouldSendStuff) && !player.sentStuff) { sendBitstream(socket, new GameOverPkt(player.won, player.damageDone, player.damageTaken, player.killCount)); player.sentStuff = true; }
 	});
 	world.postTick();

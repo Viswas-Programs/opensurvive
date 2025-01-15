@@ -9,7 +9,7 @@ import { FullPlayer, Healing } from "./store/entities";
 import { castObstacle, castMinObstacle, Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table, Box, Log } from "./store/obstacles";
 import { castTerrain } from "./store/terrains";
 import { Vec2 } from "./types/math";
-import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta, ScopeUpdatePacket, ServerScopeUpdatePacket, ServerPacketResolvable, CancelActionsPacket, DropWeaponPacket } from "./types/packet";
+import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta, ServerScopeUpdatePacket, ServerPacketResolvable, CancelActionsPacket, DropWeaponPacket } from "./types/packet";
 import { World } from "./types/world";
 import { receive, send, wait, parseSettingsStuff } from "./utils";
 import Building from "./types/building";
@@ -61,6 +61,7 @@ const handle = document.getElementsByClassName('joystick-handle')[0];
 const aimJoystick = document.getElementsByClassName('aimjoystick-container')[0];
 const aimHandle = document.getElementsByClassName('aimjoystick-handle')[0];
 let _selectedScope = 1;
+let _scopes = [1];
 let data: any;
 let __finishedDeathCleanup = false;
 let ping = 0;
@@ -146,15 +147,16 @@ async function init(address: string) {
 			x1scope.addEventListener("click", () => {
 				if (_selectedScope == 1) return;
 				_selectedScope = 1;
-				send(ws, new ServerScopeUpdatePacket(1));
 				for (let ii = 0; ii < scopeList.length; ii++) {
+					console.log(document.getElementById(`scope${scopeList[ii]}x`))
 					if (_selectedScope == scopeList[ii]) {
-						(scopes?.item(ii) as HTMLElement).style.background = "rgba(55, 55, 55, 1.5)"
+						document.getElementById(`scope${scopeList[ii]}x`)!.style.background = "rgba(55, 55, 55, 1.5)";
 					}
 					else {
-						(scopes?.item(ii) as HTMLElement).style.background = "rgba(51, 51, 51, 0.5)"
+						document.getElementById(`scope${scopeList[ii]}x`)!.style.background = "rgba(51, 51, 51, 0.5)";
 					}
 				}
+				send(ws, new ServerScopeUpdatePacket(1));
 			}
 
 			)
@@ -221,6 +223,33 @@ async function init(address: string) {
 							const ammosElements = document.getElementsByClassName("ammos");
 							for (let ii = 0; ii < usableGunAmmoNames.length; ii++) {
 								(<HTMLElement>ammosElements.item(ii)).textContent = `${usableGunAmmoNames[ii]}: ${player.inventory.ammos[ii]}`
+							}
+							if (_scopes.length != player.inventory.scopes.length) {
+								for (const i of player.inventory.scopes) {
+									if (_scopes.indexOf(i) == -1) {
+										const scopeEle = (<HTMLElement>scopes.item(scopeList.indexOf(i)))
+										scopeEle.style.display = "block";
+										scopeEle.style.background = "rgba(51, 51, 51, 0.5)";
+										_scopes = player.inventory.scopes
+										scopeEle.addEventListener("click", () => {
+											send(ws, new ServerScopeUpdatePacket(i))
+										})
+									}
+								}
+							}
+							if (_selectedScope != player.scope) {
+								for (let ii = 0; ii < scopes.length; ii++) {
+									(<HTMLElement>scopes[ii]).style.background = "rgba(51, 51, 51, 0.5)";
+								}
+								const oldScope = player.scope
+								const element = (<HTMLElement>scopes.item(scopeList.indexOf(player.scope)));
+								element.style.display = "block";
+								element.style.background = "rgba(55, 55, 55, 0.9)";
+								element.addEventListener("click", () => {
+									send(ws, new ServerScopeUpdatePacket(oldScope))
+								})
+								_selectedScope = player.scope
+								_scopes = player.inventory.scopes
 							}
 						}
 						break;
@@ -304,34 +333,6 @@ async function init(address: string) {
 						}
 						document.getElementById("gameover")!.style.display = "block";
 						cleanupAfterPlayerDeath()
-						break;
-					}
-					case RecvPacketTypes.SCOPEUPD: {
-						const data = {
-							type:packetType,
-							scope: (stream as IslandrBitStream).readInt8()
-						}
-						const scopeChangePkt = <ScopeUpdatePacket>data;
-						for (let ii = 0; ii < scopes!.length; ii++) {
-							(<HTMLElement>scopes?.item(ii)).style.background = "rgba(55, 55, 55, 0.5)";
-						}
-						const scopeElement = (scopes?.item(scopeList.indexOf(Number(scopeChangePkt.scope))) as HTMLElement);
-						scopeElement.style.display = "block";
-						scopeElement.style.background = "rgba(55, 55, 55, 1.5)"
-						
-						scopeElement.addEventListener("click", () => {
-							_selectedScope = scopeChangePkt.scope
-							console.log(Number(scopeElement.textContent?.replace("x", "") as unknown)))
-							send(ws, new ServerScopeUpdatePacket(Number(scopeElement.textContent?.replace("x", "") as unknown)))
-							for (let ii = 0; ii < scopeList.length; ii++) {
-								if (_selectedScope == scopeList[ii]) {
-									(scopes?.item(ii) as HTMLElement).style.background = "rgba(55, 55, 55, 1.5)"
-								}
-								else {
-									(scopes?.item(ii) as HTMLElement).style.background = "rgba(51, 51, 51, 0.5)"
-								}
-							}
-						})
 						break;
 					}
 				}
