@@ -3,7 +3,7 @@ import { IslandrBitStream } from "../packets";
 import { calculateAllocBytesForObs, calculateAllocBytesForTickPkt, serialiseDiscardables, serialiseMinObstacles, serialiseMinParticles, serialisePlayer } from "../serialisers";
 import { Player } from "../store/entities";
 import Building from "./building";
-import { Entity } from "./entity";
+import { Entity, Inventory } from "./entity";
 import { Vec2 } from "./math";
 import { MinBuilding, MinCircleHitbox, MinMinObstacle, MinObstacle, MinParticle, MinTerrain, MinVec2 } from "./minimized";
 import { MovementDirection } from "./misc";
@@ -228,12 +228,14 @@ export class MapPacket implements IPacket {
 	type = OutPacketTypes.MAP;
 	obstacles: MinMinObstacle[];
 	buildings: MinBuilding[];
-	terrains: MinTerrain[]
+	terrains: MinTerrain[];
+	maxAmmos: Array<number[]>;
 
 	constructor(obstacles: Obstacle[], buildings: Building[], terrains: Terrain[]) {
 		this.obstacles = obstacles.map(obstacle => obstacle.minmin());
 		this.buildings = buildings.map(building => building.minimize());
 		this.terrains = terrains.map(terrain => terrain.minimize());
+		this.maxAmmos = Inventory.maxAmmos;
 	}
 }
 export class PlayerTickPkt extends IPacketSERVER {

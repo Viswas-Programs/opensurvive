@@ -44,7 +44,10 @@ export function getId() { return id; }
 export function getPlayer() { return player; }
 export function getTPS() { return tps; }
 
-
+let maxAmmos: Array<number[]> = []
+function getMaxAmmoAmt(backpackLevel: number, gunColor: GunColor){
+	return maxAmmos[backpackLevel][gunColor]
+}
 export let Settings = new Map<string, number>(parseSettingsStuff())
 let ws: WebSocket;
 let connected = false;
@@ -90,7 +93,8 @@ async function init(address: string) {
 		}
 		Healing.setupHud()
 		for (let ii = 0; ii < usableGunAmmoNames.length; ii++) {
-			(<HTMLElement>ammosElements.item(ii)).textContent = `${usableGunAmmoNames[ii]}: 0`
+			(<HTMLElement>ammosElements.item(ii)).textContent = `${usableGunAmmoNames[ii]}: 0`;
+			(<HTMLElement>ammosElements.item(ii)).style.color = "#ffffff";
 		}
 		for (const scopeElement of document.getElementsByClassName("scope")) {
 			(<HTMLElement>scopeElement).style.display = "none";
@@ -126,7 +130,6 @@ async function init(address: string) {
 			gameEnded = false;
 			deathImg = localStorage.getItem("playerDeathImg")
 			skin = localStorage.getItem("playerSkin");
-			console.log(deathImg, username, skin )
 			var currentCursor = localStorage.getItem("selectedCursor")
 			if (!currentCursor) { localStorage.setItem("selectedCursor", "default"); currentCursor = localStorage.getItem("selectedCursor") }
 			if (currentCursor) { document.documentElement.style.cursor = currentCursor }
@@ -191,6 +194,7 @@ async function init(address: string) {
 						world.terrains = mapPkt.terrains.map(ter => castTerrain(ter));
 						world.obstacles = <Obstacle[]>mapPkt.obstacles.map(obs => castObstacle(castMinObstacle(obs))).filter(obs => !!obs);
 						world.buildings = mapPkt.buildings.map(bui => new Building(bui));
+						maxAmmos = mapPkt.maxAmmos;
 						initMap();
 						//Show player count once game starts
 						(document.querySelector("#playercountcontainer") as HTMLInputElement).style.display = "block";
@@ -223,6 +227,7 @@ async function init(address: string) {
 							const ammosElements = document.getElementsByClassName("ammos");
 							for (let ii = 0; ii < usableGunAmmoNames.length; ii++) {
 								(<HTMLElement>ammosElements.item(ii)).textContent = `${usableGunAmmoNames[ii]}: ${player.inventory.ammos[ii]}`
+								if (player.inventory.ammos[ii] == getMaxAmmoAmt(player.inventory.backpackLevel, ii)) { (<HTMLElement>ammosElements.item(ii)).style.color = "#ffd700"; }
 							}
 							if (_scopes.length != player.inventory.scopes.length) {
 								for (const i of player.inventory.scopes) {
