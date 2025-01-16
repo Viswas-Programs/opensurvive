@@ -36,6 +36,10 @@ settingsForChange.forEach(setting => {
     document.getElementById(`${setting}-Btn`)?.addEventListener("click", () => {
         settingsMainContentFrame!.innerHTML = mainElementMap.get(`${setting}-Main`)!
         currentUIElementSelected = setting
+        for (let ii = 0; ii < settingsForChange.length; ii++) {
+            document.getElementById(`${settingsForChange[ii]}-Btn`)!.style.background = "inherit";
+        }
+        document.getElementById(`${setting}-Btn`)!.style.background = "rgba(65, 65, 65, 0.9)";
     })
 })
 

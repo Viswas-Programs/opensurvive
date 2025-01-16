@@ -44,11 +44,14 @@ div#scopes {
     height: 35px;
     vertical-align: middle;
     text-align: center;
+    cursor: pointer;
+    padding: 2%;
 }
 
 .scope:hover {
-    border-width: 2px;
-    transition: all ease .5s;
+    transition: none;
+    border: solid;
+    border-color: #4CAF50;
 }
 
 div#menu {
@@ -930,7 +933,7 @@ div#sidebar {
     text-align:left;
     overflow-y: hidden;
     width: 20%;
-    height: 95%;
+    height: 100%;
     float: left;
 }
 div#main-content {
@@ -952,6 +955,10 @@ div#settings-saveChangesBtn {
     padding-bottom: 2%;
     font-size: 20px;
     cursor: pointer;
+}
+
+.sidebarButtons:hover {
+    background: rgba(57, 57, 57, 0.9)
 }
 .mainContent{
     text-align: left;
