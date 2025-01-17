@@ -71,6 +71,15 @@ let _scopes = [1];
 let data: any;
 let __finishedDeathCleanup = false;
 let ping = 0;
+const usableGunAmmoNames = ["9mm", "12 gauge", "7.62mm", "5.56mm", ".308 subsonic"];
+const ammosElements = document.getElementsByClassName("ammos");
+const ammoImgElements = document.getElementsByClassName("ammoImgs")
+for (let ii = 0; ii < 4; ii++) {
+	const ele = (<HTMLImageElement>ammoImgElements.item(ii)!);
+	ele.src = `/assets/${getMode()}/images/game/ammos/${ii}.svg`;
+	ele.width = window.innerWidth * 2.5 / 100
+
+}
 let pingTimer = 0;
 declare type modeMapColourType = keyof typeof modeMapColours
 async function init(address: string) {
@@ -84,8 +93,6 @@ async function init(address: string) {
 	function cleanupAfterPlayerDeath() {
 		// Post-death (Post player.despawn at RecvPacketTypes.PLAYERTICK)
 		if (__finishedDeathCleanup) return;
-		const usableGunAmmoNames = ["9mm", "12 gauge", "7.62mm", "5.56mm", ".308 subsonic"];
-		const ammosElements = document.getElementsByClassName("ammos");
 		for (let ii = 0; ii < 4; ii++) {
 			const divEle = document.getElementById("weapon-panel-" + ii);
 			const nameEle = document.getElementById("weapon-name-" + ii);
@@ -96,7 +103,7 @@ async function init(address: string) {
 		}
 		Healing.setupHud()
 		for (let ii = 0; ii < usableGunAmmoNames.length; ii++) {
-			(<HTMLElement>ammosElements.item(ii)).textContent = `${usableGunAmmoNames[ii]}: 0`;
+			(<HTMLElement>ammosElements.item(ii)).textContent = `0`;
 			(<HTMLElement>ammosElements.item(ii)).style.color = "#ffffff";
 		}
 		for (const scopeElement of document.getElementsByClassName("scope")) {
@@ -230,11 +237,10 @@ async function init(address: string) {
 						else player.copy(playerSrvr);
 						if (player.despawn) cleanupAfterPlayerDeath()
 						else {
-							const usableGunAmmoNames = ["9mm", "12 gauge", "7.62mm", "5.56mm", ".308 subsonic"];
-							const ammosElements = document.getElementsByClassName("ammos");
 							for (let ii = 0; ii < usableGunAmmoNames.length; ii++) {
-								(<HTMLElement>ammosElements.item(ii)).textContent = `${usableGunAmmoNames[ii]}: ${player.inventory.ammos[ii]}`
+								(<HTMLElement>ammosElements.item(ii)).textContent = `${player.inventory.ammos[ii]}`
 								if (player.inventory.ammos[ii] == getMaxAmmoAmt(player.inventory.backpackLevel, ii)) { (<HTMLElement>ammosElements.item(ii)).style.color = "#ffd700"; }
+								else { (<HTMLElement>ammosElements.item(ii)).style.color = "#ffffff"; }
 							}
 							if (_scopes.length != player.inventory.scopes.length) {
 								for (const i of player.inventory.scopes) {
