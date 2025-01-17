@@ -287,6 +287,7 @@ export class MapPacket implements IPacket {
 	buildings!: MinBuilding[];
 	terrains!: MinTerrain[];
 	maxAmmos!: Array<number[]>;
+	maxHealings!: Array<Map<string, number>>;
 }
 
 /// Packet from server about sound and its location

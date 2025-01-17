@@ -1,25 +1,24 @@
 /* eslint-disable no-fallthrough */
-import $ from "jquery"
+import { cookieExists, getCookieValue } from "cookies-utils";
 import { Howl, Howler } from "howler";
+import { inflate } from "pako";
 import { GunColor, KeyBind, movementKeys, RecvPacketTypes, TIMEOUT } from "./constants";
+import { deserialiseDiscardables, deserialiseMinEntities, deserialiseMinObstacles, deserialiseMinParticles, deserialisePlayer, setUsrnameIdDeathImg } from "./deserialisers";
+import { getMode } from "./homepage";
+import { IslandrBitStream } from "./packets";
 import { start, stop } from "./renderer";
 import { initMap } from "./rendering/map";
 import { addKeyPressed, addMousePressed, cleanUpMouseAndKeyPressed, getToken, isKeyPressed, isMenuHidden, isMouseDisabled, removeKeyPressed, removeMousePressed, toggleBigMap, toggleHud, toggleMap, toggleMenu, toggleMinimap, toggleMouseDisabled } from "./states";
 import { FullPlayer, Healing } from "./store/entities";
-import { castObstacle, castMinObstacle, Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table, Box, Log } from "./store/obstacles";
+import { Barrel, Box, Bush, castMinObstacle, castObstacle, Crate, Desk, Log, Stone, Table, Toilet, ToiletMore, Tree } from "./store/obstacles";
 import { castTerrain } from "./store/terrains";
-import { Vec2 } from "./types/math";
-import { PingPacket, MovementPressPacket, MovementReleasePacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, GamePacket, MapPacket, AckPacket, InteractPacket, SwitchWeaponPacket, ReloadWeaponPacket, UseHealingPacket, ResponsePacket, SoundPacket, ParticlesPacket, MovementResetPacket, MovementPacket, AnnouncementPacket, PlayerRotationDelta, ServerScopeUpdatePacket, ServerPacketResolvable, CancelActionsPacket, DropWeaponPacket } from "./types/packet";
-import { World } from "./types/world";
-import { receive, send, wait, parseSettingsStuff } from "./utils";
 import Building from "./types/building";
-import { cookieExists, getCookieValue } from "cookies-utils";
-import { Obstacle } from "./types/obstacle";
-import { getMode } from "./homepage";
-import { IslandrBitStream } from "./packets";
+import { Vec2 } from "./types/math";
 import { MinTerrain, MinVec2 } from "./types/minimized";
-import { deserialiseDiscardables, deserialiseMinEntities, deserialiseMinObstacles, deserialiseMinParticles, deserialisePlayer, setUsrnameIdDeathImg } from "./deserialisers";
-import { inflate } from "pako";
+import { Obstacle } from "./types/obstacle";
+import { AckPacket, AnnouncementPacket, CancelActionsPacket, DropWeaponPacket, GamePacket, InteractPacket, MapPacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, MovementPacket, MovementPressPacket, MovementReleasePacket, MovementResetPacket, ParticlesPacket, PingPacket, PlayerRotationDelta, ReloadWeaponPacket, ResponsePacket, ServerScopeUpdatePacket, SoundPacket, SwitchWeaponPacket, UseHealingPacket } from "./types/packet";
+import { World } from "./types/world";
+import { parseSettingsStuff, receive, send, wait } from "./utils";
 //handle users that tried to go to old domain name, or direct ip
 var urlargs = new URLSearchParams(window.location.search);
 if(urlargs.get("from")){
@@ -45,8 +44,12 @@ export function getPlayer() { return player; }
 export function getTPS() { return tps; }
 
 let maxAmmos: Array<number[]> = []
+const maxHealings: Array<Map<string, number>> = []
 function getMaxAmmoAmt(backpackLevel: number, gunColor: GunColor){
 	return maxAmmos[backpackLevel][gunColor]
+}
+export function getMaxHealingAmt(backpackLevel: number, healing: string) {
+	return maxHealings[backpackLevel].get(healing);
 }
 export let Settings = new Map<string, number>(parseSettingsStuff())
 let ws: WebSocket;
@@ -195,6 +198,10 @@ async function init(address: string) {
 						world.obstacles = <Obstacle[]>mapPkt.obstacles.map(obs => castObstacle(castMinObstacle(obs))).filter(obs => !!obs);
 						world.buildings = mapPkt.buildings.map(bui => new Building(bui));
 						maxAmmos = mapPkt.maxAmmos;
+						const maxHealArr = mapPkt.maxHealings
+						for (let ii = 0; ii < 4; ii++) {
+							maxHealings.push(new Map<string, number>(maxHealArr[ii]))
+						}
 						initMap();
 						//Show player count once game starts
 						(document.querySelector("#playercountcontainer") as HTMLInputElement).style.display = "block";

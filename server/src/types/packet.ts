@@ -230,12 +230,19 @@ export class MapPacket implements IPacket {
 	buildings: MinBuilding[];
 	terrains: MinTerrain[];
 	maxAmmos: Array<number[]>;
+	maxHealings: Array<Array<any>>;
 
 	constructor(obstacles: Obstacle[], buildings: Building[], terrains: Terrain[]) {
 		this.obstacles = obstacles.map(obstacle => obstacle.minmin());
 		this.buildings = buildings.map(building => building.minimize());
 		this.terrains = terrains.map(terrain => terrain.minimize());
 		this.maxAmmos = Inventory.maxAmmos;
+		const mxHl = []
+		for (let ii = 0; ii < 4; ii++) {
+			mxHl.push(Array.from(Inventory.maxHealings[ii]))
+		}
+		this.maxHealings = mxHl
+		console.log(this.maxHealings)
 	}
 }
 export class PlayerTickPkt extends IPacketSERVER {

@@ -89,6 +89,7 @@ function drawBackpack(player: FullPlayer, canvas: HTMLCanvasElement, ctx: Canvas
 	if (img?.complete) ctx.drawImage(img, (canvas.width + healthWidth) / 2 + padding * 2, canvas.height - size, size - padding * 2, size - padding * 2);
 
 	ctx.fillStyle = "#fff";
+	if (player.inventory.backpackLevel == 3) { ctx.fillStyle = "#ffd700"; }
 	ctx.font = `${canvas.height / 54}px Arial`;
 	ctx.textBaseline = "bottom";
 	ctx.textAlign = "center";
@@ -108,6 +109,7 @@ function drawVest(player: FullPlayer, canvas: HTMLCanvasElement, ctx: CanvasRend
 	if (img?.complete) ctx.drawImage(img, (canvas.width + healthWidth) / 2 + padding * 3 + size, canvas.height - size, size - padding * 2, size - padding * 2);
 
 	ctx.fillStyle = "#fff";
+	if (player.inventory.vestLevel == 3) { ctx.fillStyle = "#ffd700"; }
 	ctx.font = `${canvas.height / 54}px Arial`;
 	ctx.textBaseline = "bottom";
 	ctx.textAlign = "center";
@@ -125,8 +127,8 @@ function drawHelmet(player: FullPlayer, canvas: HTMLCanvasElement, ctx: CanvasRe
 	ctx.globalAlpha = 1;
 	const img = Helmet.helmetImages[player.inventory.helmetLevel- 1];
 	if (img?.complete) ctx.drawImage(img, (canvas.width + healthWidth) / 2 + padding * 4 + size * 2, canvas.height - size, size - padding * 2, size - padding * 2);
-
-	ctx.fillStyle = "#fff";
+	ctx.fillStyle = "#ffffff";
+	if (player.inventory.helmetLevel == 3) { ctx.fillStyle = "#ffd700"; }
 	ctx.font = `${canvas.height / 54}px Arial`;
 	ctx.textBaseline = "bottom";
 	ctx.textAlign = "center";

@@ -18,6 +18,8 @@ import Building from "./types/building";
 import Scope from "./store/entities/scope";
 import Healing from "./store/entities/healing";
 import { GunWeapon, Weapon, WeaponType } from "./types/weapon";
+import { Inventory } from "./types/entity";
+import Backpack from "./store/entities/backpack";
 export var ticksElapsed = 0;
 
 const server = new ws.Server({ port: 8080 });
@@ -162,15 +164,10 @@ server.on("connection", async socket => {
 	playerInitialPacketsSent.set(socket, true);
 	sendBitstream(socket, new PlayerTickPkt(player));
 	//spawnGun("stf_12", GunColor.RED, player.position, 16, true)
-	const e = new Scope(8);
-	e.position = player.position; world.entities.push(e);
-	const f = new Scope(4);
-	f.position = player.position; world.entities.push(f);
 	// If the client doesn't ping for 30 seconds, we assume it is a disconnection.
 	const timeout = setTimeout(() => {
 		try {socket.close(); } catch (err) { }
 	}, 30000);
-
 	// The 4 directions of movement
 	const movements = [false, false, false, false];
 	const buttons = new Map<number, boolean>();

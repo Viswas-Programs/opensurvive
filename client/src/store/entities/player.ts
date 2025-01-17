@@ -10,7 +10,7 @@ import { circleFromCenter } from "../../utils";
 import { castCorrectWeapon, WEAPON_SUPPLIERS } from "../weapons";
 import { getMode } from "../../homepage";
 import { Vec2 } from "../../types/math";
-import { getTPS, Settings } from "../../game";
+import { getMaxHealingAmt, getTPS, Settings } from "../../game";
 import { GunColor } from "../../types/misc";
 
 const weaponPanelDivs: HTMLDivElement[] = [];
@@ -124,9 +124,12 @@ export default class Player extends Entity {
 				}
 			}
 			for (const key of Object.keys(this.inventory.healings)) {
+				const element = document.getElementById("healing-count-" + Healing.mapping.indexOf(key))
 				document.getElementById("healing-count-" + Healing.mapping.indexOf(key))!.innerHTML = `${this.inventory.healings[key]}`;
 				if (this.inventory.healings[key]) document.getElementById("healing-panel-" + Healing.mapping.indexOf(key))!.classList.add("enabled");
 				else document.getElementById("healing-panel-" + Healing.mapping.indexOf(key))!.classList.remove("enabled");
+				if (this.inventory.healings[key] && this.inventory.healings[key] == getMaxHealingAmt(this.inventory.backpackLevel, key)) { element!.style.color = "#ffd700"; }
+				else { element!.style.color = "#ffffff"; }
 			}
 			this.inventory.scopes = inventory.scopes;
 			this.inventory.selectedScope = inventory.selectedScope;
