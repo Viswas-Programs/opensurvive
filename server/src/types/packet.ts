@@ -242,7 +242,6 @@ export class MapPacket implements IPacket {
 			mxHl.push(Array.from(Inventory.maxHealings[ii]))
 		}
 		this.maxHealings = mxHl
-		console.log(this.maxHealings)
 	}
 }
 export class PlayerTickPkt extends IPacketSERVER {

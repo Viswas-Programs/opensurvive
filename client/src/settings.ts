@@ -9,25 +9,36 @@ document.getElementById("settings-close")?.addEventListener("click", () => { ctr
 const currentSettings = new Map<string, number>(parseSettingsStuff())
 let __coloredWeaponSlots = "";
 let __pingMeter = "";
+let __healthMeter = "";
+let __adrenalineMeter = "";
+let __positionMeter = "";
 if (currentSettings.get("coloredWeaponSlots")) { __coloredWeaponSlots = "checked"; }
-if (currentSettings.get("pingMeter")) { __pingMeter = "checked";}
+if (currentSettings.get("pingMeter")) { __pingMeter = "checked"; }
+if (currentSettings.get("healthMeter")) { __healthMeter = "checked"; }
+if (currentSettings.get("adrenalineMeter")) { __adrenalineMeter = "checked"; }
+if (currentSettings.get("positionMeter")) { __positionMeter = "checked"; }
 const mainElementMap = new Map<string, string>([
     [`gameUI-Main`, `<div id="gameUI-Main" class="mainContent">
                     <input type="checkbox" id="coloredWeaponSlots" name="coloredWeaponSlots" value="0"  ${__coloredWeaponSlots}> <label for="coloredWeaponSlots" >Coloured Weapon Slots</label><br>
                     <input type="checkbox" id="pingMeter" name="pingMeter" value="0"  ${__pingMeter}> <label for="pingMeter">Ping Meter</label><br>
+                    <input type="checkbox" id="healthMeter" name="healthMeter" value="0"  ${__healthMeter}> <label for="healthMeter">Health Meter</label><br>
+                    <input type="checkbox" id="adrenalineMeter" name="adrenalineMeter" value="0"  ${__adrenalineMeter}> <label for="adrenalineMeter">Adrenaline Meter</label><br>
+                    <input type="checkbox" id="positionMeter" name="positionMeter" value="0"  ${__positionMeter}> <label for="positionMeter">Show Coordinates</label><br>
                 </div>`],
     [`version-Main`, `<div id="version-Main" class="mainContent">Version: ${currentVer}</div>`]
 ])
 const actsMainElementMap = new Map<string, CallableFunction>([
     ['gameUI', () => {
-        const coloredWeaponSlotsELEMENT = (document.getElementById("coloredWeaponSlots") as HTMLInputElement).checked
-        const pingMeterELEMENT = (document.getElementById("pingMeter") as HTMLInputElement).checked
-        let weaponSlots = 0;
-        let pingMeter = 0;
-        if (coloredWeaponSlotsELEMENT) { weaponSlots = 1 }
-        if (pingMeterELEMENT) { pingMeter = 1 }
-        currentSettings.set("coloredWeaponSlots", weaponSlots)
-        currentSettings.set("pingMeter", pingMeter)
+        const checkboxElIds = ["coloredWeaponSlots", "pingMeter", "healthMeter", "adrenalineMeter", "positionMeter"]
+        const checkboxElCheckmarked = []
+        for (let ii = 0; ii < checkboxElIds.length; ii++) {
+            const id= checkboxElIds[ii]
+            console.log((<HTMLInputElement>document.getElementById(id)))
+            checkboxElCheckmarked.push(Number((<HTMLInputElement>document.getElementById(id)).checked));
+        }
+        for (let ii = 0; ii < checkboxElIds.length; ii++) {
+            currentSettings.set(checkboxElIds[ii], checkboxElCheckmarked[ii] )
+        }
     }],
     ['version', () => { }]
 ])

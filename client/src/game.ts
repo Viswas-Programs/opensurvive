@@ -90,6 +90,9 @@ async function init(address: string) {
 	ws.binaryType = "arraybuffer";
 	Settings = new Map<string, number>(parseSettingsStuff())
 	document.getElementById("volume-icon")!.style.display = 'none';
+	const pingMeterElement = document.getElementById("ping-meter")!;
+	const healthAdMeterEl = document.getElementById("health-adrenaline-meter")!;
+	const posMeterEl = document.getElementById("position-meter")!;
 	function cleanupAfterPlayerDeath() {
 		// Post-death (Post player.despawn at RecvPacketTypes.PLAYERTICK)
 		if (__finishedDeathCleanup) return;
@@ -109,7 +112,9 @@ async function init(address: string) {
 		for (const scopeElement of document.getElementsByClassName("scope")) {
 			(<HTMLElement>scopeElement).style.display = "none";
 		}
-		document.getElementById("ping-meter")!.style.display = "none";
+		pingMeterElement.style.display = "none";
+		healthAdMeterEl.style.display = "none";
+		posMeterEl.style.display = "none";
 		__finishedDeathCleanup = true;
 	}
 	await new Promise((res, rej) => {
@@ -153,7 +158,28 @@ async function init(address: string) {
 			const scopeList = [1, 2, 4, 8, 15];
 			const x1scope = scopes?.item(0) as HTMLElement
 			if (Settings.get("pingMeter")) {
-				document.getElementById("ping-meter")!.style.display = "block";
+				pingMeterElement.style.display = "block";
+			}
+			else {
+				pingMeterElement.style.display = "none";
+			}
+			if (Settings.get("healthMeter") || Settings.get("adrenalineMeter")) {
+				healthAdMeterEl.style.display = "block";
+				const healthNumEl = (<HTMLElement>document.querySelector("#healthNum"))!
+				const healthTxtEl = (<HTMLElement>document.querySelector("#healthTxt"))!
+				const adrNumEl = (<HTMLElement>document.querySelector("#adrenalineNum"))!
+				const adrTxtEl = (<HTMLElement>document.querySelector("#adrenalineTxt"))!
+				if (Settings.get("healthMeter")) { healthNumEl.style.display = "inline-block"; healthTxtEl.style.display = "inline-block"; }
+				if (Settings.get("adrenalineMeter")) { adrNumEl.style.display = "inline-block"; adrTxtEl.style.display = "inline-block"; }
+			}
+			else {
+				healthAdMeterEl.style.display = "none";
+			}
+			if (Settings.get("positionMeter")) {
+				posMeterEl.style.display = "block";
+			}
+			else {
+				posMeterEl.style.display = "none";
 			}
 			x1scope.style.display = "block"
 			x1scope.style.background = "rgba(55, 55, 55, 1.5)"
@@ -161,7 +187,6 @@ async function init(address: string) {
 				if (_selectedScope == 1) return;
 				_selectedScope = 1;
 				for (let ii = 0; ii < scopeList.length; ii++) {
-					console.log(document.getElementById(`scope${scopeList[ii]}x`))
 					if (_selectedScope == scopeList[ii]) {
 						document.getElementById(`scope${scopeList[ii]}x`)!.style.background = "rgba(55, 55, 55, 1.5)";
 					}
@@ -193,6 +218,7 @@ async function init(address: string) {
 				ping = Date.now() - pingTimer
 				pingTimer = Date.now()
 				if (Settings.get("pingMeter")) { (document.querySelector("#pingNum") as HTMLElement)!.innerText = String(ping) }
+				else { pingMeterElement.style.display = "none";  }
 				let bitstream = true;
 				let stream;
 				let packetType: number;
@@ -241,6 +267,16 @@ async function init(address: string) {
 								(<HTMLElement>ammosElements.item(ii)).textContent = `${player.inventory.ammos[ii]}`
 								if (player.inventory.ammos[ii] == getMaxAmmoAmt(player.inventory.backpackLevel, ii)) { (<HTMLElement>ammosElements.item(ii)).style.color = "#ffd700"; }
 								else { (<HTMLElement>ammosElements.item(ii)).style.color = "#ffffff"; }
+							}
+							if (!(Settings.get("healthMeter") || Settings.get("adrenalineMeter"))) { healthAdMeterEl.style.display = "none"; }
+							if (Settings.get("healthMeter")) { (<HTMLElement>document.querySelector("#healthNum")).innerText = String(player.health) }
+							if (Settings.get("adrenalineMeter")) { (<HTMLElement>document.querySelector("#adrenalineNum")).innerText = String(Math.round(player.boost)) }
+							if (Settings.get("positionMeter")) {
+								(<HTMLElement>document.querySelector("#positionX")).innerText = String((player.position.x).toFixed(2));
+								(<HTMLElement>document.querySelector("#positionY")).innerText = String((player.position.y).toFixed(2));
+							}
+							else {
+								posMeterEl.style.display = "none";
 							}
 							if (_scopes.length != player.inventory.scopes.length) {
 								for (const i of player.inventory.scopes) {

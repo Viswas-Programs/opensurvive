@@ -992,6 +992,30 @@ div#ping-meter {
     text-align: center;
     background-color: rgba(51, 51, 51, 0.5);
 }
+div#health-adrenaline-meter {
+    position: absolute;
+    display: none;
+    border-radius: 20%;
+    border: solid 0.5vh black;
+    width: 10vh;
+    height: 6vh;
+    vertical-align: middle;
+    text-align: center;
+    background-color: rgba(51, 51, 51, 0.5);
+    top: 10%;
+}
+div#position-meter {
+    position: absolute;
+    display: none;
+    border-radius: 20%;
+    border: solid 0.5vh black;
+    width: 11vh;
+    height: 6vh;
+    vertical-align: middle;
+    text-align: center;
+    background-color: rgba(51, 51, 51, 0.5);
+    top: 20%;
+}
 .ammoImgs {
     text-align: left;
     height: auto;

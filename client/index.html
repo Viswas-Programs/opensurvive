@@ -234,17 +234,24 @@
             <br />
             <span id="__pingTxt">Ping</span>
         </div>
-
+        <div id="health-adrenaline-meter" style="display:none">
+            <div id="healthFrame"><span id="healthNum" style="display:none;">0</span> <span id="healthTxt"style="display:none;">HP</span></div>
+            <div id="adrenalineFrame"><span id="adrenalineNum" style="display:none;">0</span> <span id="adrenalineTxt" style="display:none;">AD</span></div>
+        </div>
+        <div id="position-meter" style="display:none;">
+            <div id="posXFrame" style="display:inline-block;"><span id="positionTxtX" style="display:inline-block;">X:</span> <span id="positionX">null</span></div>
+            <div id="posYFrame" style="display:inline-block;"><span id="positionTxtY" style="display:inline-block;">Y:</span> <span id="positionY">null</span></div>
+        </div>
         <table id="healing-container">
             <!-- We populate this with JS -->
         </table>
         <div class="button" id="reload-btn">↻</div>
         <div class="button" id="menu-btn">≡</div>
         <div id="ammo-container">
-            <div class="ammoFrame"><img id="0-img" class="ammoImgs" alt="9mm" width="20" height="100"/><div class="ammos" id="9">0</div></div>
-            <div class="ammoFrame"><img id="1-img" class="ammoImgs" alt="12 gauge" width="20" height="100"/><div class="ammos" id="12">0</div></div>
-            <div class="ammoFrame"><img id="2-img" class="ammoImgs" alt="7.62mm" width="20" height="100"/><div class="ammos" id="7.62">0</div></div>
-            <div class="ammoFrame"><img id="3-img" class="ammoImgs" alt="5.56mm" width="20" height="100"/><div class="ammos" id="5.56">0</div></div>
+            <div class="ammoFrame"><img id="0-img" class="ammoImgs" alt="9mm" width="20" height="100" /><div class="ammos" id="9">0</div></div>
+            <div class="ammoFrame"><img id="1-img" class="ammoImgs" alt="12 gauge" width="20" height="100" /><div class="ammos" id="12">0</div></div>
+            <div class="ammoFrame"><img id="2-img" class="ammoImgs" alt="7.62mm" width="20" height="100" /><div class="ammos" id="7.62">0</div></div>
+            <div class="ammoFrame"><img id="3-img" class="ammoImgs" alt="5.56mm" width="20" height="100" /><div class="ammos" id="5.56">0</div></div>
             <div class="ammoFrame" style="display:none;"><div class="ammos" id=".308">.308 subsonic: 0</div></div>
         </div>
         <table id="weapon-container">

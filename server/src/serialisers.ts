@@ -186,7 +186,9 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 	stream.writeInt16(player.maxReloadTicks)
 	stream.writeInt16(player.healTicks)
 	stream.writeInt16(player.maxHealTicks)
-	stream.writeInt8(player.health)
+	let health = player.health
+	if (health < 0) health = 0;
+	stream.writeInt8(health)
 	// positioning
 	stream.writeFloat64(player.position.x)
 	stream.writeFloat64(player.position.y)
