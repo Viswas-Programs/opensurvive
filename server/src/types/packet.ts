@@ -43,8 +43,8 @@ export class ResponsePacket extends IPacketCLIENTSERVERCOM {
 	type = RecvPacketTypes.RESPONSE;
 	id!: string;
 	username!: string;
-	skin!: string | null;
-	deathImg!: string | null;
+	skin!: number | null;
+	deathImg!: number | null;
 	accessToken?: string;
 	mode!: string;
 	isMobile!: boolean;
@@ -52,8 +52,8 @@ export class ResponsePacket extends IPacketCLIENTSERVERCOM {
 	deserialise(stream: IslandrBitStream) {
 		this.id = stream.readId()
 		this.username = stream.readUsername()
-		this.skin = stream.readSkinOrLoadout()
-		this.deathImg = stream.readSkinOrLoadout()
+		this.skin = stream.readInt8()
+		this.deathImg = stream.readInt8()
 		this.accessToken = stream.readAccessToken()
 		this.isMobile = stream.readBoolean()
 	}

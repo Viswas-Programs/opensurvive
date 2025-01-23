@@ -28,12 +28,12 @@ export class ResponsePacket extends IPacketCLIENT {
 	type = OutPacketTypes.RESPONSE;
 	id: string;
 	username: string;
-	skin: string | null;
-	deathImg: string | null;
+	skin: number | null;
+	deathImg: number | null;
 	accessToken?: string;
 	isMobile?: boolean;
 
-	constructor(id: string, username: string, skin: string | null, deathImg: string | null, isMobile: boolean, accessToken="") {
+	constructor(id: string, username: string, skin: number | null, deathImg: number | null, isMobile: boolean, accessToken="") {
 		super()
 		this.id = id;
 		this.username = username;
@@ -48,8 +48,8 @@ export class ResponsePacket extends IPacketCLIENT {
 		const stream = this.stream
 		stream.writeId(this.id)
 		stream.writeUsername(this.username)
-		stream.writeSkinOrLoadout(this.skin as string)
-		stream.writeSkinOrLoadout(this.deathImg as string)
+		stream.writeInt8(this.skin!)
+		stream.writeInt8(this.deathImg!)
 		stream.writeAccessToken(this.accessToken as string)
 		stream.writeBoolean(this.isMobile as boolean)
 	}

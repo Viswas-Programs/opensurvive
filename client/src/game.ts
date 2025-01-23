@@ -2,7 +2,7 @@
 import { cookieExists, getCookieValue } from "cookies-utils";
 import { Howl, Howler } from "howler";
 import { inflate } from "pako";
-import { GunColor, KeyBind, movementKeys, RecvPacketTypes, TIMEOUT } from "./constants";
+import { DeathImgToNum, GunColor, KeyBind, movementKeys, RecvPacketTypes, SkinsEncoding, TIMEOUT } from "./constants";
 import { deserialiseDiscardables, deserialiseMinEntities, deserialiseMinObstacles, deserialiseMinParticles, deserialisePlayer, setUsrnameIdDeathImg } from "./deserialisers";
 import { getMode } from "./homepage";
 import { IslandrBitStream } from "./packets";
@@ -148,7 +148,7 @@ async function init(address: string) {
 			var currentCursor = localStorage.getItem("selectedCursor")
 			if (!currentCursor) { localStorage.setItem("selectedCursor", "default"); currentCursor = localStorage.getItem("selectedCursor") }
 			if (currentCursor) { document.documentElement.style.cursor = currentCursor }
-			const responsePacket = new ResponsePacket(id, username!, skin!, deathImg!, isMobile!, String(cookieExists("gave_me_cookies") ? getCookieValue("access_token") : getToken()))
+			const responsePacket = new ResponsePacket(id, username!, SkinsEncoding.get(skin!)!, DeathImgToNum.get(deathImg!)!, isMobile!, String(cookieExists("gave_me_cookies") ? getCookieValue("access_token") : getToken()))
 			connected = true;
 			send(ws, responsePacket);
 			setConnected(true)

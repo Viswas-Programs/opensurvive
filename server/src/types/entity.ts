@@ -117,7 +117,7 @@ export class Entity {
 	// Particle type to emit when damaged
 	damageParticle?: string;
 	isMobile = false;
-	allocBytes = 36;
+	allocBytes = 20;
 	goodOldPos = Vec2.ZERO;
 	goodOldDirection = Vec2.ZERO;
 	surface = "normal";

@@ -4,7 +4,7 @@ import { readFileSync } from "fs";
 import * as ws from "ws";
 import { ID, send, wait, sendBitstream, spawnGun} from "./utils";
 import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ServerSideScopeUpdate, PlayerTickPkt, GameOverPkt } from "./types/packet";
-import { DIRECTION_VEC, EntityTypes, RecvPacketTypes, TICKS_PER_SECOND } from "./constants";
+import { DIRECTION_VEC, EntityTypes, NumToDeathImg, RecvPacketTypes, SkinsDecoding, TICKS_PER_SECOND } from "./constants";
 import {  CommonAngles, RectHitbox, Vec2 } from "./types/math";
 import { Ammo, Bullet, Gun, Player } from "./store/entities";
 import { World } from "./types/world";
@@ -144,8 +144,8 @@ server.on("connection", async socket => {
 				connected = true;
 				username = decoded.username;
 				accessToken = decoded.accessToken;
-				skin = decoded.skin;
-				deathImg = decoded.deathImg;
+				skin = SkinsDecoding.get(decoded.skin)!;
+				deathImg = NumToDeathImg.get(decoded.deathImg)!;
 				isMobile = decoded.isMobile;
 			} else try { socket.close(); } catch (err) { }
 			resolve();

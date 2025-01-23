@@ -1,4 +1,4 @@
-import { ObstacleTypes } from "./constants";
+import { DeathImgToNum, gunIDsToNum, ObstacleTypes, SkinsEncoding } from "./constants";
 import { IslandrBitStream } from "./packets";
 import Player from "./store/entities/player";
 import { Roof } from "./store/obstacles";
@@ -8,11 +8,11 @@ import { GunWeapon } from "./types/weapon";
 export function writeHitboxes(hitbox: MinHitbox, stream: IslandrBitStream) {
 	if (hitbox.type == "circle") {
 		stream.writeInt8(1);
-		stream.writeFloat64(hitbox.radius)
+		stream.writeFloat32(hitbox.radius)
 	}
 	else if (hitbox.type == "rect") {
-		if (hitbox.width == hitbox.height) { stream.writeInt8(3); stream.writeFloat64(hitbox.height) }
-		else { stream.writeInt8(2); stream.writeFloat64(hitbox.width); stream.writeFloat64(hitbox.height) }
+		if (hitbox.width == hitbox.height) { stream.writeInt8(3); stream.writeFloat32(hitbox.height) }
+		else { stream.writeInt8(2); stream.writeFloat32(hitbox.width); stream.writeFloat32(hitbox.height) }
 	}
 }
 export function serialiseMinParticles(particleArray: MinParticle[], stream: IslandrBitStream) {
@@ -28,11 +28,11 @@ export function serialiseMinParticles(particleArray: MinParticle[], stream: Isla
 export function calculateAllocBytesForObs(obstacleArray: Obstacle[]): number {
 	let allocBytes = 2;
 	obstacleArray.forEach(obstacle => {
-		allocBytes += 42
+		allocBytes += 26
 		const hitbox = obstacle.hitbox.minimize()
-		if (hitbox.type == "circle") allocBytes += 8;
-		else if (hitbox.width == hitbox.height) allocBytes += 8;
-		else allocBytes += 16
+		if (hitbox.type == "circle") allocBytes += 4;
+		else if (hitbox.width == hitbox.height) allocBytes += 4;
+		else allocBytes += 8
 		obstacle.animations.forEach(animation => { allocBytes += animation.length  + 1})
 		if (obstacle.type == ObstacleTypes.ROOF) {
 			allocBytes += 31;
@@ -47,8 +47,8 @@ export function serialiseMinObstacles(obstacleArray: MinObstacle[], stream: Isla
 	obstacleArray.forEach((obstacle: MinObstacle) => {
         stream.writeInt16(Number(obstacle.id));
         stream.writeInt8(obstacle.type);
-		stream.writeFloat64(obstacle.position.x); stream.writeFloat64(obstacle.position.y);
-		stream.writeFloat64(obstacle.direction.x); stream.writeFloat64(obstacle.direction.y);
+		stream.writeFloat32(obstacle.position.x); stream.writeFloat32(obstacle.position.y);
+		stream.writeFloat32(obstacle.direction.x); stream.writeFloat32(obstacle.direction.y);
 		writeHitboxes(obstacle.hitbox, stream)
         stream.writeBoolean(obstacle.despawn);
         stream.writeInt8(obstacle.animations.length)
@@ -76,11 +76,11 @@ export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitSt
 	stream.writeInt16(Number(entity.id))
 	//write the type
 	//write position
-	stream.writeFloat64(entity.position.x)
-	stream.writeFloat64(entity.position.y)
+	stream.writeFloat32(entity.position.x)
+	stream.writeFloat32(entity.position.y)
 	//write direction
-	stream.writeFloat64(entity.direction.x)
-	stream.writeFloat64(entity.direction.y)
+	stream.writeFloat32(entity.direction.x)
+	stream.writeFloat32(entity.direction.y)
 	//despawn configs
 	stream.writeBoolean(entity.despawn);
 	if (entity._needsToSendAnimations) {
@@ -91,8 +91,8 @@ export function standardEntitySerialiser(entity: MinEntity, stream: IslandrBitSt
 
 
 export function calculateAllocBytesForTickPkt(player: Player): number {
-	let allocBytes = 75;
-	if (!player.usernamesAndIDsSent) allocBytes += player.username.length + player.id.length+10
+	let allocBytes = 49;
+	if (!player.usernamesAndIDsSent) allocBytes += player.username.length + 3 // 3 -> 1 (death img) + 2(id)
 	if (player.currentHealItem) allocBytes += player.currentHealItem.length
 	if (player.interactMessage) allocBytes += player.interactMessage.length
 	player.animations.forEach((animation) => allocBytes += animation.length)
@@ -110,14 +110,7 @@ export function calculateAllocBytesForTickPkt(player: Player): number {
 	return allocBytes;
 }
 
-const gunIDsToNum: Map<string, number> = new Map([
-	["fists", 0],
-	["cqbr", 1],
-	["mp9", 2],
-	["m18", 3],
-	["stf_12", 4],
-	["svd-m", 5]
-])
+
 
 const healingIDsToNum: Map<string, number> = new Map([
 	["energy_drink", 0],
@@ -132,7 +125,7 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 	// interact message
 	stream.writeBoolean(!!player.interactMessage)
 	if (player.interactMessage)stream.writeASCIIString(player.interactMessage ? player.interactMessage : "")
-	if (!player.usernamesAndIDsSent) stream.writeId(player.id)
+	if (!player.usernamesAndIDsSent) stream.writeInt16(Number(player.id))
 	if (!player.usernamesAndIDsSent) stream.writeUsername(player.username)
 	stream.writeFloat32(player.boost)
 	stream.writeInt8(player.scope)
@@ -179,8 +172,8 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 	}
 	stream.writeInt8(player.inventory.selectedScope)
 	//loadouts
-	stream.writeSkinOrLoadout(player.skin as string)
-	if (!player.usernamesAndIDsSent) stream.writeSkinOrLoadout(player.deathImg as string)
+	stream.writeInt8(SkinsEncoding.get(player.skin!)!)
+	if (!player.usernamesAndIDsSent) stream.writeInt8(DeathImgToNum.get(player.deathImg!)!)
 	// ticks
 	stream.writeInt16(player.reloadTicks)
 	stream.writeInt16(player.maxReloadTicks)
@@ -190,11 +183,11 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 	if (health < 0) health = 0;
 	stream.writeInt8(health)
 	// positioning
-	stream.writeFloat64(player.position.x)
-	stream.writeFloat64(player.position.y)
+	stream.writeFloat32(player.position.x)
+	stream.writeFloat32(player.position.y)
 	// directions
-	stream.writeFloat64(player.direction.x)
-	stream.writeFloat64(player.direction.y)
+	stream.writeFloat32(player.direction.x)
+	stream.writeFloat32(player.direction.y)
 	stream.writeInt8(player.animations.length)
 	player.animations.forEach(animation => {
 		stream.writeASCIIString(animation)

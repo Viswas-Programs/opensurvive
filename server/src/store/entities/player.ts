@@ -1,5 +1,5 @@
 import { world } from "../..";
-import { EntityTypes, GLOBAL_UNIT_MULTIPLIER, TICKS_PER_SECOND } from "../../constants";
+import { DeathImgToNum, EntityTypes, GLOBAL_UNIT_MULTIPLIER, gunIDsToNum, SkinsEncoding, TICKS_PER_SECOND } from "../../constants";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
 import { Entity, Inventory } from "../../types/entity";
@@ -79,7 +79,7 @@ export default class Player extends Entity {
 		this.currentHealItem = undefined;
 		this.accessToken = accessToken;
 		this.isMobile = isMobile!;
-		this.allocBytes += 35 + this.username.length + 1 + 1; //last +1 is for animation length byte
+		this.allocBytes += 19 + this.username.length;
 		this._needsToSendAnimations = true
 		this.animations.forEach(animation => this.allocBytes += animation.length)
 	}
@@ -373,8 +373,8 @@ export default class Player extends Entity {
 		stream.writeInt8(minPlayer.inventory.backpackLevel) //inventory's backpackLevel 
 		stream.writeInt8(minPlayer.inventory.helmetLevel) //inventory's helmetLevel
 		stream.writeInt8(minPlayer.inventory.vestLevel) // inventory vestLevel
-		stream.writeId(minPlayer.inventory.holding.nameId) // inventory holding currently,
-		stream.writeSkinOrLoadout(minPlayer.skin!)
-		stream.writeSkinOrLoadout(minPlayer.deathImg!)
+		stream.writeInt8(gunIDsToNum.get(minPlayer.inventory.holding.nameId)!);// inventory holding currently,
+		stream.writeInt8(SkinsEncoding.get(minPlayer.skin!)!)
+		stream.writeInt8(DeathImgToNum.get(minPlayer.deathImg!)!)
 	}
 }

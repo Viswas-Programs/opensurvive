@@ -93,3 +93,51 @@ export enum ObstacleTypes {
 	WALL = 34,
 	SPAWNER = 35
 }
+
+export const SkinsDecoding = new Map<number, string>([
+	[0, "default"],
+	[1, "illuminati"],
+	[2, "starstruck"],
+	[3, "tulip"],
+	[4, "abyssal"],
+])
+
+export const SkinCurrencies = new Map<number, number>([
+	[0, 0],
+	[1, 100],
+	[2, 150],
+	[3, 250],
+	[4, 350]
+])
+
+export const SkinsEncoding = new Map<string, number>()
+for (let ii = 0; ii < Array.from(SkinsDecoding).length; ii++) {
+	SkinsEncoding.set(SkinsDecoding.get(ii)!, ii)
+}
+
+export const gunIDsToNum: Map<string, number> = new Map([
+	["fists", 0],
+	["cqbr", 1],
+	["mp9", 2],
+	["m18", 3],
+	["stf_12", 4],
+	["svd-m", 5]
+])
+
+export const numToGunIDs = new Map<number, string>()
+for (let ii = 0; ii < Array.from(gunIDsToNum).length; ii++) {
+	numToGunIDs.set(ii, Array.from(gunIDsToNum)[ii][0])
+}
+
+export const DeathImgToNum = new Map<string, number>([
+	["Big-Head-Skull", 0],
+	["Cartoon-Skull", 1],
+	["default", 2],
+	["R.I.P", 3],
+	["3d-Quality-Skull", 4]
+])
+
+export const NumToDeathImg = new Map<number, string>()
+for (let ii = 0; ii < Array.from(DeathImgToNum).length; ii++) {
+	NumToDeathImg.set(ii, Array.from(DeathImgToNum)[ii][0])
+}

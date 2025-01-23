@@ -19,36 +19,34 @@ export function getMode(): string {
 }
 $(document).ready(function () {
 
-		$('.arrow').click(function () {
-			$('.box-selectable').toggle();
-			$(this).toggleClass('arrow-down');
-		});
-		$('.discord').click(function () {
-			window.open('http://opensurviv.run.place/discord');
-		});
-		$('.info').click(function () {
-			$('.info-box').toggle();
-		});
-		$('.close').click(function () {
-			$('.info-box').hide();
-			$('.partner-box').hide();
-		});
-		$('.partner').click(function () {
-			$('.partner-box').toggle();
-		});
-		$('.loadout').click(function () { window.location.replace(window.location.href += "loadout") })
+	$('.arrow').click(function () {
+		$('.box-selectable').toggle();
+		$(this).toggleClass('arrow-down');
+	});
+	$('.discord').click(function () {
+		window.open('http://opensurviv.run.place/discord');
+	});
+	$('.info').click(function () {
+		$('.info-box').toggle();
+	});
+	$('.close').click(function () {
+		$('.info-box').hide();
+		$('.partner-box').hide();
+	});
+	$('.partner').click(function () {
+		$('.partner-box').toggle();
 	});
 	$.get("assets/" + getMode() + "/CREDITS.md", function (data) {
 		document.getElementById("contents")!.innerHTML = new MarkdownIt().render(data);
 	}, "text");
-if (!window.location.href!.includes("/loadout")) {
+})
 	window.onload = function () {
 		document.getElementById('loading')!.classList.add('zoom-out');
 		setTimeout(function () {
 			document.getElementById('loading')!.style.display = 'none';
 		}, 1000);
 	};
-	
+
 	document.addEventListener('DOMContentLoaded', function () {
 		var audio = <HTMLAudioElement>document.getElementById('menu-audio');
 		var volumeIcon = <HTMLDivElement>document.getElementById('volume-icon');
@@ -89,21 +87,21 @@ if (!window.location.href!.includes("/loadout")) {
 		closeBox();
 	}
 	document.getElementById("button-close")!.onclick = closeBox;
-}
-if (!localStorage.getItem("version")) { localStorage.setItem("version", "0.3") }
-let version = parseFloat(localStorage.getItem("version")!);
-const currentVersion = 0.3
-if (!localStorage.getItem("settings") || currentVersion > version) {
-	localStorage.setItem("settings", "``coloredWeaponSlots:0;pingMeter:0");
-	if (currentVersion > version) {
-		localStorage.setItem("version", String(currentVersion))
-		version = currentVersion
+
+	if (!localStorage.getItem("version")) { localStorage.setItem("version", "0.3") }
+	let version = parseFloat(localStorage.getItem("version")!);
+	const currentVersion = 0.3
+	if (!localStorage.getItem("settings") || currentVersion > version) {
+		localStorage.setItem("settings", "``coloredWeaponSlots:0;pingMeter:0");
+		if (currentVersion > version) {
+			localStorage.setItem("version", String(currentVersion))
+			version = currentVersion
+		}
 	}
-}
-const modes = ["normal", "suroi_collab", "classic"]
-modes.forEach(md => {
-	document.getElementsByClassName("box-selectable")[0].children[modes.indexOf(md)].querySelector("div")?.addEventListener("click", () => { setMode(md); })
-})
+	const modes = ["normal", "suroi_collab", "classic"]
+	modes.forEach(md => {
+		document.getElementsByClassName("box-selectable")[0].children[modes.indexOf(md)].querySelector("div")?.addEventListener("click", () => { setMode(md); })
+	})
 	function showAds() {
 		document.querySelectorAll('.ads').forEach(ad => { (<HTMLElement>ad).style.visibility = "visible"; });
 	}

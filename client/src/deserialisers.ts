@@ -6,7 +6,7 @@ import { CountableString } from "./types/misc"
 import { Weapon } from "./types/weapon"
 import { Inventory } from "./types/entity"
 import { TracerData } from "./types/data"
-import { EntityTypes, ObstacleTypes } from "./constants"
+import { EntityTypes, NumToDeathImg, numToGunIDs, ObstacleTypes, SkinsDecoding } from "./constants"
 
 const gunNumToID: Map<number, string> = new Map([
     [0, "fists"],
@@ -92,7 +92,7 @@ function _getHitboxes(stream: IslandrBitStream, callFrom = "others"): MinHitbox 
         if (callFrom != "player") {
             hitbox = <MinCircleHitbox>{
                 type:"circle",
-                radius: stream.readFloat64()
+                radius: stream.readFloat32()
             }
         }
         else {
@@ -102,12 +102,12 @@ function _getHitboxes(stream: IslandrBitStream, callFrom = "others"): MinHitbox 
         }
     }
     else {
-        if (hitboxTypeVal == 3) { const HeightAndWidth = stream.readFloat64(); hitbox = <MinRectHitbox>{ type: "rect", height: HeightAndWidth, width: HeightAndWidth } }
+        if (hitboxTypeVal == 3) { const HeightAndWidth = stream.readFloat32(); hitbox = <MinRectHitbox>{ type: "rect", height: HeightAndWidth, width: HeightAndWidth } }
         else {
             hitbox = <MinRectHitbox>{
                 type: "rect",
-                width: stream.readFloat64(),
-                height: stream.readFloat64()
+                width: stream.readFloat32(),
+                height: stream.readFloat32()
             }
         }
     }
@@ -130,8 +130,8 @@ export function deserialiseMinObstacles(stream: IslandrBitStream): MinObstacle[]
         let obstacle = {
             id: String(stream.readInt16()),
             type: stream.readInt8(),
-            position: <MinVec2>{ x: stream.readFloat64(), y: stream.readFloat64() },
-            direction: <MinVec2>{ x: stream.readFloat64(), y: stream.readFloat64() },
+            position: <MinVec2>{ x: stream.readFloat32(), y: stream.readFloat32() },
+            direction: <MinVec2>{ x: stream.readFloat32(), y: stream.readFloat32() },
             hitbox: <MinHitbox>_getHitboxes(stream),
             despawn: stream.readBoolean(),
             animations: <string[]>_getAnimations(stream),
@@ -164,8 +164,8 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
     for (let ii = 0; ii < size; ii++) {
         const type = stream.readInt8()
         const id = String(stream.readInt16())
-        const position: MinVec2 = { x: stream.readFloat64(), y: stream.readFloat64() }
-        const direction: MinVec2 = { x: stream.readFloat64(), y: stream.readFloat64() }
+        const position: MinVec2 = { x: stream.readFloat32(), y: stream.readFloat32() }
+        const direction: MinVec2 = { x: stream.readFloat32(), y: stream.readFloat32() }
         //const hitbox = _getHitboxes(stream)
         const despawn = stream.readBoolean()
         const animations: string[] = []
@@ -242,10 +242,10 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
                     backpackLevel: stream.readInt8(),
                     helmetLevel: stream.readInt8(),
                     vestLevel: stream.readInt8(),
-                    holding: castCorrectWeapon(<MinWeapon>{nameId: stream.readId()})
+                    holding: castCorrectWeapon(<MinWeapon>{nameId: numToGunIDs.get(stream.readInt8())})
                 },
-                skin: stream.readSkinOrLoadout(),
-                deathImg: stream.readSkinOrLoadout(),
+                skin: SkinsDecoding.get(stream.readInt8()),
+                deathImg: NumToDeathImg.get(stream.readInt8()),
                 hitbox: <MinHitbox>{
                     type: "circle", radius: 1
                 }
@@ -276,11 +276,11 @@ function _getUsername(stream: IslandrBitStream) {
     return username
 }
 function _getUserID(stream: IslandrBitStream) {
-    if (!id) id = stream.readId()
+    if (!id) id = String( stream.readInt16())
     return id
 }
 function _getUserDeathImg(stream: IslandrBitStream) {
-    if (!deathImg) deathImg = stream.readSkinOrLoadout()
+    if (!deathImg) deathImg = NumToDeathImg.get(stream.readInt8())!
     else deathImg = "default"
     return deathImg
 }
@@ -324,7 +324,7 @@ export function deserialisePlayer(stream: IslandrBitStream) {
                 return undefined;
             }
         },
-        skin: stream.readSkinOrLoadout(),
+        skin: SkinsDecoding.get(stream.readInt8()),
         deathImg: _getUserDeathImg(stream),
         reloadTicks: stream.readInt16(),
         maxReloadTicks: stream.readInt16(),
@@ -333,12 +333,12 @@ export function deserialisePlayer(stream: IslandrBitStream) {
         health: stream.readInt8(),
         maxHealth: 100,
         position: Vec2.fromMinVec2(<MinVec2>{
-            x: stream.readFloat64(),
-            y: stream.readFloat64()
+            x: stream.readFloat32(),
+            y: stream.readFloat32()
         }),
         direction: Vec2.fromMinVec2(<MinVec2>{
-            x: stream.readFloat64(),
-            y: stream.readFloat64()
+            x: stream.readFloat32(),
+            y: stream.readFloat32()
         }),
         animations: _getAnimations(stream),
         despawn: stream.readBoolean()

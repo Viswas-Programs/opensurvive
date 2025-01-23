@@ -40,7 +40,7 @@ export function send(socket: WebSocket, packet: IPacket) {
 }
 export function sendBitstream(socket: WebSocket, packet: IPacketSERVER) {
     packet.serialise();
-    socket.send(deflate(packet.getBuffer()).buffer);
+    socket.send(deflate(packet.getBuffer()).buffer); 
 }
 // Receive packet
 export function receive(msg: ArrayBuffer) {
@@ -54,7 +54,7 @@ import { Ammo, Gun, Grenade } from "./store/entities";
 import { Vec2 } from "./types/math";
 import { GunColor } from "./types/misc";
 import fetch from "node-fetch";
-
+import { OutPacketTypes } from "./constants";
 // Spawners
 export function spawnGun(id: string, color: GunColor, position: Vec2, ammoAmount: number, normal=true) {
     const gun = new Gun(id, color);
