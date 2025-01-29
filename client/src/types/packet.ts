@@ -114,11 +114,11 @@ export class MovementPacket extends IPacketCLIENT {
 export class PlayerRotationDelta extends IPacketCLIENT {
 	type = OutPacketTypes.PL_ROATION;
 	angle: number;
-	allocBytes = 2;
+	allocBytes = 5;
 	constructor(angle: number) { super(); this.angle = angle }
 	serialise() {
 		super.serialise();
-		this.stream.writePlayerDirection(this.angle)
+		this.stream.writeFloat32(this.angle)
 	}
 }
 // Packet to notify mouse button press

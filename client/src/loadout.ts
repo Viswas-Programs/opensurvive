@@ -51,8 +51,6 @@ const descriptionMapping = new Map<number, string>([
     [3, "Want to look unique and beautiful like a tulip in the lobby? This is for you!"],
     [4, "Want to be the most menacing person in the lobby decimating every opponent in the field? This one is specifically for you!"]
 ])
-console.log("guh")
-console.log(Object.keys(SkinsDecoding).length)
 for (let ii = 0; ii < Array.from(SkinsDecoding).length; ii++) {
     let skinPrice = "Free"
     if (SkinCurrencies.get(ii) != 0) { skinPrice = String(SkinCurrencies.get(ii)) }

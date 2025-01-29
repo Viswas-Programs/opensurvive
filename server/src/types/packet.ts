@@ -80,7 +80,7 @@ export class MobileMovementPacket extends IPacketCLIENTSERVERCOM {
 	type = RecvPacketTypes.MOBILE_MOV;
 	direction!: number;
 	deserialise(stream: IslandrBitStream) {
-		this.direction = stream.readPlayerDirection()
+		this.direction = stream.readFloat32()
 	}
 
 }

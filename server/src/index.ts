@@ -116,7 +116,6 @@ server.on("connection", async socket => {
 	// Add socket to map with a generated ID.
 	const id = ID();
 	sockets.set(id, socket);
-
 	// Setup the close connection listener. Socket will be deleted from map.
 	var connected = false;
 	socket.on("close", () => {
@@ -140,12 +139,12 @@ server.on("connection", async socket => {
 			const type = stream.readPacketType()
 			const decoded = new ResponsePacket();
 			decoded.deserialise(stream);
-			if (id.includes(decoded.id) && decoded.username && decoded.skin && decoded.deathImg) {
+			if (id.includes(decoded.id) && decoded.username) {
 				connected = true;
 				username = decoded.username;
 				accessToken = decoded.accessToken;
-				skin = SkinsDecoding.get(decoded.skin)!;
-				deathImg = NumToDeathImg.get(decoded.deathImg)!;
+				skin = SkinsDecoding.get(decoded.skin!)!;
+				deathImg = NumToDeathImg.get(decoded.deathImg!)!;
 				isMobile = decoded.isMobile;
 			} else try { socket.close(); } catch (err) { }
 			resolve();

@@ -1,4 +1,4 @@
-import { KeyBind, LANG } from "../constants";
+import { KeyBind, KeyBindDef, LANG } from "../constants";
 import { getTPS } from "../game";
 import { translate } from "../languages";
 import { FullPlayer } from "../store/entities";
@@ -18,7 +18,7 @@ function drawInteract(player: FullPlayer, canvas: HTMLCanvasElement, ctx: Canvas
 	ctx.font = `${size}px Jura bold`;
 	ctx.textBaseline = "top";
 	ctx.textAlign = "center";
-	const metric = ctx.measureText(`[${KeyBind.INTERACT.toUpperCase()}] Pick up ${player.interactMessage}`);
+	const metric = ctx.measureText(`[${KeyBind.get(KeyBindDef.INTERACT)!.toUpperCase()}] Pick up ${player.interactMessage}`);
 	const yOffset = canvas.height / 24;
 	const padding = canvas.height / 72;
 	const width = metric.width + padding * 2;
@@ -29,7 +29,7 @@ function drawInteract(player: FullPlayer, canvas: HTMLCanvasElement, ctx: Canvas
 	ctx.globalAlpha = 1;
 	const split = player.interactMessage?.split(" ");
 	if (split)
-		ctx.fillText(translate(LANG, split.shift()!, KeyBind.INTERACT.toUpperCase(), split ? translate(LANG, split.shift()!, ...split) : ""), canvas.width / 2, canvas.height / 2 + padding + yOffset);
+		ctx.fillText(translate(LANG, split.shift()!, KeyBind.get(KeyBindDef.INTERACT)!.toUpperCase(), split ? translate(LANG, split.shift()!, ...split) : ""), canvas.width / 2, canvas.height / 2 + padding + yOffset);
 }
 
 function drawReloading(player: FullPlayer, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {

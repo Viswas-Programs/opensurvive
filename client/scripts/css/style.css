@@ -953,7 +953,7 @@ div#sidebar {
     float: left;
 }
 div#main-content {
-    overflow-y: hidden;
+    overflow: auto;
     height: 95%;
     width: 80%;
     display: inline-block;
@@ -979,6 +979,7 @@ div#settings-saveChangesBtn {
 .mainContent{
     text-align: left;
     font-size: 20px;
+    overflow: auto;
 }
 
 div#ping-meter {
@@ -1409,3 +1410,18 @@ div#overlay {
     /* Ensure overlay is above everything */
 }
 /* LOADOUT CSS ENDS HERE, STARTS AT LINE 1035+ */
+.keybindFrame{
+    display: inline-block;
+    width:50%
+}
+.keybind{
+    display: inline-block;
+    border-radius: 20%;
+    background: rgba(80, 80, 80, 0.8);
+    width: 20%;
+    text-align: center;
+    justify-content: center;
+}
+.keybindMainFrame {
+    margin-bottom: 2%;
+}

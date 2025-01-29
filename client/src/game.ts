@@ -2,12 +2,13 @@
 import { cookieExists, getCookieValue } from "cookies-utils";
 import { Howl, Howler } from "howler";
 import { inflate } from "pako";
-import { DeathImgToNum, GunColor, KeyBind, movementKeys, RecvPacketTypes, SkinsEncoding, TIMEOUT } from "./constants";
+import { DeathImgToNum, GunColor, KeyBind, KeyBindDef, movementKeys, RecvPacketTypes, SkinsEncoding, TIMEOUT } from "./constants";
 import { deserialiseDiscardables, deserialiseMinEntities, deserialiseMinObstacles, deserialiseMinParticles, deserialisePlayer, setUsrnameIdDeathImg } from "./deserialisers";
 import { getMode } from "./homepage";
 import { IslandrBitStream } from "./packets";
 import { start, stop } from "./renderer";
 import { initMap } from "./rendering/map";
+import { setWindowKeyDown } from "./settings";
 import { addKeyPressed, addMousePressed, cleanUpMouseAndKeyPressed, getToken, isKeyPressed, isMenuHidden, isMouseDisabled, removeKeyPressed, removeMousePressed, toggleBigMap, toggleHud, toggleMap, toggleMenu, toggleMinimap, toggleMouseDisabled } from "./states";
 import { FullPlayer, Healing } from "./store/entities";
 import { Barrel, Box, Bush, castMinObstacle, castObstacle, Crate, Desk, Log, Stone, Table, Toilet, ToiletMore, Tree } from "./store/obstacles";
@@ -81,7 +82,7 @@ for (let ii = 0; ii < 4; ii++) {
 
 }
 let pingTimer = 0;
-declare type modeMapColourType = keyof typeof modeMapColours
+declare type modeMapColourType = keyof typeof modeMapColours;
 async function init(address: string) {
 	// Initialize the websocket
 	const protocol = "ws";
@@ -619,33 +620,37 @@ document.getElementById("resume")?.addEventListener('click', () => {
 	document.getElementById("settings")?.classList.add('hidden');
 	toggleMenu();
 })
-window.onkeydown = (event) => {
+const onkeydfunc = (event: KeyboardEvent) => {
 	if (!connected || isKeyPressed(event.key) || !player || player.despawn || gameEnded) return;
 	event.stopPropagation();
 	addKeyPressed(event.key);
 	const settingsElem = document.getElementById("settings");
-	if (event.key == KeyBind.MENU) {
+	if (event.key == KeyBind.get(KeyBindDef.MENU)) {
 		if (isMenuHidden()) { settingsElem?.classList.remove("hidden"); }
-		else { settingsElem?.classList.add("hidden")}
+		else { settingsElem?.classList.add("hidden") }
 		toggleMenu();
-	} else if (event.key == KeyBind.HIDE_HUD) toggleHud();
-	else if (event.key == KeyBind.WORLD_MAP) toggleMap();
-	else if (event.key == KeyBind.HIDE_MAP) toggleMinimap();
-	else if (event.key == KeyBind.BIG_MAP) toggleBigMap();
+	} else if (event.key == KeyBind.get(KeyBindDef.HIDE_HUD)) toggleHud();
+	else if (event.key == KeyBind.get(KeyBindDef.WORLD_MAP)) toggleMap();
+	else if (event.key == KeyBind.get(KeyBindDef.HIDE_MAP)) toggleMinimap();
+	else if (event.key == KeyBind.get(KeyBindDef.BIG_MAP)) toggleBigMap();
 	if (isMenuHidden()) {
 		const index = movementKeys.indexOf(event.key);
 		if (index >= 0)
 			send(ws, new MovementPressPacket(index));
-		else if (event.key == KeyBind.INTERACT)
+		else if (event.key == KeyBind.get(KeyBindDef.INTERACT))
 			send(ws, new InteractPacket());
-		else if (event.key == KeyBind.RELOAD)
+		else if (event.key == KeyBind.get(KeyBindDef.RELOAD))
 			send(ws, new ReloadWeaponPacket());
-		else if (event.key == KeyBind.CANCEL)
+		else if (event.key == KeyBind.get(KeyBindDef.CANCEL))
 			send(ws, new CancelActionsPacket())
+		else if (event.key == KeyBind.get(KeyBindDef.MELEE))
+			send(ws, new SwitchWeaponPacket(2, true))
 		else if (!isNaN(parseInt(event.key)))
 			send(ws, new SwitchWeaponPacket(parseInt(event.key) - 1, true));
 	}
 }
+window.onkeydown = onkeydfunc
+setWindowKeyDown(onkeydfunc)
 
 window.onkeyup = (event) => {
 	if (!connected || !player || player.despawn || gameEnded) return;

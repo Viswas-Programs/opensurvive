@@ -1,11 +1,11 @@
 // This file records the state of things
 
-import { KeyBind } from "./constants";
+import { KeyBind, KeyBindDef } from "./constants";
 
 const keyPressed = new Map<string, boolean>();
-export function isKeyPressed(key: KeyBind | string) { return !!keyPressed.get(key); }
-export function addKeyPressed(key: KeyBind | string) { keyPressed.set(key, true); }
-export function removeKeyPressed(key: KeyBind | string) { keyPressed.delete(key); }
+export function isKeyPressed(key: string) { return !!keyPressed.get(key); }
+export function addKeyPressed(key: string) { keyPressed.set(key, true); }
+export function removeKeyPressed(key: string) { keyPressed.delete(key); }
 const mousePressed = new Map<number, boolean>();
 export function isMousePressed(button: number) { return !!mousePressed.get(button); }
 export function addMousePressed(button: number) { mousePressed.set(button, true); }

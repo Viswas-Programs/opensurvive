@@ -1,5 +1,5 @@
 // More like configuration
-export enum KeyBind {
+export enum DefaultKeyBinds {
 	MENU = "Escape",
 	HIDE_HUD = "F1",
 	WORLD_MAP = "g",
@@ -15,6 +15,34 @@ export enum KeyBind {
 	RELOAD = "r",
 	CANCEL = "x"
 }
+export enum KeyBindDef {
+	MENU = 0,
+	HIDE_HUD = 1,
+	WORLD_MAP = 2,
+	HIDE_MAP = 3,
+	BIG_MAP = 4,
+	RIGHT = 5,
+	UP = 6,
+	LEFT = 7,
+	DOWN = 8,
+	INTERACT = 9,
+	MELEE = 10,
+	LAST_USED = 11,
+	RELOAD = 12,
+	CANCEL = 13
+}
+export const KeyBind = new Map<number, string>()
+if (!localStorage.getItem("keybinds")) {
+	localStorage.setItem("keybinds",  "0:Escape;1:F1;2:g;3:z;4:v;5:d;6:w;7:a;8:s;9:f;10:e;11:q;12:r;13:x")
+}
+let keybind = localStorage.getItem("keybinds")!
+if (keybind[-1] == "") {keybind= keybind.substring(0, keybind.length-1) }
+const keybindRawList = keybind.split(";")
+for (let ii = 0; ii < keybindRawList.length; ii++) {
+	const keybindList = keybindRawList[ii].split(":")
+	KeyBind.set(Number(keybindList[0]), keybindList[1] )
+}
+console.log(Array.from(KeyBind))
 export enum RecvPacketTypes {
 	GAME = 0,
 	MAP = 1,
@@ -45,7 +73,7 @@ export enum OutPacketTypes {
 	SR_SCOPE_UPD = 15,
 	DROP_WEAPON = 16
 }
-export const movementKeys = [KeyBind.RIGHT, KeyBind.UP, KeyBind.LEFT, KeyBind.DOWN].map(k => <string> k);
+export const movementKeys = [KeyBind.get(KeyBindDef.RIGHT), KeyBind.get(KeyBindDef.UP), KeyBind.get(KeyBindDef.LEFT), KeyBind.get(KeyBindDef.DOWN)].map(k => <string> k);
 
 export const GRID_INTERVAL = 20;
 export const MINIMAP_SIZE = 100;
