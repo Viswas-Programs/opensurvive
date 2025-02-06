@@ -13,13 +13,8 @@ import { castMapObstacle } from "./store/obstacles";
 import { castBuilding } from "./store/buildings";
 import { MapBuildingData, MapData } from "./types/data";
 import { IslandrBitStream } from "./packets"
-import { GunColor } from "./types/misc";
 import Building from "./types/building";
-import Scope from "./store/entities/scope";
-import Healing from "./store/entities/healing";
-import { GunWeapon, Weapon, WeaponType } from "./types/weapon";
-import { Inventory } from "./types/entity";
-import Backpack from "./store/entities/backpack";
+import { GunWeapon,  WeaponType } from "./types/weapon";
 export var ticksElapsed = 0;
 
 const server = new ws.Server({ port: 8080 });
@@ -102,6 +97,7 @@ export function reset(map = "regular") {
 			const obstacle = castMapObstacle(data);
 			if (!obstacle) continue;
 			world.obstacles.push(obstacle);
+			world._obstacles.push(obstacle)
 		}
 	}
 }
@@ -293,9 +289,9 @@ server.on("connection", async socket => {
 });
 setInterval(() => {
 	world.entities.forEach(entity => {
-		if (entity.type == EntityTypes.BULLET) (entity as Bullet).collisionCheck(world.entities, world.obstacles)
+		if (entity.type == EntityTypes.BULLET && !entity.despawn) (entity as Bullet).collisionCheck(world.entities, world.obstacles)
 	})
-}, 5)
+}, 1)
 setInterval(() => {
 	world.tick();
 	// Filter players from entities and send them packets
@@ -308,7 +304,10 @@ setInterval(() => {
 		sendBitstream(socket, new PlayerTickPkt(player));
 		if (world.particles.length) sendBitstream(socket, new ParticlesPacket(world.particles, player));
 		//for (const sound of world.onceSounds) sendBitstream(socket, new SoundPacket(sound.path, sound.position));
-		for (const killFeed of world.killFeeds) sendBitstream(socket, new AnnouncePacket(killFeed.weaponUsed, killFeed.killer, killFeed.killed))
+		for (const killFeed of world.killFeeds) {
+			if (!killFeed.disconnection) sendBitstream(socket, new AnnouncePacket(killFeed.disconnection, killFeed.killed, killFeed.yourPos, (<any>killFeed).weaponUsed, (<any>killFeed).killer))
+			else sendBitstream(socket, new AnnouncePacket(killFeed.disconnection, killFeed.killed, killFeed.yourPos))
+		}
 		//if (player.changedScope) { sendBitstream(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false; }
 		if ((player.despawn || player.shouldSendStuff) && !player.sentStuff) { sendBitstream(socket, new GameOverPkt(player.won, player.damageDone, player.damageTaken, player.killCount)); player.sentStuff = true; }
 	});

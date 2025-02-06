@@ -351,7 +351,7 @@ export function deserialiseDiscardables(stream: IslandrBitStream): string[] {
     const size = stream.readInt8()
     if (size == 0 ) return []
     for (let ii = 0; ii < size; ii++) {
-        const discardable = stream.readASCIIString();
+        const discardable = String(stream.readInt16());
         discardables.push(discardable)
     }
     return discardables

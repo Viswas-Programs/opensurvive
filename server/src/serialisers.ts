@@ -197,5 +197,5 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 }
 export function serialiseDiscardables(discardables: string[], stream: IslandrBitStream) {
 	stream.writeInt8(discardables.length);
-	discardables.forEach(discardable => stream.writeASCIIString(discardable))
+	discardables.forEach(discardable => stream.writeInt16(Number(discardable)))
 }

@@ -48,7 +48,7 @@ export default class Barrel extends Obstacle {
 	die() {
 		super.die();
 		//world.onceSounds.push({ path: `obstacles/barrel_explosion.mp3`, position: this.position });
-		world.entities.push(new Explosion(this, 150, 50, this.position, this.hitbox.comparable, 4, 20));
+		world.entities.push(new Explosion(this, 150, 50, this.position, (this.hitbox.comparable*1.5), 5, 20));
 	}
 	minimize() {
 		const minimizedBarrel = Object.assign(super.minimize(), { special: this.special });

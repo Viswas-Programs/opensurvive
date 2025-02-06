@@ -34,10 +34,19 @@ export default class Explosion extends Entity {
 
 	tick(entities: Entity[], obstacles: Obstacle[]) {
 		super.tick(entities, obstacles);
-
+		const entitiesToCheck = []
+		const obstaclesToCheck = []
+		for (let ii = 0; ii < entities.length; ii++) {
+			if (entities[ii].type != EntityTypes.PLAYER && entities[ii].despawn) continue;
+			entitiesToCheck.push(entities[ii])
+		}
+		for (let ii = 0; ii < obstacles.length; ii++) {
+			if (obstacles[ii].type != EntityTypes.PLAYER && obstacles[ii].despawn) continue;
+			obstaclesToCheck.push(obstacles[ii])
+		}
 		// Damage to entities and obstacles
 		var combined: (Entity | Obstacle)[] = [];
-		combined = combined.concat(entities, obstacles);
+		combined = combined.concat(entitiesToCheck, obstaclesToCheck);
 		for (const thing of combined) {
 			if (!this.collided(thing) || this.damaged.has(thing.id)) continue;
 			const damage = this.dmg + (this.minDmg - this.dmg) * (this.hitbox.comparable - this.radius) / (this.radius * this.inflation - this.radius);
@@ -49,7 +58,7 @@ export default class Explosion extends Entity {
 		const slope = (this.radius * this.inflation - this.radius) / this.maxHealth;
 		// y = mx + radius
 		this.hitbox = new CircleHitbox(slope * (this.maxHealth - this.health) + this.radius);
-		this.health-=2;
+		this.health-=3;
 		if (this.health <= 0) this.die();
 	}
 

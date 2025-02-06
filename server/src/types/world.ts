@@ -9,12 +9,13 @@ import { EntityTypes, PLAYER_THRESHOLD, TICKS_PER_SECOND } from "../constants";
 import { Player } from "../store/entities";
 import { Terrain } from "./terrain";
 import { reset } from "..";
-
+import { MinVec2 } from "./minimized";
 export class World {
 	ticks = 0;
 	size: Vec2;
 	entities: Entity[] = [];
 	obstacles: Obstacle[] = [];
+	_obstacles: Obstacle[] = [];
 	buildings: Building[] = [];
 	discardEntities: string[] = [];
 	discardObstacles: string[] = [];
@@ -41,11 +42,10 @@ export class World {
 	joinSounds: { path: string; position: Vec2; }[] = []; // Sent when player joins, e.g. music
 
 	//Kill feed storage
-	killFeeds: { weaponUsed: string; killer: string; killed: string; }[] = [];
+	killFeeds: ({ disconnection: boolean, weaponUsed: string; killer: string; killed: string; yourPos: MinVec2 }| { disconnection: boolean, killed: string, yourPos: MinVec2 })[] = [];
 	constructor(size: Vec2, defaultTerrain: Terrain) {
 		// Set the size of map
 		this.size = size;
-
 		// Set the terrains
 		this.defaultTerrain = defaultTerrain;
 
@@ -101,13 +101,14 @@ export class World {
 		}*/
 		// Merge obstacles
 		const allObstacles = this.obstacles.concat(...this.buildings.map(b => b.obstacles.map(o => o.obstacle)));
+		const _allObstacles = this._obstacles.concat(...this.buildings.map(b => b.obstacles.map(o => o.obstacle)));
 
 		// Tick every entity and obstacle.
 		let ii: number;
 		var removable: number[] = [];
 		for (ii = 0; ii < this.entities.length; ii++) {
 			const entity = this.entities[ii];
-			entity.tick(this.entities, allObstacles);
+			if (!entity.despawn) entity.tick(this.entities, allObstacles);
 			// Mark entity for removal
 			if (entity.despawn && entity.discardable) {
 				removable.push(ii);
@@ -118,12 +119,14 @@ export class World {
 			}
 		}
 		// Remove all discardable entities
-		for (ii = removable.length - 1; ii >= 0; ii--) this.entities.splice(removable[ii], 1);
+		for (ii = removable.length - 1; ii >= 0; ii--) {
+			if (this.entities[removable[ii]].type != EntityTypes.PLAYER) this.entities.splice(removable[ii], 1);
+		}
 
 		removable = [];
-		for (ii = 0; ii < allObstacles.length; ii++) {
-			const obstacle = allObstacles[ii];
-			obstacle.tick(this.entities, allObstacles);
+		for (ii = 0; ii < _allObstacles.length; ii++) {
+			const obstacle = _allObstacles[ii];
+			obstacle.tick(this.entities, _allObstacles);
 			// Mark obstacle for removal
 			if (obstacle.despawn && obstacle.discardable) {
 				removable.push(ii);

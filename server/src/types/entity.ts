@@ -131,7 +131,6 @@ export class Entity {
 	tick(_entities: Entity[], _obstacles: Obstacle[]) {
 		if (!Number.isNaN(this.position.x)) this.goodOldPos = this.position
 		if (!Number.isNaN(this.direction.x)) this.goodOldDirection = this.direction
-		if (this.animations.length )console.log(this.type, this.animations)
 		const lastPosition = this.position;
 		// Add the velocity to the position, and cap it at map size.
 		if (this.airborne)

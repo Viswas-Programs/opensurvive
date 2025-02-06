@@ -127,6 +127,7 @@ div#menu div#connection.panel {
     right: 2.5vh;
     background-color: rgba(5, 5, 5, 0.5);
     border-radius: 5px;
+    z-index: 25;
 }
 .panel {
     position: relative;

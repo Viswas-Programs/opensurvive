@@ -1,3 +1,4 @@
+import { disconnect } from "process";
 import { BASE_RADIUS, OutPacketTypes, RecvPacketTypes } from "../constants";
 import { IslandrBitStream } from "../packets";
 import { calculateAllocBytesForObs, calculateAllocBytesForTickPkt, serialiseDiscardables, serialiseMinObstacles, serialiseMinParticles, serialisePlayer } from "../serialisers";
@@ -208,8 +209,8 @@ export class GamePacket extends IPacketSERVER {
 		this.allocBytes += calculateAllocBytesForObs(obstacles)
 		this.alivecount = alivecount;
 		this.player = player;
-		if (discardEntities.length) { this.discardEntities = discardEntities; this.discardEntities.forEach(discardable => this.allocBytes += (discardable.length+2)); this.anyDiscardEntities = true }
-		if (discardObstacles.length) { this.discardObstacles = discardObstacles; this.discardObstacles.forEach(discardable => this.allocBytes += (discardable.length + 2)); this.anyDiscardObstacles=true }
+		if (discardEntities.length) { this.discardEntities = discardEntities; this.allocBytes += this.discardEntities.length * 2; this.anyDiscardEntities = true }
+		if (discardObstacles.length) { this.discardObstacles = discardObstacles; this.allocBytes += this.discardObstacles.length * 2; this.anyDiscardObstacles=true }
 	}
 	serialise() {
 		super.serialise();
@@ -283,23 +284,32 @@ export class GameOverPkt extends IPacketSERVER {
 }
 export class AnnouncePacket extends IPacketSERVER {
 	type = OutPacketTypes.ANNOUNCE;
-	allocBytes = 1;
+	allocBytes = 10;
+	disconnection: boolean;
 	weaponUsed: string;
 	killer: string;
 	killed: string;
-
-	constructor(weaponUsed: string, killer: string, killed: string) {
+	pos: MinVec2;
+	constructor(disconnection: boolean, killed: string, yourPos: MinVec2, weaponUsed?: string, killer?: string) {
 		super();
-		this.weaponUsed = weaponUsed;
-		this.killer = killer;
+		this.disconnection = disconnection
+		this.weaponUsed = weaponUsed!;
+		this.killer = killer!;
+		this.pos = yourPos
 		this.killed = killed
-		this.allocBytes += this.killer.length + 1 + this.killed.length + 1 + this.weaponUsed.length + 1
+		this.allocBytes += this.killed.length + 1;
+		if (!this.disconnection) this.allocBytes += this.killer.length + 1 + this.weaponUsed.length + 1
 	}
 	serialise() {
 		super.serialise();
-		this.stream.writeASCIIString(this.weaponUsed)
-		this.stream.writeASCIIString(this.killer)
+		this.stream.writeBoolean(this.disconnection)
+		if (!this.disconnection) {
+			this.stream.writeASCIIString(this.weaponUsed)
+			this.stream.writeASCIIString(this.killer)
+		}
 		this.stream.writeASCIIString(this.killed)
+		this.stream.writeFloat32(this.pos.x)
+		this.stream.writeFloat32(this.pos.y)
 	}
 }
 

@@ -338,24 +338,52 @@ async function init(address: string) {
 						break;
 					}
 					case RecvPacketTypes.ANNOUNCE: {
-						const data = {
+						const disconnectionOrNot = stream?.readBoolean()
+						const _data = {
 							type: packetType,
-							weaponUsed: (stream as IslandrBitStream).readASCIIString(),
-							killer: (stream as IslandrBitStream).readASCIIString(),
-							killed: (stream as IslandrBitStream).readASCIIString()
+							killed: (stream as IslandrBitStream).readASCIIString(),
+							pos: <MinVec2>{ x: stream?.readFloat32(), y: stream?.readFloat32() }
 						}
-						const announcementPacket = <AnnouncementPacket>data;
-						const killFeeds = document.getElementById("kill-feeds")
-						const killFeedItem = document.createElement("div")
-						if (killFeeds?.childNodes.length as number > 5) { killFeeds?.childNodes[killFeeds.childNodes.length - 1].remove(); }
-						if (announcementPacket.killer == getPlayer()!.id) { killFeedItem.style.background = "rgba(0, 0, 139, 0.5)" }
-						else { killFeedItem.style.background = "rgba(139, 0, 0, 0.5)" }
-						const KILLFEED_STRING = `${announcementPacket.killer} killed ${announcementPacket.killed} with ${announcementPacket.weaponUsed}`;
-						killFeedItem.prepend(`${KILLFEED_STRING}\n`)
-						killFeeds?.prepend(killFeedItem);
-						setTimeout(() => {
-							killFeeds?.childNodes[killFeeds.childNodes.length-1].remove();
-						}, 5000);
+						if (!disconnectionOrNot) {
+							const data = Object.assign(_data, {
+								weaponUsed: (stream as IslandrBitStream).readASCIIString(),
+								killer: (stream as IslandrBitStream).readASCIIString(),
+							})
+							
+							const announcementPacket = data;
+							const killFeeds = document.getElementById("kill-feeds")
+							const killFeedItem = document.createElement("div")
+							if (killFeeds?.childNodes.length as number > 5) { killFeeds?.childNodes[killFeeds.childNodes.length - 1].remove(); }
+							if (announcementPacket.killer == getPlayer()!.id) { killFeedItem.style.background = "rgba(0, 0, 139, 0.5)" }
+							else { killFeedItem.style.background = "rgba(139, 0, 0, 0.5)" }
+							const KILLFEED_STRING = `${announcementPacket.killer} killed ${announcementPacket.killed} with ${announcementPacket.weaponUsed}`;
+							killFeedItem.prepend(`${KILLFEED_STRING}\n`)
+							killFeeds?.prepend(killFeedItem);
+							setTimeout(() => {
+								killFeeds?.childNodes[killFeeds.childNodes.length - 1].remove();
+							}, 5000);
+						}
+						else {
+							const killFeeds = document.getElementById("kill-feeds")
+							const killFeedItem = document.createElement("div")
+							if (killFeeds?.childNodes.length as number > 5) { killFeeds?.childNodes[killFeeds.childNodes.length - 1].remove(); }
+							//if (announcementPacket.killer == getPlayer()!.id) { killFeedItem.style.background = "rgba(0, 0, 139, 0.5)" }
+							else { killFeedItem.style.background = "rgba(139, 0, 0, 0.5)" }
+							const KILLFEED_STRING = `${_data.killed} left the game`;
+							killFeedItem.prepend(`${KILLFEED_STRING}\n`)
+							killFeeds?.prepend(killFeedItem);
+							setTimeout(() => {
+								killFeeds?.childNodes[killFeeds.childNodes.length - 1].remove();
+							}, 5000);
+							
+						}
+						const id = _data.killed.split("#")[1]
+						world.entities.forEach(entity => {
+							if (entity.id == id) {
+								entity.position = Vec2.fromMinVec2(_data.pos)
+								entity.despawn = true;
+							}
+						})
 						break;
 					}
 					case RecvPacketTypes.GAMEOVER: {

@@ -143,7 +143,7 @@ export default class Player extends Entity {
 		// Check for entity hitbox intersection
 		let breaked = false;
 		for (const entity of entities) {
-			if (!entity.interactable) continue;
+			if (!entity.interactable || entity.despawn) continue;
 			const scaleAllVal = 1.5;
 			//if (entity.hitbox.type == "rect") scaleAllVal = 2
 			if (entity.hitbox.scaleAll(scaleAllVal).inside(this.position, entity.position, entity.direction) ){
@@ -160,7 +160,7 @@ export default class Player extends Entity {
 			}
 		}
 		for (const obstacle of obstacles) {
-			if (!obstacle.interactable) continue;
+			if (!obstacle.interactable || obstacle.despawn) continue;
 			if (obstacle.hitbox.scaleAll(1.5).collideCircle(obstacle.position, obstacle.direction, this.hitbox, this.position, this.direction)) {
 				this.canInteract = true;
 				this.interactMessage = obstacle.interactionKey();
@@ -200,6 +200,7 @@ export default class Player extends Entity {
 		}
 		// Collision handling
 		for (const obstacle of obstacles) {
+			if (obstacle.despawn) continue;
 			const collisionType = obstacle.collided(this);
 			if (collisionType) {
 				obstacle.onCollision(this);
@@ -281,6 +282,7 @@ export default class Player extends Entity {
 	}
 
 	die() {
+		this.markDirty()
 		if (this.despawn) return;
 		super.die();
 		for (const weapon of this.inventory.weapons) {
@@ -331,9 +333,12 @@ export default class Player extends Entity {
 			const entity = world.entities.find(e => e.id == this.potentialKiller);
 			if (entity?.type === this.type) {
 				(<Player>entity).killCount++;
-				world.killFeeds.push({ weaponUsed: (<Player>entity).lastHolding, killer: `${(<Player>entity).username}#${(<Player>entity).id}`, killed: `${this.username}#${this.id}` });
+				world.killFeeds.push({ disconnection: false, weaponUsed: (<Player>entity).lastHolding, killer: `${(<Player>entity).username}#${(<Player>entity).id}`, killed: `${this.username}#${this.id}`, yourPos: this.position.minimize() });
 				if (world.playerCount == 1) { (<Player>entity).won = true; (<Player>entity).shouldSendStuff = true; }
 			}
+		}
+		else {
+			world.killFeeds.push({disconnection: true, killed: `${this.username}#${this.id}`, yourPos: this.position.minimize()})
 		}
 		// Add currency to user if they are logged in and have kills
 		if (this.accessToken && this.killCount && !this.currencyChanged) { changeCurrency(this.accessToken, this.killCount * 100); addKillCounts(this.accessToken, this.killCount); this.currencyChanged = true; }
