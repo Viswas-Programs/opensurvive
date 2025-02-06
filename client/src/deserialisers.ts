@@ -4,7 +4,7 @@ import { Vec2} from "./types/math"
 import { MinCircleHitbox, MinHitbox, MinObstacle, MinParticle, MinRectHitbox, MinVec2, MinWeapon } from "./types/minimized"
 import { CountableString } from "./types/misc"
 import { Weapon } from "./types/weapon"
-import { Inventory } from "./types/entity"
+import { Entity, Inventory } from "./types/entity"
 import { TracerData } from "./types/data"
 import { EntityTypes, NumToDeathImg, numToGunIDs, ObstacleTypes, SkinsDecoding } from "./constants"
 
@@ -16,6 +16,13 @@ const gunNumToID: Map<number, string> = new Map([
     [4, "stf_12"],
     [5, "svd-m"]
 ])
+let discardableEntitiesToRender: Entity[] = []
+export function setDiscEntArray(ent = []){
+    discardableEntitiesToRender = ent;
+}
+export function setItemToDiscEntArray(item: Entity) {
+    discardableEntitiesToRender.push(item)
+}
 export function deserialiseMinParticles(stream: IslandrBitStream): MinParticle[]{
     const particles: MinParticle[] = []
     for (let ii = 0; ii < stream.readInt8(); ii++) {
@@ -253,6 +260,7 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
             entities.push(player)
         }
     }
+    if (discardableEntitiesToRender.length) discardableEntitiesToRender.forEach(ent => entities.push(ent));
     return entities;
 }
 function _getCurrentHealItem(stream: IslandrBitStream): string | null {

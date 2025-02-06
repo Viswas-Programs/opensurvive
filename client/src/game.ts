@@ -3,7 +3,7 @@ import { cookieExists, getCookieValue } from "cookies-utils";
 import { Howl, Howler } from "howler";
 import { inflate } from "pako";
 import { DeathImgToNum, GunColor, KeyBind, KeyBindDef, movementKeys, RecvPacketTypes, SkinsEncoding, TIMEOUT } from "./constants";
-import { deserialiseDiscardables, deserialiseMinEntities, deserialiseMinObstacles, deserialiseMinParticles, deserialisePlayer, setUsrnameIdDeathImg } from "./deserialisers";
+import { deserialiseDiscardables, deserialiseMinEntities, deserialiseMinObstacles, deserialiseMinParticles, deserialisePlayer, setDiscEntArray, setItemToDiscEntArray, setUsrnameIdDeathImg } from "./deserialisers";
 import { getMode } from "./homepage";
 import { IslandrBitStream } from "./packets";
 import { start, stop } from "./renderer";
@@ -216,10 +216,6 @@ async function init(address: string) {
 				else clearInterval(interval);
 			}, 1000);
 			ws.onmessage = (event) => {
-				ping = Date.now() - pingTimer
-				pingTimer = Date.now()
-				if (Settings.get("pingMeter")) { (document.querySelector("#pingNum") as HTMLElement)!.innerText = String(ping) }
-				else { pingMeterElement.style.display = "none";  }
 				let bitstream = true;
 				let stream;
 				let packetType: number;
@@ -242,6 +238,10 @@ async function init(address: string) {
 						break;
 					}
 					case RecvPacketTypes.GAME: {
+						ping = Date.now() - pingTimer
+						pingTimer = Date.now()
+						if (Settings.get("pingMeter")) { (document.querySelector("#pingNum") as HTMLElement)!.innerText = String(ping) }
+						else { pingMeterElement.style.display = "none"; }
 						if (bitstream) {
 							data = {
 								type: packetType,
@@ -382,6 +382,7 @@ async function init(address: string) {
 							if (entity.id == id) {
 								entity.position = Vec2.fromMinVec2(_data.pos)
 								entity.despawn = true;
+								setItemToDiscEntArray(entity)
 							}
 						})
 						break;
@@ -396,6 +397,7 @@ async function init(address: string) {
 						let text = "Lost";
 						gameEnded = true;
 						if (data.playerWon) text = "Won";
+						setDiscEntArray([])
 						const elements = ["youDied", "totalKills", "damageTaken", "damageDone"];
 						const vertAllgnElMain = ["totalKills", "damageTaken", "damageDone"];
 						const vertAllgnElText = ["tKills", "dTaken", "dDone"];
