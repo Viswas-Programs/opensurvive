@@ -129,11 +129,11 @@ export class GunWeapon extends Weapon {
 	}
 
 	attack(attacker: Entity, _entities: Entity[], _obstacles: Obstacle[]) {
-		this.shoot(attacker);
+		this.shoot(attacker, _entities, _obstacles);
 	}
 
 	// Spawn the bullet(s)
-	shoot(attacker: Entity) {
+	shoot(attacker: Entity, _entities: Entity[], _obstacles: Obstacle[]) {
 		if (!attacker.despawn && this.magazine > 0) {
 			this.magazine--;
 			let angles = attacker.direction.angle() + toRadians((Math.random() - 0.5) * (attacker.velocity.magnitudeSqr() != 0 ? this.moveSpread : this.spread));
@@ -144,6 +144,7 @@ export class GunWeapon extends Weapon {
 				position = attacker.position.addVec(this.offset.addAngle(attacker.direction.angle()));
 				const bullet = new Bullet(attacker, this.bullet.damage, Vec2.UNIT_X.addAngle(angles).scaleAll(this.bullet.speed / TICKS_PER_SECOND), randomBetween(this.bullet.range[0], this.bullet.range[1]) / (this.bullet.speed / TICKS_PER_SECOND), this.bullet.falloff, this.tracer);
 				bullet.position = position;
+				bullet.setPos(position, _entities, _obstacles)
 				world.entities.push(bullet);
 
 			}
