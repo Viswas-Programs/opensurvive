@@ -144,7 +144,9 @@ export class GunWeapon extends Weapon {
 				position = attacker.position.addVec(this.offset.addAngle(attacker.direction.angle()));
 				const bullet = new Bullet(attacker, this.bullet.damage, Vec2.UNIT_X.addAngle(angles).scaleAll(this.bullet.speed / TICKS_PER_SECOND), randomBetween(this.bullet.range[0], this.bullet.range[1]) / (this.bullet.speed / TICKS_PER_SECOND), this.bullet.falloff, this.tracer);
 				bullet.position = position;
-				bullet.setPos(position, _entities, _obstacles)
+				const a: (Entity|Obstacle)[] = []
+				//console.log(a.concat(...world.buildings.map(b => b.obstacles.map(o => o.obstacle))));
+				bullet.setPos(position, _entities, _obstacles.concat(...world.buildings.map(b => b.obstacles.map(o => o.obstacle))))
 				world.entities.push(bullet);
 
 			}

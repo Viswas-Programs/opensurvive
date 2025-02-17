@@ -326,12 +326,18 @@ export class RectHitbox extends Hitbox {
 	// https://www.tutorialspoint.com/Check-if-two-line-segments-intersect
 	lineIntersects(line: Line, position: Vec2, direction: Vec2) {
 		const startingPoint = position.addVec(new Vec2(-this.width / 2, -this.height / 2));
+		/*const points = [
+			startingPoint,
+			startingPoint.addX(this.width),
+			startingPoint.addY(this.height),
+			startingPoint.addX(this.width).addY(this.height)
+		].map(point => point.addAngle(direction.angle()));*/
 		const points = [
 			startingPoint,
 			startingPoint.addX(this.width),
 			startingPoint.addY(this.height),
 			startingPoint.addX(this.width).addY(this.height)
-		].map(point => point.addAngle(direction.angle()));
+		]
 
 		for (let ii = 0; ii < points.length; ii++)
 			if (line.intersects(new Line(points[ii], points[(ii + 1) % points.length])))
