@@ -40,23 +40,8 @@ export default class Bullet extends Entity {
 					(<any>this.shooter).damageDone += this.dmg;
 				}
 					thing.damage(this.dmg, this.shooter.id);
-					//if (thing.surface == "metal") { this.position = this.position.addVec(this.direction.invert()); this.setVelocity(this.direction.invert()); this.direction = this.direction.invert() }
-					if (!thing.noCollision) this.die();
-					break;
-				}
-				if (this.type != thing.type && !thing.despawn && thing.hitbox.lineIntersects(new Line(this.position.addVec(this.velocity.scaleAll(-1.5)), this.position.addVec(this.velocity)), thing.position, thing.direction)) {
-					thing.damage(this.dmg);
-					if (!thing.noCollision) this.die();
-					break;
-				}
-
-			}
-		// In case the bullet is moving too fast, check for hitbox intersection
-		if (!this.despawn)
-			for (const thing of combined) {
-				if (this.type != thing.type && !thing.despawn && thing.hitbox.lineIntersects(new Line(this.position.addVec(this.velocity.scaleAll(-1.5)), this.position.addVec(this.velocity)), thing.position, thing.direction)) {
-					thing.damage(this.dmg);
-					if (!thing.noCollision) this.die();
+					if (thing.surface == "metal") { this.position = this.position.addVec(this.direction.invert()); this.setVelocity(this.direction.invert()); this.direction = this.direction.invert() }
+					else if (!thing.noCollision) this.die();
 					break;
 				}
 			}
@@ -69,7 +54,7 @@ export default class Bullet extends Entity {
 			entitiesToCheck.push(entities[ii])
 		}
 		for (let ii = 0; ii < obstacles.length; ii++) {
-			if (obstacles[ii].despawn) continue;
+			if (obstacles[ii].type != EntityTypes.PLAYER && obstacles[ii].despawn) continue;
 			obstaclesToCheck.push(obstacles[ii])
 		}
 		const lastPos = this.position;
@@ -77,6 +62,15 @@ export default class Bullet extends Entity {
 		this.distanceSqr += this.position.addVec(lastPos.inverse()).magnitudeSqr();
 		if (this.distanceSqr >= 10000) this.dmg *= this.falloff;
 		this.collisionCheck(entitiesToCheck, obstaclesToCheck);
+		// In case the bullet is moving too fast, check for hitbox intersection
+		/*if (!this.despawn)
+			for (const thing of combined) {
+				if (this.type != thing.type && !thing.despawn && thing.hitbox.lineIntersects(new Line(this.position, this.position.addVec(this.velocity)), thing.position, thing.direction)) {
+					thing.damage(this.dmg);
+					if (!thing.noCollision) this.die();
+					break;
+				}
+			} */
 
 		if (!this.despawn) {
 			this.health--;

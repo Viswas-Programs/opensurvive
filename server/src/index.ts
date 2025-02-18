@@ -15,6 +15,8 @@ import { MapBuildingData, MapData } from "./types/data";
 import { IslandrBitStream } from "./packets"
 import Building from "./types/building";
 import { GunWeapon,  WeaponType } from "./types/weapon";
+import { Entity } from "./types/entity";
+import { Obstacle } from "./types/obstacle";
 export var ticksElapsed = 0;
 
 const server = new ws.Server({ port: 8080 });
@@ -287,9 +289,20 @@ server.on("connection", async socket => {
 		}
 	});
 });
+
 setInterval(() => {
+	const entitiesToCheck: Entity[] = []
+	const obstaclesToCheck: Obstacle[] = []
+	for (let ii = 0; ii < world.entities.length; ii++) {
+		if (world.entities[ii].type != EntityTypes.PLAYER && world.entities[ii].despawn) continue;
+		entitiesToCheck.push(world.entities[ii])
+	}
+	for (let ii = 0; ii < world.obstacles.length; ii++) {
+		if (world.obstacles[ii].despawn) continue;
+		obstaclesToCheck.push(world.obstacles[ii])
+	}
 	world.entities.forEach(entity => {
-		if (entity.type == EntityTypes.BULLET && !entity.despawn) (entity as Bullet).collisionCheck(world.entities, world.obstacles)
+		if (entity.type == EntityTypes.BULLET && !entity.despawn) (entity as Bullet).collisionCheck(entitiesToCheck, obstaclesToCheck)
 	})
 }, 1)
 setInterval(() => {

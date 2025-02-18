@@ -331,7 +331,7 @@ export class RectHitbox extends Hitbox {
 			startingPoint.addX(this.width),
 			startingPoint.addY(this.height),
 			startingPoint.addX(this.width).addY(this.height)
-		].map(point => point.addAngle(direction.angle()));
+		]//.map(point => point.addAngle(direction.angle()));
 
 		for (let ii = 0; ii < points.length; ii++)
 			if (line.intersects(new Line(points[ii], points[(ii + 1) % points.length])))
