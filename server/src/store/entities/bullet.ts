@@ -1,5 +1,5 @@
 import { Player } from ".";
-import { EntityTypes, GLOBAL_UNIT_MULTIPLIER } from "../../constants";
+import { EntityTypes, GLOBAL_UNIT_MULTIPLIER, ObstacleTypes } from "../../constants";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser, writeHitboxes } from "../../serialisers";
 import { TracerData } from "../../types/data";
@@ -16,6 +16,7 @@ export default class Bullet extends Entity {
 	despawning = false;
 	falloff: number;
 	distanceSqr = 0;
+	oldPos?: Vec2;
 
 	constructor(shooter: Entity | Obstacle, dmg: number, velocity: Vec2, ticks: number, falloff: number, data: TracerData) {
 		super();
@@ -35,16 +36,15 @@ export default class Bullet extends Entity {
 		combined = combined.concat(entities, obstacles);
 		if (!this.despawn)
 			for (const thing of combined) {
-				if (this.type != thing.type && thing.collided(this)) {
-					if (thing.type === EntityTypes.PLAYER && this.shooter.type === EntityTypes.PLAYER) {
-					(<any>this.shooter).damageDone += this.dmg;
-				}
+				if (this.type == thing.type || thing.despawn) continue;
+				if (thing.collided(this)) {
+					if (thing.type === EntityTypes.PLAYER && this.shooter.type === EntityTypes.PLAYER && thing.id != this.shooter.id) {(<any>this.shooter).damageDone += this.dmg;}
 					thing.damage(this.dmg, this.shooter.id);
 					//if (thing.surface == "metal") { this.position = this.position.addVec(this.direction.invert()); this.setVelocity(this.direction.invert()); this.direction = this.direction.invert() }
 					if (!thing.noCollision) this.die();
 					break;
 				}
-				if (this.type != thing.type && !thing.despawn && thing.hitbox.lineIntersects(new Line(this.position.addVec(this.velocity.scaleAll(-1.5)), this.position.addVec(this.velocity)), thing.position, thing.direction)) {
+				if (thing.hitbox.lineIntersects(new Line(this.position.addVec(this.velocity.scaleAll(-1.5)), this.position.addVec(this.velocity)), thing.position, thing.direction)) {
 					thing.damage(this.dmg);
 					if (!thing.noCollision) this.die();
 					break;
@@ -54,12 +54,28 @@ export default class Bullet extends Entity {
 		// In case the bullet is moving too fast, check for hitbox intersection
 		if (!this.despawn)
 			for (const thing of combined) {
-				if (this.type != thing.type && !thing.despawn && thing.hitbox.lineIntersects(new Line(this.position.addVec(this.velocity.scaleAll(-1.5)), this.position.addVec(this.velocity)), thing.position, thing.direction)) {
+				if (thing.despawn || thing.type == this.type) continue;
+				if (thing.hitbox.lineIntersects(new Line(this.position.addVec(this.velocity.scaleAll(-1.5)), this.position.addVec(this.velocity)), thing.position, thing.direction)) {
+					thing.damage(this.dmg);
+					if (!thing.noCollision) this.die();
+					break;
+				}
+				if (this.oldPos && !(thing instanceof Entity) && thing.hitbox.lineIntersects(new Line(this.oldPos, this.position.addVec(this.velocity)), thing.position, thing.direction)) {
 					thing.damage(this.dmg);
 					if (!thing.noCollision) this.die();
 					break;
 				}
 			}
+		if (!this.despawn) {
+			for (const thing of obstacles.filter(obstacle => obstacle.type == ObstacleTypes.WALL)) {
+				if (this.oldPos && !thing.despawn && thing.hitbox.lineIntersects(new Line(this.oldPos, this.position.addVec(this.velocity), true), thing.position, thing.direction)) {
+					console.log(thing)
+					thing.damage(this.dmg);
+					if (!thing.noCollision) this.die();
+					break;
+				}
+			}
+		}
 	}
 	tick(entities: Entity[], obstacles: Obstacle[]) {
 		const entitiesToCheck = []
