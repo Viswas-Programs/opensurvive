@@ -107,6 +107,10 @@ export class Vec2 {
 	minimize() {
 		return <MinVec2>{ x: this.x, y: this.y };
 	}
+
+	toString() {
+		return `(${this.x}, ${this.y})`;
+	}
 }
 
 export class Line {
@@ -157,8 +161,8 @@ export class Line {
 
 			const abbe = ab.dot(be);
 			const abae = ab.dot(ae);
-			if (abbe > 0) return be.magnitude();
-			if (abae < 0) return ae.magnitude();
+			if (abbe > 0) return be.magnitudeSqr();
+			if (abae < 0) return ae.magnitudeSqr();
 
 			const a = this.b.y - this.a.y;
 			const b = this.a.x - this.b.x;
@@ -245,12 +249,16 @@ export class Line {
 	}
 
 	intersection(line: Line) {
-		if (this.a.equals(line.a) && this.b.equals(line.b)) return undefined;
-		if (this.yIntercept() === undefined && line.yIntercept() === undefined) return undefined;
-		else if (this.yIntercept() === undefined) return new Vec2(this.a.x, line.slope()! * this.a.x + line.yIntercept()!);
-		else if (line.yIntercept() === undefined) return new Vec2(line.a.x, this.slope()! * line.a.x + this.yIntercept()!);
-		const x = (line.yIntercept()! - this.yIntercept()!) / (this.slope()! - line.slope()!);
-		const point = new Vec2(x, this.slope()! * x + this.yIntercept()!);
+		if (this.a.equals(line.a) && this.b.equals(line.b)) return undefined; // infinite intersections
+		const thisY = this.yIntercept(), thatY = line.yIntercept();
+		if (thisY === undefined && thatY === undefined) return undefined; // parallel vertically
+		let point: Vec2;
+		if (thisY === undefined) point = new Vec2(this.a.x, line.slope()! * this.a.x + line.yIntercept()!); // this line is vertical, so x must be this
+		else if (thatY === undefined) point = new Vec2(line.a.x, this.slope()! * line.a.x + this.yIntercept()!); // other line is vertical, so x must be its
+		else {
+			const x = (thatY - thisY) / (this.slope()! - line.slope()!); // substitute mx+c = mx+c and solve for x
+			point = new Vec2(x, this.slope()! * x + this.yIntercept()!);
+		}
 		if (this.segment && !this.passthrough(point) || line.segment && !line.passthrough(point)) return undefined;
 		return point;
 	}
@@ -314,16 +322,11 @@ export class RectHitbox extends Hitbox {
 		return new RectHitbox(this.width * ratio, this.height * ratio);
 	}
 
-	// Don't ask me how this work
-	// https://www.tutorialspoint.com/Check-if-two-line-segments-intersect
+	// How this works:
+	// 1. Get all corners of the rectangle
+	// 2. For every combination of 2 adjacent corners, check if the line intersects with the line created with these 2 corners
 	lineIntersects(line: Line, position: Vec2, direction: Vec2) {
-		const startingPoint = position.addVec(new Vec2(-this.width / 2, -this.height / 2));
-		const points = [
-			startingPoint,
-			startingPoint.addX(this.width),
-			startingPoint.addY(this.height),
-			startingPoint.addX(this.width).addY(this.height)
-		].map(point => point.addAngle(direction.angle()));
+		const points = this.getCorners(position, direction);
 
 		for (let ii = 0; ii < points.length; ii++)
 			if (line.intersects(new Line(points[ii], points[(ii + 1) % points.length])))
@@ -342,6 +345,16 @@ export class RectHitbox extends Hitbox {
 		].map(point => point.addAngle(direction.angle()));
 
 		return new Polygon(points).inside(point);
+	}
+	
+	private getCorners(position: Vec2, direction: Vec2) {
+		const angle = direction.angle();
+		return [
+			new Vec2(-this.width * 0.5, -this.height * 0.5),
+			new Vec2(this.width * 0.5, -this.height * 0.5),
+			new Vec2(this.width * 0.5, this.height * 0.5),
+			new Vec2(-this.width * 0.5, this.height * 0.5)
+		].map(vec => vec.addAngle(angle).addVec(position));
 	}
 
 	collideRect(position: Vec2, direction: Vec2, hitbox: RectHitbox, position1: Vec2, direction1: Vec2) {
@@ -447,7 +460,7 @@ export class CircleHitbox extends Hitbox {
 	}
 
 	lineIntersects(line: Line, center: Vec2) {
-		return line.distanceSqrTo(center) < Math.pow(this.radius, 2);
+		return line.distanceSqrTo(center) < this.radius * this.radius;
 	}
 
 	inside(point: Vec2, position: Vec2, direction: Vec2) {
