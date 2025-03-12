@@ -32,48 +32,31 @@ export default class Bullet extends Entity {
 		this.allocBytes += 44;
 	}
 	collisionCheck(entities: Entity[], obstacles: Obstacle[]) {
+		if (this.despawn) return;
 		var combined: (Entity | Obstacle)[] = [];
 		combined = combined.concat(entities, obstacles);
-		if (!this.despawn)
-			for (const thing of combined) {
-				if (this.type == thing.type || thing.despawn) continue;
-				if (thing.collided(this)) {
-					if (thing.type === EntityTypes.PLAYER && this.shooter.type === EntityTypes.PLAYER && thing.id != this.shooter.id) {(<any>this.shooter).damageDone += this.dmg;}
-					thing.damage(this.dmg, this.shooter.id);
-					//if (thing.surface == "metal") { this.position = this.position.addVec(this.direction.invert()); this.setVelocity(this.direction.invert()); this.direction = this.direction.invert() }
-					if (!thing.noCollision) this.die();
-					break;
-				}
-				if (thing.hitbox.lineIntersects(new Line(this.position.addVec(this.velocity.scaleAll(-1.5)), this.position.addVec(this.velocity)), thing.position, thing.direction)) {
-					thing.damage(this.dmg);
-					if (!thing.noCollision) this.die();
-					break;
-				}
+		for (const thing of combined) {
+			if (this.type == thing.type || thing.despawn) continue;
+			if (thing.collided(this)) {
+				if (thing.type === EntityTypes.PLAYER && this.shooter.type === EntityTypes.PLAYER && thing.id != this.shooter.id) { (<any>this.shooter).damageDone += this.dmg; }
+				thing.damage(this.dmg, this.shooter.id);
+				//if (thing.surface == "metal") { this.position = this.position.addVec(this.direction.invert()); this.setVelocity(this.direction.invert()); this.direction = this.direction.invert() }
+				if (!thing.noCollision) this.die();
+				break;
+			}
+			if (this.type != thing.type && !thing.despawn && thing.hitbox.lineIntersects(new Line(this.position, this.position.addVec(this.velocity)), thing.position, thing.direction)) {
+				if (thing.type === EntityTypes.PLAYER && this.shooter.type === EntityTypes.PLAYER && thing.id != this.shooter.id) { (<any>this.shooter).damageDone += this.dmg; }
+				thing.damage(this.dmg);
+				if (!thing.noCollision) this.die();
+				break;
+			}
 
-			}
-		// In case the bullet is moving too fast, check for hitbox intersection
-		if (!this.despawn)
-			for (const thing of combined) {
-				if (thing.despawn || thing.type == this.type) continue;
-				if (thing.hitbox.lineIntersects(new Line(this.position.addVec(this.velocity.scaleAll(-1.5)), this.position.addVec(this.velocity)), thing.position, thing.direction)) {
-					thing.damage(this.dmg);
-					if (!thing.noCollision) this.die();
-					break;
-				}
-				if (this.oldPos && !(thing instanceof Entity) && thing.hitbox.lineIntersects(new Line(this.oldPos, this.position.addVec(this.velocity)), thing.position, thing.direction)) {
-					thing.damage(this.dmg);
-					if (!thing.noCollision) this.die();
-					break;
-				}
-			}
-		if (!this.despawn) {
-			for (const thing of obstacles.filter(obstacle => obstacle.type == ObstacleTypes.WALL)) {
-				if (this.oldPos && !thing.despawn && thing.hitbox.lineIntersects(new Line(this.oldPos, this.position.addVec(this.velocity), true), thing.position, thing.direction)) {
-					console.log(thing)
-					thing.damage(this.dmg);
-					if (!thing.noCollision) this.die();
-					break;
-				}
+		}
+		for (const thing of obstacles) {
+			if (this.oldPos && !thing.despawn && thing.hitbox.lineIntersects(new Line(this.oldPos.addVec(this.velocity.inverse()), this.position.addVec(this.velocity), true), thing.position, thing.direction)) {
+				thing.damage(this.dmg);
+				if (!thing.noCollision) this.die();
+				break;
 			}
 		}
 	}
