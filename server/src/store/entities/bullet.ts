@@ -102,7 +102,7 @@ export default class Bullet extends Entity {
 		//combined = combined.concat(entities, obstacles);
 		//const ln = new Line(this.position, this.position.addVec(this.direction.scaleAll(this.health)));
 		if (!this.despawn) {
-			for (const thing of this.objectsToCollisionCheck) {
+			for (const thing of this.objectsToCollisionCheck.concat(entities.filter(entity => (entity.type == EntityTypes.PLAYER)))) {
 				if (this.type != thing.type && (thing.collided(this)|| this.hitbox.scaleAll(1.5).inside(thing.position, this.position, this.direction))) {
 					if (thing.type === EntityTypes.PLAYER && this.shooter.type === EntityTypes.PLAYER) {
 						(<any>this.shooter).damageDone += this.dmg;
