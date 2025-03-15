@@ -47,6 +47,8 @@ export default class Grenade extends Entity {
         combined = combined.concat(entities, obstacles);
         for (const thing of combined) {
             if (this.type == thing.type || thing.despawn) continue;
+            if (this.airborne && !(thing instanceof Obstacle)) continue;
+            if (this.airborne && thing.type != ObstacleTypes.WALL) continue;
             if (thing.collided(this)) {
                 if (thing.type === EntityTypes.PLAYER && this.thrower.type === EntityTypes.PLAYER && thing.id != this.thrower.id) { (<any>this.thrower).damageDone += this.dmg; }
                 thing.damage(this.dmg, this.thrower.id);
@@ -73,6 +75,7 @@ export default class Grenade extends Entity {
         this.dmg -= dmg * 0.3
     }
     tick(entities: Entity[], obstacles: Obstacle[]) {
+        this.velocity = this.velocity.addVec(Vec2.fromArray([-this.health/3000, -this.health/3000]))
         const entitiesToCheck = []
         const obstaclesToCheck = []
         for (let ii = 0; ii < entities.length; ii++) {
@@ -87,7 +90,11 @@ export default class Grenade extends Entity {
         super.tick(entities, obstacles);
         this.distanceSqr += this.position.addVec(lastPos.inverse()).magnitudeSqr();
         if (this.distanceSqr >= 10000) this.dmg *= this.falloff;
-        if (this.health < this.ticksStageChangePoint){this.currentStage = 2; this.airborne = false;}
+        if (this.health < this.ticksStageChangePoint){
+            this.currentStage = 2; 
+            this.airborne = false;
+            this.velocity = this.velocity.addVec(Vec2.fromArray([-this.health/1500, -this.health/1500]))
+        }
         this.collisionCheck(entitiesToCheck, obstaclesToCheck);
 
         if (!this.despawn) {

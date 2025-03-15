@@ -37,9 +37,13 @@ export function deserialiseMinParticles(stream: IslandrBitStream): MinParticle[]
 }
 function _getUtilities(stream: IslandrBitStream): CountableString {
     const utilities: CountableString = {}
-    for (let ii = 0; ii < stream.readInt8(); ii++) {
-        utilities[stream.readASCIIString(15)] = stream.readInt8()
+    const size = stream.readInt8()
+    for (let ii = 0; ii < size; ii++) {
+        const indexer = stream.readASCIIString()
+        const index = stream.readInt8()
+        utilities[indexer] = index
     }
+    console.log(utilities)
     return utilities
 }
 

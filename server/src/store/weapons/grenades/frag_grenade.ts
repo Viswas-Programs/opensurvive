@@ -15,7 +15,7 @@ export default class FragGrenade extends GrenadeWeapon {
 		super(FragGrenade.ID);
 	}
 
-	static {
+	/*static {
 		WEAPON_SUPPLIERS.set(FragGrenade.ID, new FragGrenadeSupplier());
-	}
+	}*/
 }

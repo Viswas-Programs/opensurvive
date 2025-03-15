@@ -29,13 +29,13 @@ export default class GrenadeLoot extends Item {
 		const newAmount = Math.min(Inventory.maxUtilities[player.inventory.backpackLevel].get(this.nameId) || 0, (player.inventory.utilities[this.nameId] || 0) + this.amount);
 		const delta = newAmount - (player.inventory.utilities[this.nameId] || 0);
 		player.inventory.utilities[this.nameId] = newAmount;
+		player.inventory.utilOrder.add(this.nameId);
+		player.inventory.fourthSlot();
 		if (delta != this.amount) {
 			this.amount -= delta;
 			this.setVelocity(Vec2.UNIT_X.addAngle(this.position.addVec(player.position.inverse()).angle()).scaleAll(0.001));
 			return false;
 		}
-		player.inventory.utilOrder.add(this.nameId);
-		player.inventory.fourthSlot();
 		return true;
 	}
 

@@ -105,7 +105,7 @@ export function calculateAllocBytesForTickPkt(player: Player): number {
 		for (let ii = 0; ii < Object.keys(player.inventory.healings).length; ii++) {allocBytes += 2}}
 	for (let ii = 0; ii < player.inventory.scopes.length; ii++) { allocBytes++ }
 	if (player.inventory.utilities) {
-		for (let ii = 0; ii < Object.keys(player.inventory.utilities).length; ii++) { allocBytes += 16 }}
+		for (let ii = 0; ii < Object.keys(player.inventory.utilities).length; ii++) { allocBytes += Object.keys(player.inventory.utilities)[ii].length +1  }}
 	for (let ii = 0; ii < player.inventory.ammos.length; ii++) { allocBytes++ }
 	return allocBytes;
 }
@@ -159,7 +159,7 @@ export function serialisePlayer(player: Player, stream: IslandrBitStream) {
 	if (player.inventory.utilities) {
 		stream.writeInt8(Object.keys(player.inventory.utilities).length)
 		for (let ii = 0; ii < Object.keys(player.inventory.utilities).length; ii++) {
-			stream.writeASCIIString(Object.keys(player.inventory.utilities)[ii], 15)
+			stream.writeASCIIString(Object.keys(player.inventory.utilities)[ii])
 			stream.writeInt8(Number(Object.values(player.inventory.utilities)[ii]))
 		}
 	}

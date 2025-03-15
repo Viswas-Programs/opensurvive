@@ -2,6 +2,7 @@ import * as fs from "fs";
 import { GunData, MeleeData } from "../../types/data";
 import { WeaponSupplier } from "../../types/supplier";
 import { GunWeapon, MeleeWeapon, Weapon } from "../../types/weapon";
+import FragGrenade from "./grenades/frag_grenade";
 
 export const WEAPON_SUPPLIERS = new Map<string, WeaponSupplier>();
 
@@ -38,6 +39,18 @@ class GunSupplier implements WeaponSupplier {
 	}
 }
 
+class GrenadeSupplier implements WeaponSupplier {
+	id: string;
+	
+	constructor(id: string){
+		this.id = id;
+	}
+
+	create(){
+		return new FragGrenade()
+	}
+}
+
 for (const file of fs.readdirSync("../data/weapons/melee/")) {
 	if (file.startsWith(".")) continue;
 	const data = <MeleeData> JSON.parse(fs.readFileSync("../data/weapons/melee/" + file, { encoding: "utf8" }));
@@ -51,3 +64,5 @@ for (const file of fs.readdirSync("../data/weapons/guns/")) {
 	const id = file.split(".").slice(0, -1).join(" ");
 	WEAPON_SUPPLIERS.set(id, new GunSupplier(id, data));
 }
+
+WEAPON_SUPPLIERS.set("frag_grenade", new GrenadeSupplier("frag_grenade"))

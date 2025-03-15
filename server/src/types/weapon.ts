@@ -1,6 +1,6 @@
 import { world } from "..";
 import { EntityTypes, GLOBAL_UNIT_MULTIPLIER, TICKS_PER_SECOND } from "../constants";
-import { Bullet } from "../store/entities";
+import { Bullet, Grenade } from "../store/entities";
 import { GunColor } from "./misc";
 import { randomBetween, toRadians } from "../utils";
 import { Entity } from "./entity";
@@ -165,7 +165,10 @@ export class GrenadeWeapon extends Weapon {
 
 
 	attack(attacker: Entity, _entities: Entity[], _obstacles: Obstacle[]) {
-		//this.attack(attacker, _entities, _obstacles);
+		const e = new Grenade(attacker, 100, Vec2.UNIT_X.addAngle(attacker.direction.angle()), 20, 1);
+		e.position = attacker.position
+		e.oldPos = attacker.position
+		world.entities.push(e)
 	}
 
 	// Spawn the bullet(s)
