@@ -2,6 +2,7 @@ import { MeleeData, GunData } from "../../types/data";
 import { MinWeapon } from "../../types/minimized";
 import { WeaponSupplier } from "../../types/supplier";
 import { MeleeWeapon, GunWeapon } from "../../types/weapon";
+import FragGrenade from "./grenades/frag_grenade";
 
 export const WEAPON_SUPPLIERS = new Map<string, WeaponSupplier>();
 
@@ -49,4 +50,5 @@ class GunSupplier implements WeaponSupplier {
 		const data = <GunData>await fetch(`data/weapons/guns/${file}.json`).then(res => res.json())
 		WEAPON_SUPPLIERS.set(file, new GunSupplier(file, data));
 	}
+	// WEAPON_SUPPLIERS.set("", new FragGrenade())
 })();

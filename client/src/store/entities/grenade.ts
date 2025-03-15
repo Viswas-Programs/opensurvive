@@ -35,8 +35,9 @@ export default class Grenade extends Entity {
 	}
 
 	copy(minEntity: MinEntity & AdditionalEntity) {
+		console.log(minEntity)
 		super.copy(minEntity);
-		this.nameId = minEntity.nameId;
+		this.nameId = "frag_grenade";
 	}
 
 	render(you: Player, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scale: number) {

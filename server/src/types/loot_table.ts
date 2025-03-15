@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { Ammo, Grenade, Gun } from "../store/entities";
+import { Ammo, Grenade, GrenadeLoot, Gun } from "../store/entities";
 import Backpack from "../store/entities/backpack";
 import { WEAPON_SUPPLIERS } from "../store/weapons";
 import { LootTableData, TypeLootTableData } from "./data";
@@ -104,7 +104,7 @@ class LootTable {
 					if (supplier) {
 						const weapon = supplier.create();
 						if (weapon.type != WeaponType.GRENADE) break;
-						entities.push(new Grenade((<GrenadeWeapon>weapon).nameId, result.amount));
+						entities.push(new GrenadeLoot((<GrenadeWeapon>weapon).nameId, result.amount));
 					}
 					break;
 				}

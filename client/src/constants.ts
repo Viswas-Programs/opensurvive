@@ -95,13 +95,14 @@ export enum EntityTypes {
 	BACKPACK = 1,
 	BULLET = 2,
 	EXPLOSION = 3,
-	GRENADE = 4,
+	GRENADELOOT = 4,
 	GUN = 5,
 	HELMET = 6,
 	PLAYER = 7,
 	SCOPE = 8,
 	VEST = 9,
-	HEALING = 10
+	HEALING = 10,
+	GRENADE = 11
 }
 
 export enum ObstacleTypes {

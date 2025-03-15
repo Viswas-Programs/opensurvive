@@ -50,7 +50,7 @@ export function receive(msg: ArrayBuffer) {
 
 // Things that require game object imports
 import { world } from ".";
-import { Ammo, Gun, Grenade } from "./store/entities";
+import { Ammo, Gun, Grenade, GrenadeLoot } from "./store/entities";
 import { Vec2 } from "./types/math";
 import { GunColor } from "./types/misc";
 import fetch from "node-fetch";
@@ -73,7 +73,7 @@ export function spawnAmmo(amount: number, color: GunColor, position: Vec2) {
     world.entities.push(ammo);
 }
 export function spawnGrenade(id: string, amount: number, position: Vec2){
-    const grenade = new Grenade(id, amount);
+    const grenade = new GrenadeLoot(id, amount);
     grenade.position = position;
     world.entities.push(grenade);
 }

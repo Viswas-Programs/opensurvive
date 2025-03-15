@@ -6,7 +6,7 @@ import { ID, send, wait, sendBitstream, spawnGun} from "./utils";
 import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ServerSideScopeUpdate, PlayerTickPkt, GameOverPkt } from "./types/packet";
 import { DIRECTION_VEC, EntityTypes, NumToDeathImg, RecvPacketTypes, SkinsDecoding, TICKS_PER_SECOND } from "./constants";
 import {  CommonAngles, RectHitbox, Vec2 } from "./types/math";
-import { Ammo, Bullet, Gun, Player } from "./store/entities";
+import { Ammo, Bullet, Grenade, Gun, Player } from "./store/entities";
 import { World } from "./types/world";
 import { Plain, castMapTerrain } from "./store/terrains";
 import { castMapObstacle } from "./store/obstacles";
@@ -168,7 +168,13 @@ server.on("connection", async socket => {
 	// The 4 directions of movement
 	const movements = [false, false, false, false];
 	const buttons = new Map<number, boolean>();
-
+	const e = new Grenade(player, 100, Vec2.fromArray([1.5, 1.5]), 20, 1);
+	e.position = player.position
+	e.oldPos = player.position
+	player.scope = 4
+	player.inventory.scopes = [1, 4]
+	player.inventory.selectScope(4)
+	world.entities.push(e)
 	socket.on("message", (msg: ArrayBuffer) => {
 		const stream = new IslandrBitStream(msg)
 		const type = stream.readPacketType()

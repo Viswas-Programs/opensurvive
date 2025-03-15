@@ -222,7 +222,7 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
             const minEntity = Object.assign(baseMinEntity, { health: stream.readInt8(), maxHealth: stream.readInt8(), hitbox: _getHitboxes(stream) })
             entities.push(minEntity)
         }
-        else if ([EntityTypes.HEALING, EntityTypes.GRENADE].includes(type)) {
+        else if ([EntityTypes.HEALING, EntityTypes.GRENADELOOT].includes(type)) {
             const minEntity = Object.assign(baseMinEntity, {
                 nameId: stream.readId(),
                 hitbox: <MinHitbox>{
@@ -240,7 +240,7 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
                 } })
             entities.push(minEntity)
         }
-        else {
+        else if (type == EntityTypes.PLAYER) { //We are using else if here due to debug grenade testing. 
             baseMinEntity.animations = _getAnimations(stream)
             console.log(baseMinEntity)
             const player = Object.assign(baseMinEntity, {
@@ -258,6 +258,15 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
                 }
             })
             entities.push(player)
+        }
+        else if (type == EntityTypes.GRENADE){
+            const grenade = Object.assign(baseMinEntity, {
+                hitbox: <MinHitbox>{
+                    type: "circle", radius: 1
+                }
+            });
+            entities.push(baseMinEntity)
+            console.log(baseMinEntity.type, 'from deserialiser.ts')
         }
     }
     if (discardableEntitiesToRender.length) discardableEntitiesToRender.forEach(ent => entities.push(ent));

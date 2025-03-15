@@ -36,7 +36,7 @@
     "typescript": "^5.0.2"
   },
   "dependencies": {
-    "@damienvesper/bit-buffer": "^1.0.0",
+    "@damienvesper/bit-buffer": "^1.0.1",
     "body-parser": "^1.20.2",
     "csv-parser": "^3.0.0",
     "dotenv": "^16.3.1",
