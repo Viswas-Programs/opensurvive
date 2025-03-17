@@ -40,6 +40,17 @@ class GunSupplier implements WeaponSupplier {
 	}
 }
 
+class GrenadeSupplier implements WeaponSupplier{
+	id: string;
+
+	constructor(id: string){
+		this.id = id;
+	}
+	create(){
+		return new FragGrenade()
+	}
+}
+
 (async () => {
 	for (const file of await fetch(`data/weapons/melee/.list.json`).then(res => res.json()).catch(err => console.error(err))) {
 		const data = <MeleeData>await fetch(`data/weapons/melee/${file}.json`).then(res => res.json());
@@ -50,5 +61,5 @@ class GunSupplier implements WeaponSupplier {
 		const data = <GunData>await fetch(`data/weapons/guns/${file}.json`).then(res => res.json())
 		WEAPON_SUPPLIERS.set(file, new GunSupplier(file, data));
 	}
-	// WEAPON_SUPPLIERS.set("", new FragGrenade())
+	WEAPON_SUPPLIERS.set("frag_grenade", new GrenadeSupplier("frag_grenade"))
 })();

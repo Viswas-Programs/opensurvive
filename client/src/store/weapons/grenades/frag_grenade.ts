@@ -18,9 +18,9 @@ export default class FragGrenade extends GrenadeWeapon {
 		super(FragGrenade.ID);
 	}
 
-	static {
+	/*static {
 		WEAPON_SUPPLIERS.set(FragGrenade.ID, new FragGrenadeSupplier());
-	}
+	}*/
 
 	render(player: Player, _canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scale: number) {
 		const radius = scale * player.hitbox.comparable;
