@@ -11,7 +11,8 @@
     "deep-install": "npm i && cd server && npm i && cd ../client && npm i",
     "gameserv": "cd server && npm run build && npm start",
     "webserv": "npm run build-client && npm run build && node lib/index.js",
-    "start": "concurrently \"npm run webserv\" \"npm run gameserv\" "
+    "start": "concurrently \"npm run webserv\" \"npm run gameserv\" ",
+    "fix-audit-errors": "npm audit fix && cd client && npm audit fix && cd .. && cd server && npm audit fix && cd .."
   },
   "repository": {
     "type": "git",
