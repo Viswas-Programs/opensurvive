@@ -42,7 +42,8 @@
     "nipplejs": "^0.10.1",
     "node-fetch": "^3.3.2",
     "pako": "^2.1.0",
-    "ws": "^8.7.0"
+    "ws": "^8.7.0",
+    "@damienvesper/bit-buffer": "^1.0.0"
   },
   "browser": {
     "msgpack-lite": "msgpack-lite/global"

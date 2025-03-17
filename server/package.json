@@ -27,6 +27,7 @@
     "typescript": "^4.7.2"
   },
   "dependencies": {
+    "@damienvesper/bit-buffer": "^1.0.0",
     "axios": "^1.5.0",
     "dotenv": "^16.3.1",
     "msgpack-lite": "^0.1.26",
