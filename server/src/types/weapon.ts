@@ -165,7 +165,7 @@ export class GrenadeWeapon extends Weapon {
 
 
 	attack(attacker: Entity, _entities: Entity[], _obstacles: Obstacle[]) {
-		const e = new Grenade(attacker, 100, Vec2.UNIT_X.addAngle(attacker.direction.angle()), 20, 1);
+		const e = new Grenade(attacker, 100, Vec2.UNIT_X.addAngle(attacker.direction.angle()).scaleAll(0.5), 100, 1);
 		e.position = attacker.position
 		e.oldPos = attacker.position
 		world.entities.push(e)
