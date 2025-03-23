@@ -16,6 +16,7 @@ export { default as Backpack } from "./backpack";
 export { default as Scope } from "./scope";
 export { default as Vest } from "./vest";
 export { default as Helmet} from "./helmet"
+export { default as GrenadeLoot} from "./grenadeLoot";
 
 // This still need hard-coding unfortunately
 export function castEntity(minEntity: MinEntity & { [key: string]: any }) {

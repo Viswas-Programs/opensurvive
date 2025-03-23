@@ -43,7 +43,7 @@ export default class Grenade extends Entity {
         if (this.despawn) return;
         var combined: (Entity | Obstacle)[] = [];
         combined = combined.concat(entities, obstacles);
-        for (const thing of combined) {
+        for (const thing of obstacles) {
             if (this.type == thing.type || thing.despawn) continue;
             if (this.airborne && !(thing instanceof Obstacle)) continue;
             if (this.airborne && thing.type != ObstacleTypes.WALL) continue;

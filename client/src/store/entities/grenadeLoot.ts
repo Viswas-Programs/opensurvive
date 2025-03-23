@@ -1,0 +1,69 @@
+import { ENTITY_SUPPLIERS } from ".";
+import { EntityTypes } from "../../constants";
+import { getWeaponImagePath } from "../../textures";
+import { Entity } from "../../types/entity";
+import { MinEntity } from "../../types/minimized";
+import { EntitySupplier } from "../../types/supplier";
+import { circleFromCenter } from "../../utils";
+import Player from "./player";
+
+interface AdditionalEntity {
+	nameId: string;
+}
+
+class GrenadeLootSupplier implements EntitySupplier {
+	create(minEntity: MinEntity & AdditionalEntity) {
+		return new GrenadeLoot(minEntity);
+	}
+}
+
+export default class GrenadeLoot extends Entity {
+	static readonly GrenadeLootImages = new Map<string, HTMLImageElement>();
+	static readonly TYPE = EntityTypes.GRENADELOOT;
+	type = GrenadeLoot.TYPE;
+	// Used for rendering GrenadeLoot size
+	nameId!: string;
+	zIndex = 8;
+
+	constructor(minEntity: MinEntity & AdditionalEntity) {
+		super(minEntity);
+		this.copy(minEntity);
+	}
+
+	static {
+		ENTITY_SUPPLIERS.set(GrenadeLoot.TYPE, new GrenadeLootSupplier());
+	}
+
+	copy(minEntity: MinEntity & AdditionalEntity) {
+		console.log(minEntity)
+		super.copy(minEntity);
+		this.nameId = "frag_grenade";
+	}
+
+	render(you: Player, canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, scale: number) {
+		const relative = this.position.addVec(you.position.inverse());
+		const radius = scale * this.hitbox.comparable;
+		ctx.translate(canvas.width / 2 + relative.x * scale, canvas.height / 2 + relative.y * scale);
+		ctx.rotate(-this.direction.angle());
+		ctx.strokeStyle = "#000";
+		ctx.lineWidth = scale * 0.1;
+		circleFromCenter(ctx, 0, 0, radius, false, true);
+		ctx.fillStyle = "#00000066"; // <- alpha/opacity
+		circleFromCenter(ctx, 0, 0, radius, true, false);
+		const img = GrenadeLoot.GrenadeLootImages.get(this.nameId);
+		if (!img?.complete) {
+			if (!img) {
+				const image = new Image();
+				image.src = getWeaponImagePath(this.nameId);
+				GrenadeLoot.GrenadeLootImages.set(this.nameId, image);
+			}
+			ctx.textAlign = "center";
+			ctx.textBaseline = "middle";
+			ctx.fillStyle = "#fff";
+			ctx.font = `${canvas.height / 54}px Arial`;
+			ctx.fillText(this.nameId, 0, 0);
+		} else
+			ctx.drawImage(img, -0.6*radius, -0.6*radius, 1.2*radius, 1.2*radius);
+		ctx.resetTransform();
+	}
+}
