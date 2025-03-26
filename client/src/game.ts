@@ -85,7 +85,7 @@ let pingTimer = 0;
 declare type modeMapColourType = keyof typeof modeMapColours;
 async function init(address: string) {
 	// Initialize the websocket
-	const protocol = "ws";
+	const protocol = "wss";
 	// if ((<HTMLInputElement>document.getElementById("wss")).checked) protocol += "s";
 	ws = new WebSocket(`${protocol}://${address}`);
 	ws.binaryType = "arraybuffer";
