@@ -6,11 +6,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "build-server": "cd server && npm run build",
-    "build-client": "cd client && npm run build",
+    "build-server": "npm run build && cd server && npm run build",
+    "build-client": "npm run build && cd client && npm run build",
     "deep-install": "npm i && cd server && npm i && cd ../client && npm i",
     "gameserv": "cd server && npm run build && npm start",
     "webserv": "npm run build-client && npm run build && node lib/index.js",
+    "hostclient": "node lib/index.js",
+    "hostserver": "cd server && npm start",
     "start": "concurrently \"npm run webserv\" \"npm run gameserv\" ",
     "fix-audit-errors": "npm audit fix && cd client && npm audit fix && cd .. && cd server && npm audit fix && cd .."
   },
