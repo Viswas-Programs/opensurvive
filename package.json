@@ -14,6 +14,7 @@
     "hostclient": "node lib/index.js",
     "hostserver": "cd server && npm start",
     "start": "concurrently \"npm run webserv\" \"npm run gameserv\" ",
+    "startHost": "concurrently \"npm run hostclient\" \"npm run hostserver\" ",
     "fix-audit-errors": "npm audit fix && cd client && npm audit fix && cd .. && cd server && npm audit fix && cd .."
   },
   "repository": {
