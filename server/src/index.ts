@@ -17,9 +17,10 @@ import Building from "./types/building";
 import { GunWeapon,  WeaponType } from "./types/weapon";
 import { Entity } from "./types/entity";
 import { Obstacle } from "./types/obstacle";
+import { env } from "process";
 export var ticksElapsed = 0;
 
-const server = new ws.Server({ port: 443 });
+const server = new ws.Server({ port: Number(env.PORT) || 8080 });
 server.once("listening", () => console.log(`WebSocket Server listening at port ${server.options.port}`));
 
 export const sockets = new Map<string, ws.WebSocket>();
