@@ -1,25 +1,19 @@
 {
-	"size": [400, 400],
+	"size": [200, 200],
 	"defaultTerrain": "plain",
 	"terrains": [
-		{ "id": "beach", "args": [0, 60] },
-		{ "id": "beach", "args": [1, 60] },
-		{ "id": "beach", "args": [2, 60] },
-		{ "id": "beach", "args": [3, 60] },
+		{ "id": "beach", "args": [0, 30] },
+		{ "id": "beach", "args": [1, 30] },
+		{ "id": "beach", "args": [2, 30] },
+		{ "id": "beach", "args": [3, 30] },
 		{ "id": "river" },
-		{ "id": "sea", "args": [0, 40] },
-		{ "id": "sea", "args": [1, 40] },
-		{ "id": "sea", "args": [2, 40] },
-		{ "id": "sea", "args": [3, 40] }
+		{ "id": "sea", "args": [0, 20] },
+		{ "id": "sea", "args": [1, 20] },
+		{ "id": "sea", "args": [2, 20] },
+		{ "id": "sea", "args": [3, 20] }
 	],
 	"buildings": [
-		{ "id": "cross", "includeTerrains": ["beach"], "direction": [1, 0], "amount": 3 },
-		{
-			"id": "warehouse",
-			"includeTerrains": [ "plain" ],
-			"amount": 2,
-			"direction": [ 1, 0 ]
-		},
+		{ "id": "cross", "includeTerrains": ["beach"], "direction": [1, 0], "amount": 1 },
 		{
 			"id": "warehouse",
 			"includeTerrains": [ "plain" ],
@@ -29,21 +23,21 @@
 		{
 			"id": "woodshack",
 			"includeTerrains": [ "plain" ],
-			"amount": 3
+			"amount": 1
 		},
 		{
 			"id": "conExBoxBlue",
 			"includeTerrains": [ "plain" ],
-			"amount": 10
+			"amount": 3
 		}
 	],
 	"obstacles": [
-		{ "type": "tree", "amount": 55 },
-		{ "type": "stone", "amount": 55 },
-		{ "type": "crate", "amount": 60 },
-		{ "type": "crate", "amount": 25, "args": ["soviet"] },
-		{ "type": "bush", "amount": 40 },
-		{ "type": "barrel", "amount": 40 },
-		{ "type":  "spawner", "amount":  30}
+		{ "type": "tree", "amount": 25 },
+		{ "type": "stone", "amount": 20 },
+		{ "type": "crate", "amount": 30 },
+		{ "type": "crate", "amount": 15, "args": ["soviet"] },
+		{ "type": "bush", "amount": 25 },
+		{ "type": "barrel", "amount": 25 },
+		{ "type":  "spawner", "amount":  10}
 	]
 }
