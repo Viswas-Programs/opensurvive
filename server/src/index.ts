@@ -19,7 +19,7 @@ import { Entity } from "./types/entity";
 import { Obstacle } from "./types/obstacle";
 export var ticksElapsed = 0;
 
-const server = new ws.Server({ port: 8080 });
+const server = new ws.Server({ port: 443 });
 server.once("listening", () => console.log(`WebSocket Server listening at port ${server.options.port}`));
 
 export const sockets = new Map<string, ws.WebSocket>();
