@@ -120,7 +120,7 @@ function _getHitboxes(stream: IslandrBitStream, callFrom = "others"): MinHitbox 
     }
     return hitbox
 }
-function _getAnimations(stream: IslandrBitStream): string[] {
+export function _getAnimations(stream: IslandrBitStream): string[] {
     const animations: string[] = [];
     const size = stream.readInt8();
     for (let ii = 0; ii < size ; ii++) {

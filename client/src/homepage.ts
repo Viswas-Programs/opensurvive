@@ -6,6 +6,7 @@ import "./loadout";
 import { getToken, setToken, setUsername } from "./states";
 import { wait } from "./utils";
 import "./settings";
+import { DefaultKeybStr } from "./constants";
 let mode = "normal"
 let pageLoaded = false
 wait(10000).then(() => {
@@ -88,16 +89,7 @@ $(document).ready(function () {
 	}
 	document.getElementById("button-close")!.onclick = closeBox;
 
-	if (!localStorage.getItem("version")) { localStorage.setItem("version", "0.3") }
-	let version = parseFloat(localStorage.getItem("version")!);
-	const currentVersion = 0.3
-	if (!localStorage.getItem("settings") || currentVersion > version) {
-		localStorage.setItem("settings", "``coloredWeaponSlots:0;pingMeter:0");
-		if (currentVersion > version) {
-			localStorage.setItem("version", String(currentVersion))
-			version = currentVersion
-		}
-	}
+
 	const modes = ["normal", "suroi_collab", "classic"]
 	modes.forEach(md => {
 		document.getElementsByClassName("box-selectable")[0].children[modes.indexOf(md)].querySelector("div")?.addEventListener("click", () => { setMode(md); })

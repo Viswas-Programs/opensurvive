@@ -41,11 +41,12 @@ interface AdditionalEntity {
 	deathImg: string | null;
 	interactMessage: string | null;
 	currentHealItem: string | null;
+	team: string;
 }
 
 class PlayerSupplier implements EntitySupplier {
 	create(minEntity: MinEntity & AdditionalEntity) {
-		return new PartialPlayer(minEntity);
+		return new PartialPlayer(minEntity, "");
 	}
 }
 const helmetImgs = new Map<number, HTMLImageElement>()
@@ -82,12 +83,14 @@ export default class Player extends Entity {
 	currentHealItem: string | null = null;
 	_lastPosChange = Date.now();
 	_lastDirectionChng = Date.now();
+	team: string = ""
 
-	constructor(minEntity: MinEntity & AdditionalEntity) {
+	constructor(minEntity: MinEntity & AdditionalEntity, team: string) {
 		super(minEntity);
 		this.copy(minEntity);
 		this.currentSkinImg.src = "assets/" + getMode() + "/images/game/skins/" + this.skin + ".svg";
 		this.currentDeathImg.src = "assets/" + getMode() + "/images/game/entities/" + this.deathImg + ".svg";
+		this.team = team
 	}
 
 	copy(minEntity: MinEntity & AdditionalEntity) {
@@ -236,6 +239,7 @@ export class FullPlayer extends Player {
 	maxHealTicks!: number;
 	interactMessage!: string | null;
 	currentHealItem!: string | null;
+	team!: string
 	copy(minEntity: MinEntity & AdditionalEntity) {
 		this.position = this.oldPos = Vec2.fromMinVec2(minEntity.position)
 		this.direction = this.oldDir = Vec2.fromMinVec2(minEntity.direction)

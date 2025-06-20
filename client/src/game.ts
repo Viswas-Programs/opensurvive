@@ -2,14 +2,14 @@
 import { cookieExists, getCookieValue } from "cookies-utils";
 import { Howl, Howler } from "howler";
 import { inflate } from "pako";
-import { DeathImgToNum, GunColor, KeyBind, KeyBindDef, movementKeys, RecvPacketTypes, SkinsEncoding, TIMEOUT } from "./constants";
-import { deserialiseDiscardables, deserialiseMinEntities, deserialiseMinObstacles, deserialiseMinParticles, deserialisePlayer, setDiscEntArray, setItemToDiscEntArray, setUsrnameIdDeathImg } from "./deserialisers";
+import { DeathImgToNum, GunColor, KeyBind, KeyBindDef, movementKeys, RecvPacketTypes, SkinsEncoding, teamNumMapping, TIMEOUT } from "./constants";
+import { deserialiseDiscardables, deserialiseMinEntities, deserialiseMinObstacles, deserialiseMinParticles, deserialisePlayer, setDiscEntArray, setItemToDiscEntArray, setUsrnameIdDeathImg, _getAnimations } from "./deserialisers";
 import { getMode } from "./homepage";
 import { IslandrBitStream } from "./packets";
 import { start, stop } from "./renderer";
 import { initMap } from "./rendering/map";
 import { setWindowKeyDown } from "./settings";
-import { addKeyPressed, addMousePressed, cleanUpMouseAndKeyPressed, getToken, isKeyPressed, isMenuHidden, isMouseDisabled, removeKeyPressed, removeMousePressed, toggleBigMap, toggleHud, toggleMap, toggleMenu, toggleMinimap, toggleMouseDisabled } from "./states";
+import { addKeyPressed, addMousePressed, cleanUpMouseAndKeyPressed, getToken, isKeyPressed, isMenuHidden, isMouseDisabled, leaderBoardViewStatus, removeKeyPressed, removeMousePressed, toggleBigMap, toggleHud, toggleLeaderboard, toggleMap, toggleMenu, toggleMinimap, toggleMouseDisabled } from "./states";
 import { FullPlayer, Healing } from "./store/entities";
 import { Barrel, Box, Bush, castMinObstacle, castObstacle, Crate, Desk, Log, Stone, Table, Toilet, ToiletMore, Tree } from "./store/obstacles";
 import { castTerrain } from "./store/terrains";
@@ -17,7 +17,7 @@ import Building from "./types/building";
 import { Vec2 } from "./types/math";
 import { MinTerrain, MinVec2 } from "./types/minimized";
 import { Obstacle } from "./types/obstacle";
-import { AckPacket, AnnouncementPacket, CancelActionsPacket, DropWeaponPacket, GamePacket, InteractPacket, MapPacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, MovementPacket, MovementPressPacket, MovementReleasePacket, MovementResetPacket, ParticlesPacket, PingPacket, PlayerRotationDelta, ReloadWeaponPacket, ResponsePacket, ServerScopeUpdatePacket, SoundPacket, SwitchWeaponPacket, UseHealingPacket } from "./types/packet";
+import { AckPacket, AnnouncementPacket, CancelActionsPacket, DropWeaponPacket, GamePacket, InteractPacket, MapPacket, MouseMovePacket, MousePressPacket, MouseReleasePacket, MovementPacket, MovementPressPacket, MovementReleasePacket, MovementResetPacket, ParticlesPacket, PingPacket, PlayerRotationDelta, ReloadWeaponPacket, ResponsePacket, ServerScopeUpdatePacket, SoundPacket, SwitchWeaponPacket, TDMInfoPacket, UseHealingPacket } from "./types/packet";
 import { World } from "./types/world";
 import { parseSettingsStuff, receive, send, wait } from "./utils";
 //handle users that tried to go to old domain name, or direct ip
@@ -133,7 +133,8 @@ async function init(address: string) {
 				id: stream.readId(),
 				tps: stream.readInt8(),
 				size: [stream.readInt16(), stream.readInt16()],
-				terrain: <MinTerrain>{ id: stream.readId() }
+				terrain: <MinTerrain>{ id: stream.readId() },
+				team: teamNumMapping.get(stream.readInt8()!)
 			}
 			id = dataA.id;
 			tps = dataA.tps;
@@ -217,7 +218,7 @@ async function init(address: string) {
 			}, 1000);
 			ws.onmessage = (event) => {
 				let bitstream = true;
-				let stream;
+				let stream: IslandrBitStream | undefined;
 				let packetType: number;
 				if (receive(event.data) && (receive(event.data)!.type == RecvPacketTypes.GAME || receive(event.data)!.type == RecvPacketTypes.MAP)) { data = receive(event.data); bitstream = false; packetType = receive(event.data)!.type }
 				else { stream = new IslandrBitStream(inflate(event.data).buffer); packetType = (stream as IslandrBitStream).readPacketType() } 
@@ -260,7 +261,7 @@ async function init(address: string) {
 					}
 					case RecvPacketTypes.PLAYERTICK: {
 						const playerSrvr = deserialisePlayer(stream as IslandrBitStream)
-						if (!player) player = new FullPlayer(playerSrvr);
+						if (!player) player = new FullPlayer(playerSrvr, dataA.team);
 						else player.copy(playerSrvr);
 						if (player.despawn) cleanupAfterPlayerDeath()
 						else {
@@ -420,6 +421,57 @@ async function init(address: string) {
 						cleanupAfterPlayerDeath()
 						break;
 					}
+					case RecvPacketTypes.TDMINFO: {
+						const packetData = <TDMInfoPacket>{
+							redTeamScore: stream!.readInt8()!,
+							blueTeamScore: stream!.readInt8()!,
+							redTeamMembers: _getAnimations(stream!)!,
+							blueTeamMembers: _getAnimations(stream!)!
+						}
+						const removedPlyersListLen = stream!.readInt8()
+						const removedPlayersIDS = []
+						for (let ii=0; ii<removedPlyersListLen; ii++){removedPlayersIDS.push(String(stream!.readInt16()))}
+						if (!player?.team) return
+						let youTeamScore, youTeamPlayers: string[], themTeamScore, themTeamPlayers: string[];
+						let youGradient= "", themGradient = "", youNameGrad = "", themNameGrad = "";
+						const youElementsStuff = [document.getElementById("youScore"), document.getElementById("youPplList"), document.getElementById("youText")]
+						const themElementsStuff = [document.getElementById("themScore"), document.getElementById("themPplList"), document.getElementById("themText")]
+						
+						if (player.team == "RED") {youTeamPlayers = packetData.redTeamMembers; youTeamScore = packetData.redTeamScore; themTeamPlayers =  packetData.blueTeamMembers; themTeamScore = packetData.blueTeamScore; youGradient="rgba(155, 0, 0, 0.5)", youNameGrad="rgba(155, 0, 0, 0.8)", themGradient="rgba(0,0, 155, 0.5)", themNameGrad="rgba(0,0, 155, 0.8)"}
+						else {themTeamPlayers = packetData.redTeamMembers; themTeamScore = packetData.redTeamScore; youTeamPlayers =  packetData.blueTeamMembers; youTeamScore = packetData.blueTeamScore; youGradient="rgba(0, 0, 155, 0.5)", youNameGrad="rgba(0, 0, 155, 0.8)", themGradient="rgba(155, 0, 0, 0.5)", themNameGrad="rgba(155, 0, 0, 0.8)"}
+						youElementsStuff.forEach(element => {element!.style.background =youGradient;});
+						themElementsStuff.forEach(element => {element!.style.background =themGradient;});
+						youElementsStuff[0]!.innerText =  String(youTeamScore);
+						themElementsStuff[0]!.innerText =  String(themTeamScore);
+						youTeamPlayers.forEach(member => {
+							const plID = member.split("#")[member.split("#").length-1]
+							if (!document.getElementById(plID)){
+							const newNameElement = document.createElement("div");
+							newNameElement.setAttribute("class", "nameFrame");
+							newNameElement.style.background= youNameGrad;
+							newNameElement.setAttribute("id", plID)
+							if (`${player?.username}#${player?.id}` == member) member += " [YOU]"
+							newNameElement.textContent=member;
+							youElementsStuff[1]?.appendChild(newNameElement);}
+						})
+						themTeamPlayers.forEach(member => {
+							const plID = member.split("#")[member.split("#").length-1]
+							if (!document.getElementById(plID)){
+							console.log("done for", plID)
+							const newNameElement = document.createElement("div");
+							newNameElement.setAttribute("class", "nameFrame");
+							newNameElement.setAttribute("id", plID)
+							newNameElement.style.background= themNameGrad;
+							newNameElement.textContent=member;
+							themElementsStuff[1]?.appendChild(newNameElement);}
+						})
+						removedPlayersIDS.forEach(ID => 
+							document.getElementById(ID)!.style.display = "none"
+						)
+
+						break;
+					}
+					// Packet switcher ends.
 				}
 			}
 		}
@@ -652,6 +704,7 @@ document.getElementById("resume")?.addEventListener('click', () => {
 })
 const onkeydfunc = (event: KeyboardEvent) => {
 	if (!connected || isKeyPressed(event.key) || !player || player.despawn || gameEnded) return;
+	event.preventDefault()
 	event.stopPropagation();
 	addKeyPressed(event.key);
 	const settingsElem = document.getElementById("settings");
@@ -675,6 +728,10 @@ const onkeydfunc = (event: KeyboardEvent) => {
 			send(ws, new CancelActionsPacket())
 		else if (event.key == KeyBind.get(KeyBindDef.MELEE))
 			send(ws, new SwitchWeaponPacket(2, true))
+		else if (event.key == KeyBind.get(KeyBindDef.LEADERBOARD)){
+			event.preventDefault()
+			if (!leaderBoardViewStatus()){toggleLeaderboard(); document.getElementById("people")!.style.display = "none";}
+			else{toggleLeaderboard(); document.getElementById("people")!.style.display = "flex";}}
 		else if (!isNaN(parseInt(event.key)))
 			send(ws, new SwitchWeaponPacket(parseInt(event.key) - 1, true));
 	}

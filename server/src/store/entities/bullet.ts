@@ -45,7 +45,10 @@ export default class Bullet extends Entity {
 				break;
 			}
 			if (this.type != thing.type && !thing.despawn && thing.hitbox.lineIntersects(new Line(this.position, this.position.addVec(this.velocity)), thing.position, thing.direction)) {
-				if (thing.type === EntityTypes.PLAYER && this.shooter.type === EntityTypes.PLAYER && thing.id != this.shooter.id) { (<any>this.shooter).damageDone += this.dmg; }
+
+				if (thing.type === EntityTypes.PLAYER && this.shooter.type === EntityTypes.PLAYER && thing.id != this.shooter.id) { 
+					if ((<Player>this.shooter).team == (<Player>thing).team) continue;
+					(<any>this.shooter).damageDone += this.dmg; }
 				thing.damage(this.dmg);
 				if (!thing.noCollision) this.die();
 				break;

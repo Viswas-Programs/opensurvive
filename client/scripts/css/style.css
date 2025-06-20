@@ -1426,3 +1426,23 @@ div#overlay {
 .keybindMainFrame {
     margin-bottom: 2%;
 }
+
+div#scores{
+    display: flex;
+    position: fixed;
+    top: 12vh;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+div#you{display: flex; padding-right:3vw;}
+div#them{display: flex; padding-left:3vw;}
+div#themScore{font-size: 25px; padding-right:0.3vw;}
+div#youScore{font-size: 25px; padding-left: 0.3vw;}
+div#themText{font-size:20px; padding-left: 0.3vw;}
+div#youText{font-size: 20px; padding-right: 0.3vw;}
+
+div#people{display: none; left: 50%; position: fixed; top: 20vh; transform: translateX(-50%)}
+div#youPplList{display: block; padding-right: 5vw; width: 20vw;}
+div#themPplList{display: block; padding-left: 5vw; width: 20vw;}
+.nameFrame {display: block; padding: 5px;}

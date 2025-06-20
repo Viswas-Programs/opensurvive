@@ -21,7 +21,7 @@ if (currentSettings.get("healthMeter")) { __healthMeter = "checked"; }
 if (currentSettings.get("adrenalineMeter")) { __adrenalineMeter = "checked"; }
 if (currentSettings.get("positionMeter")) { __positionMeter = "checked"; }
 let keybindEle = `<div id="keybinds-Main" class="mainContent">`
-const strings = ["Exit Menu", "Hide HUD", "World Map", "Hide Map", "Big Map", "Move right", "Move up", "Move left", "Move down", "Interact", "Melee", "Last used weapon", "Reload Weapon", "Cancel"]
+const strings = ["Exit Menu", "Hide HUD", "World Map", "Hide Map", "Big Map", "Move right", "Move up", "Move left", "Move down", "Interact", "Melee", "Last used weapon", "Reload Weapon", "Cancel", "Show Leaderboard"]
 for (let ii = 0; ii < strings.length; ii++) {
     let keyb = (KeyBind.get(ii)!)
     if (keyb.length == 1) keyb = keyb.toUpperCase()

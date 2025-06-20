@@ -29,17 +29,36 @@ export enum KeyBindDef {
 	MELEE = 10,
 	LAST_USED = 11,
 	RELOAD = 12,
-	CANCEL = 13
+	CANCEL = 13,
+	LEADERBOARD = 14
 }
 export const KeyBind = new Map<number, string>()
+export const DefaultKeybStr = "1:F1;0:Escape;2:g;3:z;4:v;5:d;6:w;7:a;8:s;9:f;10:e;11:q;12:r;13:x;14:Tab;"
 if (!localStorage.getItem("keybinds")) {
-	localStorage.setItem("keybinds",  "0:Escape;1:F1;2:g;3:z;4:v;5:d;6:w;7:a;8:s;9:f;10:e;11:q;12:r;13:x")
+	localStorage.setItem("keybinds",  DefaultKeybStr)
 }
+if (!localStorage.getItem("version")) { localStorage.setItem("version", "0.4") }
+	let version = parseFloat(localStorage.getItem("version")!);
+	const currentVersion = 0.4
+	if (!localStorage.getItem("settings") || currentVersion > version) {
+		localStorage.setItem("settings", "``coloredWeaponSlots:0;pingMeter:0");
+		if (currentVersion > version) {
+			localStorage.setItem("version", String(currentVersion))
+			version = currentVersion
+			if (localStorage.getItem("keybinds")){
+				//merge
+				const newKeybinds = DefaultKeybStr.slice(localStorage.getItem("keybinds")!.length, -1)
+				localStorage.setItem("keybinds", localStorage.getItem("keybinds")!.concat(";".concat(newKeybinds!)))
+			}
+		}
+	}
 let keybind = localStorage.getItem("keybinds")!
 if (keybind[-1] == "") {keybind= keybind.substring(0, keybind.length-1) }
 const keybindRawList = keybind.split(";")
 for (let ii = 0; ii < keybindRawList.length; ii++) {
+	console.log(keybindRawList[ii])
 	const keybindList = keybindRawList[ii].split(":")
+	console.log(keybindList)
 	KeyBind.set(Number(keybindList[0]), keybindList[1] )
 }
 console.log(Array.from(KeyBind))
@@ -51,8 +70,14 @@ export enum RecvPacketTypes {
 	PARTICLES = 4,
 	ANNOUNCE = 5,
 	ACK = 6,
-	GAMEOVER = 7
+	GAMEOVER = 7,
+	TDMINFO = 8
 }
+
+export const teamNumMapping: Map<number, String> = new Map([
+	[0, "RED"],
+	[1, "BLUE"]
+])
 
 export enum OutPacketTypes {
 	RESPONSE = 0,

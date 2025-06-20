@@ -1,6 +1,6 @@
 import { world } from "..";
 import { EntityTypes, GLOBAL_UNIT_MULTIPLIER, TICKS_PER_SECOND } from "../constants";
-import { Bullet } from "../store/entities";
+import { Bullet, Player } from "../store/entities";
 import { GunColor } from "./misc";
 import { randomBetween, toRadians } from "../utils";
 import { Entity } from "./entity";
@@ -83,10 +83,11 @@ export class MeleeWeapon extends Weapon {
 			dummy.direction = attacker.direction;
 			for (const thing of combined)
 				if (thing.collided(dummy) && thing.id != attacker.id) {
+					if (thing.type === EntityTypes.PLAYER && attacker.type === EntityTypes.PLAYER && (<Player>attacker).team == (<Player>thing).team) continue;
 					thing.damage(this.damage, attacker.id);
 					if (thing.damageParticle) world.particles.push(new Particle(thing.damageParticle, position, 0.25));
 					if (thing.type === EntityTypes.PLAYER && attacker.type === EntityTypes.PLAYER) {
-						(<any>attacker).damageDone += this.damage;
+						(<Player>attacker).damageDone += this.damage;
 					}
 					if (!this.cleave) break;
 				}

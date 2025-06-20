@@ -1,5 +1,5 @@
 import { world } from "../..";
-import { DeathImgToNum, EntityTypes, GLOBAL_UNIT_MULTIPLIER, gunIDsToNum, SkinsEncoding, TICKS_PER_SECOND } from "../../constants";
+import { addKillToTeam, DeathImgToNum, EntityTypes, GLOBAL_UNIT_MULTIPLIER, gunIDsToNum, removePlayerFromTeam, SkinsEncoding, TeamPlayerInfo, TeamUsernameInfo, TICKS_PER_SECOND } from "../../constants";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
 import { Entity, Inventory } from "../../types/entity";
@@ -32,6 +32,7 @@ export default class Player extends Entity {
 	buildingEnterScope = 1;
 	_scope = 1;
 	tryAttacking = false;
+	team: string;
 	attackLock = 0;
 	tryInteracting = false;
 	canInteract = false;
@@ -67,8 +68,8 @@ export default class Player extends Entity {
 	won = false;
 	weaponsScheduledToReload: string[] = [];
 
-	constructor(id: string, username: string, skin: string | null, deathImg: string | null, accessToken?: string, isMobile?: boolean) {
-		super();
+	constructor(id: string, username: string, skin: string | null, deathImg: string | null, team: string, accessToken?: string, isMobile?: boolean, position?: Vec2) {
+		super(position);
 		this.id = id;
 		this.interactMessage = null;
 		this.username = username;
@@ -82,6 +83,7 @@ export default class Player extends Entity {
 		this.allocBytes += 19 + this.username.length;
 		this._needsToSendAnimations = true
 		this.animations.forEach(animation => this.allocBytes += animation.length)
+		this.team = team;
 	}
 
 	setVelocity(velocity?: Vec2) {
@@ -273,6 +275,8 @@ export default class Player extends Entity {
 
 	damage(dmg: number, damager?: string) {
 		if (!this.vulnerable) return;
+		const damagerEntity = world.entities.find(e => e.id == this.potentialKiller);
+		if (damagerEntity instanceof Player && damagerEntity.team == this.team) return;
 		// Implement headshot multiplier in gun data later
 		if (Math.random() < 0.1) this.health -= dmg * (1 - Helmet.HELMET_REDUCTION[this.inventory.helmetLevel]);
 		else this.health -= dmg * (1 - Vest.VEST_REDUCTION[this.inventory.vestLevel]);
@@ -333,6 +337,7 @@ export default class Player extends Entity {
 			const entity = world.entities.find(e => e.id == this.potentialKiller);
 			if (entity?.type === this.type) {
 				(<Player>entity).killCount++;
+				addKillToTeam((<Player>entity).team)
 				world.killFeeds.push({ disconnection: false, weaponUsed: (<Player>entity).lastHolding, killer: `${(<Player>entity).username}#${(<Player>entity).id}`, killed: `${this.username}#${this.id}`, yourPos: this.position.minimize() });
 				if (world.playerCount == 1) { (<Player>entity).won = true; (<Player>entity).shouldSendStuff = true; }
 			}
@@ -340,6 +345,7 @@ export default class Player extends Entity {
 		else {
 			world.killFeeds.push({disconnection: true, killed: `${this.username}#${this.id}`, yourPos: this.position.minimize()})
 		}
+		removePlayerFromTeam(this.team, this.username, this.id)
 		// Add currency to user if they are logged in and have kills
 		if (this.accessToken && this.killCount && !this.currencyChanged) { changeCurrency(this.accessToken, this.killCount * 100); addKillCounts(this.accessToken, this.killCount); this.currencyChanged = true; }
 

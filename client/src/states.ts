@@ -12,11 +12,15 @@ export function addMousePressed(button: number) { mousePressed.set(button, true)
 export function removeMousePressed(button: number) { mousePressed.delete(button); }
 export function cleanUpMouseAndKeyPressed() { keyPressed.clear(); mousePressed.clear() }
 
-var menuHidden = true;
+let menuHidden = true;
 export function isMenuHidden() { return menuHidden; }
 export function toggleMenu() { menuHidden = !menuHidden; }
 
-var hudHidden = false;
+let leaderBoardHidden = true;
+export function leaderBoardViewStatus() {return leaderBoardHidden;}
+export function toggleLeaderboard(){ leaderBoardHidden = !leaderBoardHidden;}
+
+let hudHidden = false;
 export function isHudHidden() { return hudHidden; }
 export function toggleHud() {
 	hudHidden = !hudHidden;
@@ -24,28 +28,28 @@ export function toggleHud() {
 	else document.getElementById("hud")!.classList.remove("hidden");
 }
 
-var mapOpened = false;
+let mapOpened = false;
 export function isMapOpened() { return mapOpened; }
 export function toggleMap() { mapOpened = !mapOpened; }
 
-var mapHidden = false;
+let mapHidden = false;
 export function isMapHidden() { return mapHidden; }
 export function toggleMinimap() { mapHidden = !mapHidden; }
 
-var bigMap = false;
+let bigMap = false;
 export function isBigMap() { return bigMap; }
 export function toggleBigMap() { bigMap = !bigMap; }
 
 
-var mouseDisabled = false;
+let mouseDisabled = false;
 export function isMouseDisabled() { return mouseDisabled; }
 export function toggleMouseDisabled() { mouseDisabled = !mouseDisabled; }
 
 // Used when cookies are not accepted
-var username: string;
+let username: string;
 export function getUsername() { return username; }
 export function setUsername(u: string) { return username = u; }
 
-var token: string | undefined;
+let token: string | undefined;
 export function getToken() { return token; }
 export function setToken(t?: string) { return token = t; }

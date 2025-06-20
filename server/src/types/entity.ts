@@ -122,10 +122,11 @@ export class Entity {
 	goodOldDirection = Vec2.ZERO;
 	surface = "normal";
 	readonly actualType = "entity";
-	constructor() {
+	constructor(position?: Vec2) {
 		this.id = ID();
 		// Currently selects a random position to spawn. Will change in the future.
-		this.position = this.goodOldPos = world.size.scale(Math.random(), Math.random());
+		if (!position)this.position = this.goodOldPos = world.size.scale(Math.random(), Math.random());
+		else this.position=this.goodOldPos=position;
 	}
 
 	tick(_entities: Entity[], _obstacles: Obstacle[]) {

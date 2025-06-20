@@ -164,20 +164,21 @@ export type ClientPacketResolvable = ResponsePacket | PingPacket | MousePressPac
 
 export class AckPacket extends IPacketSERVER {
 	type = OutPacketTypes.ACK;
-	allocBytes = 8;
+	allocBytes = 9;
 	id: string;
 	tps: number;
 	size: number[];
 	terrain: string;
+	team: number;
 
-	constructor(id: string, tps: number, size: Vec2, terrain: Terrain) {
+	constructor(id: string, tps: number, size: Vec2, terrain: Terrain, team: number) {
 		super()
 		this.id = id;
 		this.tps = tps;
 		this.size = Object.values(size);
 		this.terrain = terrain.id;
 		this.allocBytes += this.terrain.length + this.id.length
-		console.log(this.id)
+		this.team = team
 	}
 	serialise() {
 		super.serialise();
@@ -185,6 +186,7 @@ export class AckPacket extends IPacketSERVER {
 		this.stream.writeInt8(this.tps);
 		this.stream.writeInt16(this.size[0]); this.stream.writeInt16(this.size[1]);
 		this.stream.writeId(this.terrain)
+		this.stream.writeInt8(this.team)
 	}
 }
 
@@ -245,6 +247,44 @@ export class MapPacket implements IPacket {
 		this.maxHealings = mxHl
 	}
 }
+
+export class TDMInfoPacket extends IPacketSERVER{
+	type = OutPacketTypes.TDMINFO;
+	allocBytes= 6;
+	redTeamScore: number;
+	blueTeamScore: number;
+	redTeamMembers: Array<string>;
+	blueTeamMembers: Array<string>;
+	removedPlayers: Array<string>;
+
+	constructor(redTeamScore: number, blueTeamScore: number, redTeamMembers: Array<string>, blueTeamMembers: Array<string>, removedPlayers: Array<string>){
+		super();
+		this.redTeamMembers = redTeamMembers;
+		this.redTeamScore = redTeamScore;
+		this.blueTeamMembers = blueTeamMembers;
+		this.blueTeamScore = blueTeamScore;
+		this.removedPlayers = removedPlayers
+		this.blueTeamMembers.forEach(member => this.allocBytes+= member.length + 1)
+		this.redTeamMembers.forEach(member => this.allocBytes+= member.length + 1)
+		this.removedPlayers.forEach(member => this.allocBytes += 2)
+	}
+	serialise(): void {
+		super.serialise()
+		this.stream.writeInt8(this.redTeamScore)
+		this.stream.writeInt8(this.blueTeamScore)
+		let redTeamLN = 0
+		this.redTeamMembers.forEach(member => redTeamLN ++)
+		let blueLN = 0
+		this.blueTeamMembers.forEach(member => blueLN ++)
+		this.stream.writeInt8(redTeamLN)
+		this.redTeamMembers.forEach(member => this.stream.writeASCIIString(member))
+		this.stream.writeInt8(blueLN)
+		this.blueTeamMembers.forEach(member => this.stream.writeASCIIString(member))
+		this.stream.writeInt8(this.removedPlayers.length)
+		this.removedPlayers.forEach(member => this.stream.writeInt16(Number(member)))
+	}
+}
+
 export class PlayerTickPkt extends IPacketSERVER {
 	type = OutPacketTypes.PLAYERTICK;
 	allocBytes = 2;

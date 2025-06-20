@@ -22,8 +22,14 @@ export enum OutPacketTypes {
 	PARTICLES = 4,
 	ANNOUNCE = 5,
 	ACK = 6,
-	GAMEOVER = 7
+	GAMEOVER = 7,
+	TDMINFO = 8
 }
+
+export const numTeamMapping: Map<string, number> = new Map([
+	["RED", 0],
+	["BLUE", 1]
+])
 
 export enum RecvPacketTypes {
 	RESPONSE = 0,
@@ -115,4 +121,41 @@ export const DeathImgToNum = new Map<string, number>([
 export const NumToDeathImg = new Map<number, string>()
 for (let ii = 0; ii < Array.from(DeathImgToNum).length; ii++) {
 	NumToDeathImg.set(ii, Array.from(DeathImgToNum)[ii][0])
+}
+
+export enum TEAMS{
+	RED = "RED",
+	BLUE = "BLUE"
+}
+export const TeamPlayerInfo = new Map<string, string[]>([
+	["RED", []],
+	["BLUE", []]])
+export const TeamUsernameInfo = new Map<string, string[]>([
+	["RED", []],
+	["BLUE", []]])
+export const TeamRemovePlayerInfo: string[] = []
+export const RED_TEAM = TeamPlayerInfo.get("RED")!
+export const BLUE_TEAM = TeamPlayerInfo.get("BLUE")!
+export const RED_TEAM_USRNMS = TeamUsernameInfo.get("RED")!
+export const BLUE_TEAM_USRNMS = TeamUsernameInfo.get("BLUE")!
+let blueTeamKills = 0
+let redTeamKills = 0
+export function getTotalKillsFromTeam(team: string): number{
+	if (team == "RED") return redTeamKills;
+	else{return blueTeamKills;}
+}
+export function addKillToTeam(team: string): void{
+	if (team == "RED") redTeamKills ++;
+	else blueTeamKills ++
+	return;
+}
+
+export function removePlayerFromTeam(team: string, username: string, id: string){
+	let teamPlInfo = TeamPlayerInfo.get(team)!
+	let teamUsrInfo = TeamUsernameInfo.get(team)!
+	delete teamPlInfo[TeamPlayerInfo.get(team)?.indexOf(id)!]
+	delete teamUsrInfo[TeamUsernameInfo.get(team)?.indexOf(`${username}#${id}`)!]
+	TeamPlayerInfo.set(team, teamPlInfo);
+	TeamUsernameInfo.set(team, teamUsrInfo)
+	TeamRemovePlayerInfo.push(id)
 }

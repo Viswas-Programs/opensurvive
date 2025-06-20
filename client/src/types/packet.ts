@@ -265,6 +265,7 @@ export class AckPacket implements IPacket {
 	tps!: number;
 	size!: number[];
 	terrain!: MinTerrain;
+	team!: string;
 }
 
 /// Packet from server containing game data
@@ -307,5 +308,13 @@ export class AnnouncementPacket implements IPacket {
 	weaponUsed!: string;
 	killer!: string;
 	killed!: string;
+}
+
+export class TDMInfoPacket implements IPacket{
+	type = RecvPacketTypes.TDMINFO;
+	redTeamScore!: number;
+	blueTeamScore!: number;
+	redTeamMembers!: Array<string>;
+	blueTeamMembers!: Array<string>;
 }
 export type ServerPacketResolvable = AckPacket | GamePacket | MapPacket | SoundPacket | ParticlesPacket | AnnouncementPacket;
