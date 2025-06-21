@@ -33,25 +33,27 @@ export enum KeyBindDef {
 	LEADERBOARD = 14
 }
 export const KeyBind = new Map<number, string>()
-export const DefaultKeybStr = "1:F1;0:Escape;2:g;3:z;4:v;5:d;6:w;7:a;8:s;9:f;10:e;11:q;12:r;13:x;14:Tab;"
+export const DefaultKeybStr = "0:Escape;1:F1;2:g;3:z;4:v;5:d;6:w;7:a;8:s;9:f;10:e;11:q;12:r;13:x;14:Tab;"
 if (!localStorage.getItem("keybinds")) {
 	localStorage.setItem("keybinds",  DefaultKeybStr)
 }
 if (!localStorage.getItem("version")) { localStorage.setItem("version", "0.4") }
-	let version = parseFloat(localStorage.getItem("version")!);
-	const currentVersion = 0.4
-	if (!localStorage.getItem("settings") || currentVersion > version) {
-		localStorage.setItem("settings", "``coloredWeaponSlots:0;pingMeter:0");
-		if (currentVersion > version) {
-			localStorage.setItem("version", String(currentVersion))
-			version = currentVersion
-			if (localStorage.getItem("keybinds")){
-				//merge
-				const newKeybinds = DefaultKeybStr.slice(localStorage.getItem("keybinds")!.length, -1)
-				localStorage.setItem("keybinds", localStorage.getItem("keybinds")!.concat(";".concat(newKeybinds!)))
-			}
+let version = parseFloat(localStorage.getItem("version")!);
+const currentVersion = 0.4
+if (!localStorage.getItem("settings") || currentVersion > version) {
+	localStorage.setItem("settings", "``coloredWeaponSlots:0;pingMeter:0");
+	if (currentVersion > version) {
+		localStorage.setItem("version", String(currentVersion))
+		version = currentVersion
+		if (localStorage.getItem("keybinds")){
+			//merge
+			const newKeybinds = DefaultKeybStr.slice(localStorage.getItem("keybinds")!.length+1, -1)
+			let prefixStr = ""
+			if (localStorage.getItem("keybinds")![-1] != ";") {prefixStr = ";"}
+			localStorage.setItem("keybinds", localStorage.getItem("keybinds")!.concat(prefixStr.concat(newKeybinds!)))
 		}
 	}
+}
 let keybind = localStorage.getItem("keybinds")!
 if (keybind[-1] == "") {keybind= keybind.substring(0, keybind.length-1) }
 const keybindRawList = keybind.split(";")
@@ -59,6 +61,7 @@ for (let ii = 0; ii < keybindRawList.length; ii++) {
 	console.log(keybindRawList[ii])
 	const keybindList = keybindRawList[ii].split(":")
 	console.log(keybindList)
+	if (keybindList.length < 2) continue
 	KeyBind.set(Number(keybindList[0]), keybindList[1] )
 }
 console.log(Array.from(KeyBind))
