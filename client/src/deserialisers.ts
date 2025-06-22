@@ -6,7 +6,7 @@ import { CountableString } from "./types/misc"
 import { Weapon } from "./types/weapon"
 import { Entity, Inventory } from "./types/entity"
 import { TracerData } from "./types/data"
-import { EntityTypes, NumToDeathImg, numToGunIDs, ObstacleTypes, SkinsDecoding } from "./constants"
+import { EntityTypes, NumToDeathImg, numToGunIDs, ObstacleTypes, SkinsDecoding, teamNumMapping } from "./constants"
 
 const gunNumToID: Map<number, string> = new Map([
     [0, "fists"],
@@ -255,7 +255,8 @@ export function deserialiseMinEntities(stream: IslandrBitStream) {
                 deathImg: NumToDeathImg.get(stream.readInt8()),
                 hitbox: <MinHitbox>{
                     type: "circle", radius: 1
-                }
+                },
+                team: teamNumMapping.get(stream.readInt8())!
             })
             entities.push(player)
         }

@@ -1,5 +1,5 @@
 import { world } from "../..";
-import { addKillToTeam, DeathImgToNum, EntityTypes, GLOBAL_UNIT_MULTIPLIER, gunIDsToNum, removePlayerFromTeam, SkinsEncoding, TeamPlayerInfo, TeamUsernameInfo, TICKS_PER_SECOND } from "../../constants";
+import { addKillToTeam, DeathImgToNum, EntityTypes, GLOBAL_UNIT_MULTIPLIER, gunIDsToNum, numTeamMapping, removePlayerFromTeam, SkinsEncoding, TeamPlayerInfo, TeamUsernameInfo, TICKS_PER_SECOND } from "../../constants";
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
 import { Entity, Inventory } from "../../types/entity";
@@ -80,7 +80,7 @@ export default class Player extends Entity {
 		this.currentHealItem = undefined;
 		this.accessToken = accessToken;
 		this.isMobile = isMobile!;
-		this.allocBytes += 19 + this.username.length;
+		this.allocBytes += 20 + this.username.length;
 		this._needsToSendAnimations = true
 		this.animations.forEach(animation => this.allocBytes += animation.length)
 		this.team = team;
@@ -387,5 +387,6 @@ export default class Player extends Entity {
 		stream.writeInt8(gunIDsToNum.get(minPlayer.inventory.holding.nameId)!);// inventory holding currently,
 		stream.writeInt8(SkinsEncoding.get(minPlayer.skin!)!)
 		stream.writeInt8(DeathImgToNum.get(minPlayer.deathImg!)!)
+		stream.writeInt8(numTeamMapping.get(this.team)!)
 	}
 }

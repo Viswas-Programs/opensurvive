@@ -84,6 +84,7 @@ export default class Player extends Entity {
 	_lastPosChange = Date.now();
 	_lastDirectionChng = Date.now();
 	team: string = ""
+	setTeamByConstructor= false
 
 	constructor(minEntity: MinEntity & AdditionalEntity, team: string) {
 		super(minEntity);
@@ -91,10 +92,12 @@ export default class Player extends Entity {
 		this.currentSkinImg.src = "assets/" + getMode() + "/images/game/skins/" + this.skin + ".svg";
 		this.currentDeathImg.src = "assets/" + getMode() + "/images/game/entities/" + this.deathImg + ".svg";
 		this.team = team
+		this.setTeamByConstructor = true
 	}
 
 	copy(minEntity: MinEntity & AdditionalEntity) {
 		super.copy(minEntity);
+		if (!this.setTeamByConstructor) this.team = minEntity.team;
 		this.username = minEntity.username;
 		this.skin = minEntity.skin;
 		this.deathImg = minEntity.deathImg;
