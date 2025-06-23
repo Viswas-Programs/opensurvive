@@ -2,7 +2,7 @@
 import "dotenv/config";
 import { readFileSync } from "fs";
 import * as ws from "ws";
-import { ID, send, wait, sendBitstream, spawnGun} from "./utils";
+import { ID, send, wait, sendBitstream, spawnGun, getArrayLength} from "./utils";
 import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ServerSideScopeUpdate, PlayerTickPkt, GameOverPkt, TDMInfoPacket } from "./types/packet";
 import { DIRECTION_VEC, EntityTypes, numTeamMapping, NumToDeathImg, RecvPacketTypes, SkinsDecoding, TICKS_PER_SECOND, RED_TEAM, BLUE_TEAM, TeamPlayerInfo, TEAMS, getTotalKillsFromTeam, TeamUsernameInfo, removePlayerFromTeam, TeamRemovePlayerInfo } from "./constants";
 import {  CommonAngles, RectHitbox, Vec2 } from "./types/math";
@@ -131,8 +131,9 @@ server.on("connection", async socket => {
 	let deathImg = "default";
 	let isMobile = false;
 	let playerTeam = ""
-	if ((BLUE_TEAM.length >= RED_TEAM.length) && RED_TEAM.length < 10 ){ playerTeam = TEAMS.RED; RED_TEAM.push(id)}
-	else if ((BLUE_TEAM.length <= RED_TEAM.length) && BLUE_TEAM.length < 10) { playerTeam = TEAMS.BLUE; BLUE_TEAM.push(id)}
+	console.log(BLUE_TEAM, RED_TEAM)
+	if ((getArrayLength(BLUE_TEAM) >= getArrayLength(RED_TEAM)) && getArrayLength(RED_TEAM) < 10 ){ playerTeam = TEAMS.RED; RED_TEAM.push(id)}
+	else if ((getArrayLength(BLUE_TEAM) <= getArrayLength(RED_TEAM)) && getArrayLength(BLUE_TEAM) < 10) { playerTeam = TEAMS.BLUE; BLUE_TEAM.push(id)}
 	else {socket.close()}
 	// Communicate with the client by sending the ID and map size. The client should respond with ID and username, or else close the connection.
 	await Promise.race([wait(10000), new Promise<void>(resolve => {

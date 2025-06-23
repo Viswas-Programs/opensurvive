@@ -84,6 +84,12 @@ export function spawnLoot(type: string, id: string, color: GunColor, position: V
     }
 }
 
+export function getArrayLength(array: Array<any>): number{
+    let length = 0;
+    array.forEach(member => length++);
+    return length
+}
+
 // Networking
 export function changeCurrency(accessToken: string, delta: number) {
     fetch((process.env.API_URL || "http://localhost:8000") + "/api/delta-currency", { method: "POST", headers: { "Authorization": "Bearer " + process.env.SERVER_DB_TOKEN, "Content-Type": "application/json" }, body: JSON.stringify({ accessToken, delta }) })

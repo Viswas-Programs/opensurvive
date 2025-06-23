@@ -1,5 +1,5 @@
 import { disconnect } from "process";
-import { BASE_RADIUS, OutPacketTypes, RecvPacketTypes } from "../constants";
+import { BASE_RADIUS, BLUE_TEAM, OutPacketTypes, RecvPacketTypes, RED_TEAM } from "../constants";
 import { IslandrBitStream } from "../packets";
 import { calculateAllocBytesForObs, calculateAllocBytesForTickPkt, serialiseDiscardables, serialiseMinObstacles, serialiseMinParticles, serialisePlayer } from "../serialisers";
 import { Player } from "../store/entities";
@@ -11,6 +11,7 @@ import { MovementDirection } from "./misc";
 import { Obstacle } from "./obstacle";
 import { Particle } from "./particle";
 import { Terrain } from "./terrain";
+import { getArrayLength } from "../utils";
 
 export class  IPacketSERVER {
 	type!: number;
@@ -272,15 +273,11 @@ export class TDMInfoPacket extends IPacketSERVER{
 		super.serialise()
 		this.stream.writeInt8(this.redTeamScore)
 		this.stream.writeInt8(this.blueTeamScore)
-		let redTeamLN = 0
-		this.redTeamMembers.forEach(member => redTeamLN ++)
-		let blueLN = 0
-		this.blueTeamMembers.forEach(member => blueLN ++)
-		this.stream.writeInt8(redTeamLN)
+		this.stream.writeInt8(getArrayLength(RED_TEAM))
 		this.redTeamMembers.forEach(member => this.stream.writeASCIIString(member))
-		this.stream.writeInt8(blueLN)
+		this.stream.writeInt8(getArrayLength(BLUE_TEAM))
 		this.blueTeamMembers.forEach(member => this.stream.writeASCIIString(member))
-		this.stream.writeInt8(this.removedPlayers.length)
+		this.stream.writeInt8(getArrayLength(this.removedPlayers))
 		this.removedPlayers.forEach(member => this.stream.writeInt16(Number(member)))
 	}
 }
