@@ -31,7 +31,22 @@ export default class Bullet extends Entity {
 		this.falloff = falloff;
 		this.allocBytes += 44;
 	}
-	collisionCheck(entities: Entity[], obstacles: Obstacle[]) {
+
+	_richoChet(thing: Entity | Obstacle){
+		/*const delX = this.position.x-this.oldPos!.x
+		const delY = this.position.y-this.oldPos!.y
+		this.oldPos = this.position 
+		let angle = Math.PI + 2*Math.atan(delX/delY)
+		if (delY > 0){ angle= Math.PI - 2*Math.atan(delX/delY) }
+		this.position = this.position.addVec(this.direction.addAngle(angle))
+		this.setVelocity(this.direction.addAngle(angle)); this.direction = this.direction.addAngle(angle)
+		*/
+		this.die()
+		}
+
+	collisionCheck(entities: Entity[], obstacles: Obstacle[]) {const delX = this.position.x-this.oldPos!.x
+		const delY = this.position.y-this.oldPos!.y
+	
 		if (this.despawn) return;
 		var combined: (Entity | Obstacle)[] = [];
 		combined = combined.concat(entities, obstacles);
@@ -40,8 +55,9 @@ export default class Bullet extends Entity {
 			if (thing.collided(this)) {
 				if (thing.type === EntityTypes.PLAYER && this.shooter.type === EntityTypes.PLAYER && thing.id != this.shooter.id) { (<any>this.shooter).damageDone += this.dmg; }
 				thing.damage(this.dmg, this.shooter.id);
-				//if (thing.surface == "metal") { this.position = this.position.addVec(this.direction.invert()); this.setVelocity(this.direction.invert()); this.direction = this.direction.invert() }
-				if (!thing.noCollision) this.die();
+				if (thing.surface == "metal") { 
+					this._richoChet(thing) }
+				else if (!thing.noCollision) this.die();
 				break;
 			}
 			if (this.type != thing.type && !thing.despawn && thing.hitbox.lineIntersects(new Line(this.position, this.position.addVec(this.velocity)), thing.position, thing.direction)) {
@@ -49,16 +65,20 @@ export default class Bullet extends Entity {
 				if (thing.type === EntityTypes.PLAYER && this.shooter.type === EntityTypes.PLAYER && thing.id != this.shooter.id) { 
 					if ((<Player>this.shooter).team == (<Player>thing).team) continue;
 					(<any>this.shooter).damageDone += this.dmg; }
-				thing.damage(this.dmg);
-				if (!thing.noCollision) this.die();
+				thing.damage(this.dmg, this.shooter.id);
+				if (thing.surface == "metal") { 
+					this._richoChet(thing) }
+				else if (!thing.noCollision) this.die();
 				break;
 			}
 
 		}
 		for (const thing of obstacles) {
 			if (this.oldPos && !thing.despawn && thing.hitbox.lineIntersects(new Line(this.oldPos.addVec(this.velocity.inverse()), this.position.addVec(this.velocity), true), thing.position, thing.direction)) {
-				thing.damage(this.dmg);
-				if (!thing.noCollision) this.die();
+				thing.damage(this.dmg, this.shooter.id);
+				if (thing.surface == "metal") { 
+					this._richoChet(thing) }
+				else if (!thing.noCollision) this.die();
 				break;
 			}
 		}

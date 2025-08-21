@@ -12,7 +12,7 @@ class PlainSupplier implements TerrainSupplier {
 export default class Plain extends FullTerrain {
 	static readonly ID = "plain";
 	id = Plain.ID;
-	color = 0x80B251;
+	color = 0x604526;
 
 	constructor(minTerrain: MinTerrain) {
 		super(minTerrain);

@@ -11,6 +11,7 @@ export { default as Pond } from "./pond";
 export { default as River } from "./river";
 export { default as Sea } from "./sea";
 export { default as Beach } from "./beach";
+export { SlDarkBeach, DarkBeach } from "./beach"
 
 export function castTerrain(data: TerrainData) {
 	return TERRAIN_SUPPLIERS.get(data.type)?.create(data) || new Plain();

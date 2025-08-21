@@ -3,18 +3,18 @@ import { MinTerrain, MinLine, MinVec2 } from "../../types/minimized";
 import { TerrainSupplier } from "../../types/supplier";
 import { LineTerrain } from "../../types/terrain";
 
-class BeachSupplier implements TerrainSupplier {
+class SlDarkBeachSupplier implements TerrainSupplier {
 	create(minTerrain: MinTerrain & { line: MinLine, range: number, boundary: MinVec2[] }) {
-		return new Beach(minTerrain);
+		return new SlDarkBeach(minTerrain);
 	}
 }
 
-export default class Beach extends LineTerrain {
-	static readonly ID = "beach";
-	id = Beach.ID;
-	color = 0xd7a757;
+export default class SlDarkBeach extends LineTerrain {
+	static readonly ID = "sldarkbeach";
+	id = SlDarkBeach.ID;
+	color = 0xbb8328;
 
 	static {
-		TERRAIN_SUPPLIERS.set(Beach.ID, new BeachSupplier());
+		TERRAIN_SUPPLIERS.set(SlDarkBeach.ID, new SlDarkBeachSupplier());
 	}
 }

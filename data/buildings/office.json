@@ -1,0 +1,90 @@
+{
+    "obstacles": [
+        {
+            "type": "wall",
+            "position": [-9.5, 3],
+            "hitbox": [0.5, 33.5],
+            "color": 2592373247,
+            "surface": "metal"
+        },
+        {
+            "type": "wall",
+            "position": [26, -8.75],
+            "hitbox": [0.5, 58],
+            "color":2592373247,
+            "surface":"metal"
+        },
+        {
+            "type": "wall",
+            "position": [-2.25, 19.6],
+            "hitbox": [15, 0.5],
+            "color":2592373247,
+            "surface": "metal"
+        },
+        {
+            "type": "wall",
+            "position": [19.25, 19.7],
+            "hitbox": [13.5, 0.5],
+            "color":2592373247,
+            "surface":"metal"
+        },
+        {
+            "type": "wall",
+            "position": [5, 11],
+            "hitbox": [0.5, 16],
+            "color": 3468538111
+        },
+        {
+            "type": "wall",
+            "position": [12.5, -2.5],
+            "hitbox": [0.5, 20],
+            "color": 3468538111
+        },
+        {
+            "type": "wall",
+            "hitbox": [0.5, 10],
+            "position": [-10, 32.75],
+            "color": 2592373247
+        }
+    ],
+    "floors": [
+        {
+            "type": "floor",
+            "position": [0, 0],
+            "size": [51.35,75.6],
+            "texture": {
+                "path": "fixed/office.svg",
+                "horizontalFill":2
+            }
+        }
+    ],
+    "roofs":[
+        {
+            "type": "roof",
+            "position" :[0.5,-0.5],
+            "hitbox": [52, 75.8],
+            "color":3468538111,
+            "texture": {
+                "path":"fixed/office_roof.svg",
+                "horizontalFill": 2
+            }
+        }
+    ],
+    "zones": [
+        {
+            "position": [8.5,3.25],
+            "hitbox": [36, 35],
+            "map": true
+        },
+        {
+            "position": [8.5, 23],
+            "hitbox": [7, 9],
+            "map": true
+        },
+        {
+            "position": [1.5, 33],
+            "hitbox": [20.5, 8]
+        }
+    ],
+    "mapColor": 1566399999
+}

@@ -3,7 +3,7 @@ import { addKillToTeam, DeathImgToNum, EntityTypes, GLOBAL_UNIT_MULTIPLIER, gunI
 import { IslandrBitStream } from "../../packets";
 import { standardEntitySerialiser } from "../../serialisers";
 import { Entity, Inventory } from "../../types/entity";
-import { CircleHitbox, Vec2 } from "../../types/math";
+import { CircleHitbox, CommonAngles, Line, RectHitbox, Vec2 } from "../../types/math";
 import { CollisionType, GunColor, GunColorReverse } from "../../types/misc";
 import { Obstacle } from "../../types/obstacle";
 import { Particle } from "../../types/particle";
@@ -193,12 +193,15 @@ export default class Player extends Entity {
 			
 		}
 		// Building collision handling
-		const rooflessAdd = new Set<string>();
-		const rooflessDel = new Set<string>();
+		let rooflessAdd = new Set<string>();
+		let rooflessDel = new Set<string>();
 		for (const building of world.buildings) {
-			if (building.zones.some(z => z.hitbox.collideCircle(z.position.addVec(building.position), building.direction, this.hitbox, this.position, this.direction) != CollisionType.NONE)) { rooflessAdd.add(building.id); this.scope = 1; }
+			//if (building.position.x>300){ console.log("BUILDING ID:",building.id)}
+			if (building.zones.some(z => {
+				return z.hitbox.collideCircle(z.position.addVec(building.position), building.direction, this.hitbox, this.position, this.direction) != CollisionType.NONE})) { rooflessAdd = rooflessAdd.add(building.id); this.scope = 1;}
 			else {
-				setTimeout(() => { rooflessDel.add(building.id);  this.scope = this._scope }, 45 ) }
+				//if (building.position.x>300){console.log("BUILDING ID:",building.id)}
+				setTimeout(() => { rooflessDel = rooflessDel.add(building.id);  this.scope = this._scope;}, 45 ) }
 		}
 		// Collision handling
 		for (const obstacle of obstacles) {
@@ -217,8 +220,10 @@ export default class Player extends Entity {
 			// For roof to be roofless
 			if (obstacle.type === Roof.ID) {
 				const roof = <Roof>obstacle;
-				if (rooflessAdd.has(roof.buildingId)) roof.addRoofless(this.id)
-				if (rooflessDel.has(roof.buildingId) || rooflessAdd.size == 0 ) roof.delRoofless(this.id)
+				if (rooflessAdd.has(roof.buildingId)) {roof.addRoofless(this.id);}
+				else {roof.delRoofless(this.id);}
+				if (rooflessDel.has(roof.buildingId) || rooflessAdd.size == 0 ) {roof.delRoofless(this.id);}
+
 			}
 		}
 

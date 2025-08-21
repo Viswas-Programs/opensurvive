@@ -2,38 +2,23 @@
 	"obstacles": [
 		{
 			"type": "wall",
-			"hitbox": [ 0.5, 11 ],
-			"color": 2592373247,
-			"__color": "(comment) 1566399999 is 0xad6218ff",
-			"position": [ -9, -9 ],
-			"surface": "metal"
-		},
-		{
-			"type": "wall",
-			"hitbox": [0.5, 11],
-			"color": 2592373247,
-			"position": [-9, 14 ],
-			"surface" : "metal"
-		},
-		{
-			"type": "door",
-			"hitbox": [0.5, 5],
-			"color":2592373247,
-			"position": [-8.75, 1],
-			"pivot": [0, -2.5],
-			"health": 150
-		},
-		{
-			"type": "wall",
 			"hitbox": [ 0.5, 39 ],
-			"color": 2592373247,
+			"color": 1566399999,
+			"__color": "(comment) 1566399999 is 0xad6218ff",
 			"position": [ 9, 0 ],
 			"surface": "metal"
 		},
 		{
 			"type": "wall",
+			"hitbox": [ 0.5, 39 ],
+			"color": 1566399999,
+			"position": [ -9, 0 ],
+			"surface": "metal"
+		},
+		{
+			"type": "wall",
 			"hitbox": [ 13, 0.5 ],
-			"color": 2592373247,
+			"color": 1566399999,
 			"position": [ -2.5, 19.25 ],
 			"surface": "metal"
 
@@ -41,7 +26,7 @@
 		{
 			"type": "wall",
 			"hitbox": [ 3.8, 0.5 ],
-			"color": 2592373247,
+			"color": 1566399999,
 			"position": [ -7, -19.25 ],
 			"surface": "metal"
 
@@ -49,7 +34,7 @@
 		{
 			"type": "wall",
 			"hitbox": [ 1, 0.5 ],
-			"color": 2592373247,
+			"color": 1566399999,
 			"position": [ 8.5, 19.25 ],
 			"surface": "metal"
 
@@ -57,10 +42,43 @@
 		{
 			"type": "wall",
 			"hitbox": [ 3.8, 0.5 ],
-			"color": 2592373247,
+			"color": 1566399999,
 			"position": [ 7, -19.25 ],
 			"surface": "metal"
 
+		},
+		{
+			"type": "box",
+			"position": [ -3, 11.5 ]
+		},
+		{
+			"type": "box",
+			"position": [ -5.2, 12 ]
+		},
+		{
+			"type": "crate",
+			"position": [ 0, -5 ],
+			"special": "soviet"
+		},
+		{
+			"type": "stone",
+			"position": [ 5.5, -9.5 ],
+			"special": "pillar"
+		},
+		{
+			"type": "stone",
+			"position": [ -5.5, -9.5 ],
+			"special": "pillar"
+		},
+		{
+			"type": "stone",
+			"position": [ 5.5, 9.5 ],
+			"special": "pillar"
+		},
+		{
+			"type": "stone",
+			"position": [ -5.5, 9.5 ],
+			"special": "pillar"
 		},
 		{
 			"type": "barrel",

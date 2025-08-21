@@ -2,7 +2,7 @@
 	"obstacles": [
 		{
 			"type": "wall",
-			"hitbox": [ 12.5, 0.1 ],
+			"hitbox": [ 14.5, 0.1 ],
 			"color": 1169987695,
 			"__color": "(comment) 6900887695 is 0xad6218ff",
 			"position": [ 0.25, -2.5 ],
@@ -10,29 +10,21 @@
 		},
 		{
 			"type": "wall",
-			"hitbox": [ 12.5, 0.1 ],
+			"hitbox": [ 14.5, 0.1 ],
 			"color": 1169987695,
 			"__color": "(comment) 6900887695 is 0xad6218ff",
 			"position": [ 0.25, 2.5 ],
 			"surface" :"metal"
 		},
 		{
-			"type": "wall",
-			"hitbox": [ 0.1, 5 ],
-			"color": 1169987695,
-			"position": [ -6.5, 0 ],
-			"surface" :"metal"
-		},
-		{
 			"type": "spawner",
-			"position": [ -2, 0.5 ],
-			"surface" :"metal"
+			"position": [ 0, 0.5 ]
 		}
 	],
 	"zones": [
 		{
-			"position": [ -2.25, 0 ],
-			"hitbox": [ 10.25, 5 ],
+			"position": [ 0.25, 0 ],
+			"hitbox": [ 12.25, 5 ],
 			"map": true
 		}
 	],
@@ -41,7 +33,7 @@
 		{
 			"type": "floor",
 			"size": [ 10, 5 ],
-			"position": [ -1.75, 0 ],
+			"position": [ 0.25, 0 ],
 			"texture": {
 				"path": "fixed/floor_conex_blue.svg",
 				"horizontalFill": 2
@@ -51,11 +43,11 @@
 	"roofs": [
 		{
 			"type": "roof",
-			"hitbox": [ 10.1, 5.557 ],
-			"position": [ -1.75, 0 ],
+			"hitbox": [ 10, 5.557 ],
+			"position": [ 0.25, 0 ],
 			"color": 1169987695,
 			"texture": {
-				"path": "fixed/conex_blue.svg"
+				"path": "fixed/conex_blue_pass.svg"
 			}
 		}
 	]

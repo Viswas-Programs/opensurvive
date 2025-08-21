@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="Layer_1"
+   viewBox="0 0 969.64003 356.86999"
+   version="1.1"
+   sodipodi:docname="roof_armory.svg"
+   width="969.64001"
+   height="356.87"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview132"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     showgrid="false"
+     inkscape:zoom="0.86423826"
+     inkscape:cx="297.95024"
+     inkscape:cy="85.624536"
+     inkscape:window-width="1920"
+     inkscape:window-height="1008"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Layer_1" />
+  <defs
+     id="defs47">
+    <style
+       id="style2">.cls-1{fill:none;}.cls-2{fill:#4d4d4d;}.cls-2,.cls-3,.cls-4{stroke:#000;stroke-miterlimit:10;stroke-width:4px;}.cls-3{fill:#665f39;}.cls-4{fill:#666;}.cls-5{fill:#823532;}.cls-6{fill:#a3503b;}.cls-7{fill:gray;}.cls-8{fill:url(#New_Pattern_Swatch_3);opacity:.1;}.cls-9{opacity:.5;}</style>
+    <pattern
+       id="New_Pattern_Swatch_3"
+       x="0"
+       y="0"
+       width="47.26"
+       height="47.27"
+       patternTransform="translate(-19.07 -233.14)"
+       patternUnits="userSpaceOnUse"
+       viewBox="0 0 47.26 47.27">
+      <rect
+         class="cls-1"
+         width="47.26"
+         height="47.27"
+         id="rect4" />
+      <path
+         d="M47.26,44.53v2.74h-2.74c.81-1.01,1.73-1.93,2.74-2.74Z"
+         id="path6" />
+      <polygon
+         points="47.26 23.63 47.26 23.63 47.26 23.63 47.26 23.63"
+         id="polygon8" />
+      <polygon
+         points="29.53 41.36 29.53 41.37 29.53 41.37 29.53 41.36"
+         id="polygon10" />
+      <polygon
+         points="36.9 34 36.9 34 36.9 34 36.9 34"
+         id="polygon12" />
+      <polygon
+         points="34 36.9 34 36.9 34 36.9 34 36.9"
+         id="polygon14" />
+      <path
+         d="M47.26,0v2.75c-1.73,1.4-3.73,2.49-5.9,3.16.67-2.17,1.75-4.17,3.16-5.91h2.74Z"
+         id="path16" />
+      <path
+         d="M26.37,0c-.41.51-.83.99-1.29,1.45-2.04,2.03-4.55,3.59-7.35,4.45.67-2.17,1.76-4.16,3.15-5.9h5.49Z"
+         id="path18" />
+      <path
+         d="M41.36,17.72h-.02c-5.61-1.74-10.06-6.22-11.8-11.81,5.6,1.75,10.09,6.21,11.82,11.81Z"
+         id="path20" />
+      <path
+         d="M29.54,17.73c-1.75,5.6-6.21,10.08-11.82,11.81,1.73-5.61,6.22-10.06,11.82-11.81Z"
+         id="path22" />
+      <polygon
+         points="17.72 5.9 17.73 5.9 17.73 5.9 17.72 5.9"
+         id="polygon24" />
+      <path
+         d="M47.26,20.9v5.48c-1.73,1.4-3.73,2.49-5.89,3.16h-.01c.87-2.8,2.42-5.32,4.46-7.35.45-.46.94-.89,1.44-1.29Z"
+         id="path26" />
+      <polygon
+         points="10.36 13.27 10.36 13.27 10.36 13.27 10.36 13.27"
+         id="polygon28" />
+      <polygon
+         points="13.26 10.37 13.26 10.37 13.26 10.37 13.26 10.37"
+         id="polygon30" />
+      <path
+         d="M41.36,41.36c-2.81-.87-5.32-2.42-7.36-4.46-2.04-2.04-3.59-4.57-4.46-7.36,2.79.87,5.32,2.43,7.36,4.46,2.03,2.04,3.59,4.56,4.46,7.36Z"
+         id="path32" />
+      <path
+         d="M2.73,0C1.92,1.01,1,1.93,0,2.75V0h2.73Z"
+         id="path34" />
+      <path
+         d="M5.9,17.73h0c-.87,2.8-2.43,5.32-4.46,7.35-.46.46-.94.89-1.44,1.3v-5.49c1.73-1.39,3.73-2.48,5.89-3.16h.01Z"
+         id="path36" />
+      <path
+         d="M17.72,17.73c-2.8-.87-5.32-2.43-7.35-4.46h-.01c-2.03-2.04-3.59-4.57-4.46-7.36,2.79.87,5.32,2.42,7.36,4.46s3.59,4.55,4.46,7.36Z"
+         id="path38" />
+      <path
+         d="M5.9,41.36c-.67,2.17-1.76,4.17-3.16,5.91H0v-2.74c1.74-1.4,3.73-2.49,5.9-3.17Z"
+         id="path40" />
+      <path
+         d="M29.53,41.37c-.67,2.16-1.76,4.16-3.16,5.9h-5.48c.4-.5.83-.99,1.29-1.45,2.03-2.03,4.56-3.58,7.35-4.45Z"
+         id="path42" />
+      <path
+         d="M17.72,41.36c-1.73-5.61-6.21-10.06-11.81-11.82l.08.1-.09-.09c1.75,5.59,6.2,10.07,11.8,11.8h-.01s.03.01.03.01Z"
+         id="path44" />
+    </pattern>
+  </defs>
+  <g
+     id="g629"
+     transform="rotate(-90,178.435,178.435)">
+    <rect
+       class="cls-6"
+       x="11"
+       y="10"
+       width="335.87"
+       height="947.64001"
+       id="rect49" />
+    <path
+       d="M 344.87,12 V 955.64 H 13 V 12 h 331.87 m 4,-4 H 9 v 951.64 h 339.87 z"
+       id="path51" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="295.64001"
+       width="331.87"
+       height="31"
+       id="rect53" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="244.64"
+       width="331.87"
+       height="31"
+       id="rect55" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="194.64"
+       width="331.87"
+       height="31"
+       id="rect57" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="143.64"
+       width="331.87"
+       height="31"
+       id="rect59" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="93.639999"
+       width="331.87"
+       height="31"
+       id="rect61" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="42.639999"
+       width="331.87"
+       height="31"
+       id="rect63" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="548.64001"
+       width="331.87"
+       height="31"
+       id="rect65" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="597.64001"
+       width="331.87"
+       height="31"
+       id="rect67" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="497.64001"
+       width="331.87"
+       height="31"
+       id="rect69" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="447.64001"
+       width="331.87"
+       height="31"
+       id="rect71" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="396.64001"
+       width="331.87"
+       height="31"
+       id="rect73" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="346.64001"
+       width="331.87"
+       height="31"
+       id="rect75" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="850.64001"
+       width="331.87"
+       height="31"
+       id="rect77" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="799.64001"
+       width="331.87"
+       height="31"
+       id="rect79" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="749.64001"
+       width="331.87"
+       height="31"
+       id="rect81" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="698.64001"
+       width="331.87"
+       height="31"
+       id="rect83" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="648.64001"
+       width="331.87"
+       height="31"
+       id="rect85" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="901.64001"
+       width="331.87"
+       height="31"
+       id="rect87" />
+    <rect
+       class="cls-5"
+       x="13"
+       y="12"
+       width="331.87"
+       height="11.64"
+       id="rect89" />
+    <path
+       class="cls-7"
+       d="m 344.87,22 c -5.51,0 -10,-4.49 -10,-10 0,-5.51 4.49,-10 10,-10 5.51,0 10,4.49 10,10 0,5.51 -4.49,10 -10,10 z"
+       id="path91" />
+    <path
+       d="m 344.87,4 c 4.42,0 8,3.58 8,8 0,4.42 -3.58,8 -8,8 -4.42,0 -8,-3.58 -8,-8 0,-4.42 3.58,-8 8,-8 m 0,-4 c -6.62,0 -12,5.38 -12,12 0,6.62 5.38,12 12,12 6.62,0 12,-5.38 12,-12 0,-6.62 -5.38,-12 -12,-12 z"
+       id="path93" />
+    <path
+       class="cls-7"
+       d="M 12,22 C 6.49,22 2,17.51 2,12 2,6.49 6.49,2 12,2 c 5.51,0 10,4.49 10,10 0,5.51 -4.49,10 -10,10 z"
+       id="path95" />
+    <path
+       d="m 12,4 c 4.42,0 8,3.58 8,8 0,4.42 -3.58,8 -8,8 C 7.58,20 4,16.42 4,12 4,7.58 7.58,4 12,4 M 12,0 C 5.39,0 0,5.38 0,12 0,18.62 5.38,24 12,24 18.62,24 24,18.62 24,12 24,5.38 18.62,0 12,0 Z"
+       id="path97" />
+    <path
+       class="cls-7"
+       d="m 12,967.64 c -5.51,0 -10,-4.49 -10,-10 0,-5.51 4.49,-10 10,-10 5.51,0 10,4.49 10,10 0,5.51 -4.49,10 -10,10 z"
+       id="path99" />
+    <path
+       d="m 12,949.64 c 4.42,0 8,3.58 8,8 0,4.42 -3.58,8 -8,8 -4.42,0 -8,-3.58 -8,-8 0,-4.42 3.58,-8 8,-8 m 0,-4 c -6.62,0 -12,5.38 -12,12 0,6.62 5.38,12 12,12 6.62,0 12,-5.38 12,-12 0,-6.62 -5.38,-12 -12,-12 z"
+       id="path101" />
+    <path
+       class="cls-7"
+       d="m 344.87,967.35 c -5.51,0 -10,-4.42 -10,-9.86 0,-5.44 4.49,-9.86 10,-9.86 5.51,0 10,4.42 10,9.86 0,5.44 -4.49,9.86 -10,9.86 z"
+       id="path103" />
+    <path
+       d="m 344.87,949.64 c 4.42,0 8,3.52 8,7.86 0,4.34 -3.58,7.86 -8,7.86 -4.42,0 -8,-3.52 -8,-7.86 0,-4.34 3.58,-7.86 8,-7.86 m 0,-4 c -6.62,0 -12,5.32 -12,11.86 0,6.54 5.38,11.86 12,11.86 6.62,0 12,-5.32 12,-11.86 0,-6.54 -5.38,-11.86 -12,-11.86 z"
+       id="path105" />
+    <rect
+       class="cls-4"
+       x="97.519997"
+       y="81"
+       width="152"
+       height="163"
+       rx="8.6000004"
+       ry="8.6000004"
+       transform="rotate(180,173.525,162.5)"
+       id="rect107" />
+    <rect
+       class="cls-3"
+       x="105.52"
+       y="89"
+       width="136"
+       height="136"
+       id="rect109"
+       transform="rotate(90,173.52,157)" />
+    <rect
+       class="cls-8"
+       x="105.52"
+       y="89"
+       width="136"
+       height="136"
+       id="rect111" />
+    <rect
+       class="cls-2"
+       x="157.52"
+       y="202"
+       width="32"
+       height="16"
+       transform="rotate(180,173.525,210)"
+       id="rect113" />
+    <circle
+       class="cls-9"
+       cx="226.52"
+       cy="104"
+       r="5"
+       id="circle115" />
+    <circle
+       class="cls-9"
+       cx="120.52"
+       cy="104"
+       r="5"
+       id="circle117" />
+    <circle
+       class="cls-9"
+       cx="226.52"
+       cy="210"
+       r="5"
+       id="circle119" />
+    <circle
+       class="cls-9"
+       cx="120.52"
+       cy="210"
+       r="5"
+       id="circle121" />
+    <circle
+       class="cls-9"
+       cx="216.52"
+       cy="235"
+       r="5"
+       id="circle123" />
+    <circle
+       class="cls-9"
+       cx="196.52"
+       cy="235"
+       r="5"
+       id="circle125" />
+    <circle
+       class="cls-9"
+       cx="130.52"
+       cy="235"
+       r="5"
+       id="circle127" />
+    <circle
+       class="cls-9"
+       cx="150.52"
+       cy="235"
+       r="5"
+       id="circle129" />
+  </g>
+</svg>

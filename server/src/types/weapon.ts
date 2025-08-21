@@ -4,7 +4,7 @@ import { Bullet, Player } from "../store/entities";
 import { GunColor } from "./misc";
 import { randomBetween, toRadians } from "../utils";
 import { Entity } from "./entity";
-import { CircleHitbox, Hitbox, Vec2 } from "./math";
+import { CircleHitbox, Hitbox, Line, Vec2 } from "./math";
 import { MinWeapon } from "./minimized";
 import { Obstacle } from "./obstacle";
 import { BulletStats, GunData, MeleeData, TracerData } from "./data";
@@ -81,6 +81,35 @@ export class MeleeWeapon extends Weapon {
 			dummy.hitbox = this.hitbox;
 			dummy.position = position;
 			dummy.direction = attacker.direction;
+
+				var combined: (Entity | Obstacle)[] = [];
+				combined = combined.concat(entities, obstacles);
+				for (const thing of combined) {
+					if (thing.despawn) continue;
+					if (thing.collided(dummy) && thing.id != attacker.id) {
+						if (thing.type === EntityTypes.PLAYER && attacker.type === EntityTypes.PLAYER && thing.id != attacker.id) { (<any>attacker).damageDone += this.damage; }
+						thing.damage(this.damage, attacker.id);
+						if (!this.cleave) break;;
+					}
+					if (!thing.despawn && thing.hitbox.lineIntersects(new Line(attacker.position, position), thing.position, thing.direction)) {
+						
+						if (thing.type === EntityTypes.PLAYER && attacker.type === EntityTypes.PLAYER && thing.id != attacker.id) { 
+							if ((<Player>attacker).team == (<Player>thing).team) continue;
+							(<any>attacker).damageDone += this.damage; }
+						
+						if (thing.id != attacker.id)thing.damage(this.damage, attacker.id);
+						if (!this.cleave) break;
+					}
+		
+				}
+				for (const thing of obstacles) {
+					if (attacker.position && !thing.despawn && thing.hitbox.lineIntersects(new Line(attacker.position, position, true), thing.position, thing.direction)) {
+						if (thing.id != attacker.id) thing.damage(this.damage, attacker.id);
+						if (!this.cleave) break;
+					}
+				}
+
+
 			for (const thing of combined)
 				if (thing.collided(dummy) && thing.id != attacker.id) {
 					if (thing.type === EntityTypes.PLAYER && attacker.type === EntityTypes.PLAYER && (<Player>attacker).team == (<Player>thing).team) continue;

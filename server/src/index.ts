@@ -17,6 +17,7 @@ import Building from "./types/building";
 import { GunWeapon,  WeaponType } from "./types/weapon";
 import { Entity } from "./types/entity";
 import { Obstacle } from "./types/obstacle";
+import { GunColor } from "./types/misc";
 export var ticksElapsed = 0;
 
 const server = new ws.Server({ port: 8080 });
@@ -161,6 +162,9 @@ server.on("connection", async socket => {
 	// Create the new player and add it to the entity list.
 	const player = new Player(id, username, skin, deathImg, playerTeam, accessToken, isMobile);
 	world.addPlayer(player);
+	player.scope = player.inventory.selectedScope = 2
+	player.inventory.scopes.push(2)
+	player.position = Vec2.fromArray([300, 230])
 	// Send the player the entire map
 	send(socket, new MapPacket(world.obstacles, world.buildings, world.terrains.concat(...world.buildings.map(b => b.floors.map(fl => fl.terrain)))));
 	// Send the player initial objects
@@ -175,6 +179,7 @@ server.on("connection", async socket => {
 	// The 4 directions of movement
 	const movements = [false, false, false, false];
 	const buttons = new Map<number, boolean>();
+	spawnGun("m18", GunColor.YELLOW, player.position, 60)
 
 	socket.on("message", (msg: ArrayBuffer) => {
 		const stream = new IslandrBitStream(msg)

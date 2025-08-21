@@ -59,7 +59,7 @@ let clearUsrStuffAfterDiscon = true;
 export function getConnected() { return connected; }
 function setConnected(v: boolean) { connected = v; return connected; }
 enum modeMapColours {
-	normal = 0x748838,
+	normal = 0x604526,
 	suroi_collab = 0x49993e,
 	classic = 0x80B251
 }
