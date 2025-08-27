@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="Layer_1"
+   viewBox="0 0 350.47 180"
+   version="1.1"
+   sodipodi:docname="vent_roof1.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview59"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     showgrid="false"
+     inkscape:zoom="3.6921848"
+     inkscape:cx="175.37042"
+     inkscape:cy="89.91966"
+     inkscape:window-width="1920"
+     inkscape:window-height="1008"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Layer_1" />
+  <defs
+     id="defs4">
+    <style
+       id="style2">.cls-1{fill:#929497;}.cls-1,.cls-2,.cls-3,.cls-4,.cls-5,.cls-6{stroke:#000;stroke-miterlimit:10;stroke-width:4px;}.cls-2{fill:#bbbdbf;}.cls-3{fill:#999;}.cls-4{fill:#6d6e70;}.cls-5{fill:none;}.cls-6{fill:gray;}</style>
+  </defs>
+  <rect
+     class="cls-3"
+     x="212.66"
+     y="37.71"
+     width="57.63"
+     height="99.78"
+     id="rect6" />
+  <rect
+     class="cls-3"
+     x="79.45"
+     y="37.71"
+     width="57.63"
+     height="99.78"
+     id="rect8" />
+  <path
+     class="cls-2"
+     d="M41.65,37.71h37.8v99.78H8.36v-66.48c0-18.39,14.91-33.3,33.3-33.3Z"
+     id="path10" />
+  <rect
+     class="cls-2"
+     x="137.08"
+     y="37.71"
+     width="75.58"
+     height="99.78"
+     id="rect12" />
+  <path
+     class="cls-2"
+     d="M 269.37424,137.46302 V 37.736985 h 72.94152 v 66.444045 c 0,18.38005 -15.29402,33.28199 -34.15768,33.28199 z"
+     id="path14" />
+  <rect
+     class="cls-2"
+     x="8.35"
+     y="137.49"
+     width="99.78"
+     height="30.51"
+     id="rect16" />
+  <rect
+     class="cls-2"
+     x="240.34439"
+     y="14.024832"
+     width="102.32121"
+     height="23.660336"
+     id="rect18" />
+  <rect
+     class="cls-1"
+     x="-37.688301"
+     y="236.11867"
+     width="8.9365759"
+     height="110.77267"
+     transform="rotate(-90)"
+     id="rect20" />
+  <rect
+     class="cls-1"
+     x="53.75"
+     y="87.98"
+     width="8.98"
+     height="108.01"
+     transform="translate(-83.74 200.22) rotate(-90)"
+     id="rect22" />
+  <rect
+     class="cls-1"
+     x="270.15521"
+     y="37.741596"
+     width="9.2495832"
+     height="103.83681"
+     id="rect24" />
+  <rect
+     class="cls-1"
+     x="203.69"
+     y="33.59"
+     width="8.97"
+     height="108.02"
+     id="rect26" />
+  <rect
+     class="cls-1"
+     x="137.08"
+     y="33.59"
+     width="8.98"
+     height="108.02"
+     id="rect28" />
+  <rect
+     class="cls-1"
+     x="70.47"
+     y="33.59"
+     width="8.98"
+     height="103.9"
+     id="rect30" />
+  <path
+     class="cls-2"
+     d="M132.58,87.6c0,23.36,18.94,42.29,42.29,42.29s42.29-18.94,42.29-42.29-18.94-42.29-42.29-42.29-42.29,18.94-42.29,42.29ZM207.08,87.6c0,17.78-14.42,32.2-32.2,32.2s-32.2-14.42-32.2-32.2,14.42-32.2,32.2-32.2,32.2,14.42,32.2,32.2Z"
+     id="path32" />
+  <circle
+     class="cls-4"
+     cx="174.87"
+     cy="87.6"
+     id="circle34"
+     r="32.2" />
+  <line
+     class="cls-5"
+     x1="174.87"
+     y1="55.4"
+     x2="174.87"
+     y2="119.81"
+     id="line36" />
+  <polyline
+     class="cls-5"
+     points="168.22 56.08 168.22 61 168.22 67.65 168.22 74.3 168.22 80.95 168.22 87.6 168.22 94.25 168.22 100.9 168.22 107.56 168.22 114.21 168.22 119.12"
+     id="polyline38" />
+  <line
+     class="cls-5"
+     x1="161.57"
+     y1="116.94"
+     x2="161.57"
+     y2="58.27"
+     id="line40" />
+  <line
+     class="cls-5"
+     x1="154.92"
+     y1="112.88"
+     x2="154.92"
+     y2="62.32"
+     id="line42" />
+  <line
+     class="cls-5"
+     x1="148.27"
+     y1="105.75"
+     x2="148.27"
+     y2="69.45"
+     id="line44" />
+  <line
+     class="cls-5"
+     x1="181.52"
+     y1="119.12"
+     x2="181.52"
+     y2="56.08"
+     id="line46" />
+  <line
+     class="cls-5"
+     x1="188.17"
+     y1="116.94"
+     x2="188.17"
+     y2="58.27"
+     id="line48" />
+  <line
+     class="cls-5"
+     x1="194.83"
+     y1="112.88"
+     x2="194.83"
+     y2="62.32"
+     id="line50" />
+  <line
+     class="cls-5"
+     x1="201.48"
+     y1="105.75"
+     x2="201.48"
+     y2="69.45"
+     id="line52" />
+  <polygon
+     class="cls-6"
+     points="347.24,2 341.24,14 240.24,14 235.24,2 "
+     id="polygon54"
+     transform="matrix(1.0257819,0,0,0.99634748,-7.5100057,0.02922015)" />
+  <polygon
+     class="cls-6"
+     points="8.24 168 109.24 168 115.24 178 3.24 178 8.24 168"
+     id="polygon56" />
+</svg>

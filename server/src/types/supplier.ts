@@ -66,8 +66,9 @@ export class BuildingSupplier implements Supplier<Building> {
 
 	create(direction = Vec2.UNIT_X) {
 		const angle = direction.angle();
-		const building = new Building();
+		const building = new Building(this.id);
 		building.direction = direction;
+		building.subBuildings = this.data.subBuildings
 		for (const ob of this.data.obstacles) {
 			const obstacle = castObstacle(ob);
 			if (!obstacle) continue;

@@ -164,9 +164,16 @@ server.on("connection", async socket => {
 	world.addPlayer(player);
 	player.scope = player.inventory.selectedScope = 2
 	player.inventory.scopes.push(2)
-	player.position = Vec2.fromArray([300, 230])
+	player.position = Vec2.fromArray([60, 60])
+	let map = world.terrains.concat(...world.buildings.map(b => b.floors.map(fl => fl.terrain)))
+	world.buildings.forEach(building => {
+		if (building.subBuildings){
+			building.subBuildings.forEach(subBuild => world.buildings.forEach(b => {if (subBuild == b.name){map = map.concat(b.floors.map(fl => fl.terrain))}}))
+		}
+	})
+
 	// Send the player the entire map
-	send(socket, new MapPacket(world.obstacles, world.buildings, world.terrains.concat(...world.buildings.map(b => b.floors.map(fl => fl.terrain)))));
+	send(socket, new MapPacket(world.obstacles, world.buildings, map));
 	// Send the player initial objects
 	send(socket, new GamePacket(world.entities, world.obstacles.concat(...world.buildings.map(b => b.obstacles.map(o => o.obstacle))), player, world.playerCount, true));
 	playerInitialPacketsSent.set(socket, true);

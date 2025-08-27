@@ -6,6 +6,7 @@ import { Terrain } from "./terrain";
 
 export default class Building {
 	id: string;
+	name: string;
 	// Center of the building
 	position = Vec2.ZERO;
 	direction = Vec2.UNIT_X;
@@ -15,11 +16,12 @@ export default class Building {
 	zones: { origPos: Vec2, position: Vec2, hitbox: Hitbox, map: boolean }[] = [];
 	color?: number;
 	zoneHitbox?: CircleHitbox;
-	subBuilding?: Building
+	subBuildings?: string[]
 	zoneHitboxForObstacles?: RectHitbox
 
-	constructor() {
+	constructor(name: string) {
 		this.id = ID();
+		this.name = name
 	}
 
 	addZone(position: Vec2, hitbox: Hitbox, map: boolean) {

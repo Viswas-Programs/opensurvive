@@ -5,21 +5,29 @@
 			"hitbox": [ 0.5, 11 ],
 			"color": 2592373247,
 			"__color": "(comment) 1566399999 is 0xad6218ff",
-			"position": [ -9, -9 ],
+			"position": [ 9, -14 ],
 			"surface": "metal"
 		},
 		{
 			"type": "wall",
 			"hitbox": [0.5, 11],
 			"color": 2592373247,
-			"position": [-9, 14 ],
+			"position": [9, 9 ],
 			"surface" : "metal"
 		},
 		{
 			"type": "door",
-			"hitbox": [0.5, 5],
+			"hitbox": [0.5, 5.5],
 			"color":2592373247,
-			"position": [-8.75, 1],
+			"position": [9, 0.5],
+			"pivot": [0, 2.5],
+			"health": 150
+		},
+		{
+			"type": "door",
+			"hitbox": [0.5, 5.5],
+			"color":2592373247,
+			"position": [9, -5.5],
 			"pivot": [0, -2.5],
 			"health": 150
 		},
@@ -27,7 +35,7 @@
 			"type": "wall",
 			"hitbox": [ 0.5, 39 ],
 			"color": 2592373247,
-			"position": [ 9, 0 ],
+			"position": [ -9, 0 ],
 			"surface": "metal"
 		},
 		{
@@ -93,6 +101,7 @@
 			}
 		}
 	],
+	"subBuildings": ["conExBoxBlue"],
 	"roofs": [
 		{
 			"type": "roof",

@@ -112,6 +112,9 @@ export async function start() {
 	(<HTMLAudioElement>document.getElementById("menu-audio")).pause();
 	document.getElementById("menu")?.classList.add("hidden");
 	document.getElementById("hud")?.classList.remove("hidden");
+	for (let ii=0; ii< document.getElementsByClassName("nameFrame").length; ii++){
+		(<HTMLElement>document.getElementsByClassName('nameFrame')[ii]).remove()
+	}
 	await Healing.setupHud();
 	animate(0);
 }

@@ -24,7 +24,7 @@
 	"zones": [
 		{
 			"position": [ 0.25, 0 ],
-			"hitbox": [ 12.25, 5 ],
+			"hitbox": [ 12.25, 4.5 ],
 			"map": true
 		}
 	],

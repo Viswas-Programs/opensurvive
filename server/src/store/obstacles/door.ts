@@ -18,6 +18,7 @@ export default class Door extends Obstacle {
 	type = Door.TYPE;
 	// Pivot is relative to the center of 
 	pivot: Vec2;
+	ogPivot: Vec2;
 	discardable = true;
 	interactable = true;
 	opened = false;
@@ -26,7 +27,7 @@ export default class Door extends Obstacle {
 	// We may add a metal type later
 	constructor(hitbox: RectHitbox, health: number, pivot: Vec2) {
 		super(world, hitbox, hitbox, health, health);
-		this.pivot = pivot;
+		this.pivot = this.ogPivot= pivot;
 	}
 
 	static {
@@ -40,7 +41,10 @@ export default class Door extends Obstacle {
 			this.pivot = this.pivot.addAngle(-this.turnedAngle);
 			this.opened = false;
 		} else {
-			if (player.position.y < this.position.y){if ( this.turnedAngle != -CommonAngles.PI_TWO){this.turnedAngle = -CommonAngles.PI_TWO; this.pivot = this.pivot.inverse()}}
+			if ((player.position.y < this.position.y && (this.ogPivot.x < 0|| this.ogPivot.y < 0)) || (player.position.y > this.position.y && (this.ogPivot.x > 0|| this.ogPivot.y > 0))){
+				if ( this.turnedAngle != -CommonAngles.PI_TWO)
+					{this.turnedAngle = -CommonAngles.PI_TWO; this.pivot = this.pivot.inverse()}
+			}
 			else{ if (this.turnedAngle == -CommonAngles.PI_TWO){this.pivot = this.pivot.inverse(); } this.turnedAngle= CommonAngles.PI_TWO;}
 			this.position = this.position.addVec(this.pivot).addVec(this.pivot.inverse().addAngle(this.turnedAngle));
 			this.direction = this.direction.addAngle(this.turnedAngle);
