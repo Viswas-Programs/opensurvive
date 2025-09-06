@@ -148,7 +148,7 @@ export type TerrainData = {
 
 export type BuildingData = {
 	obstacles: ObstacleData[];
-	zones?: { position: number[], hitbox: number[] | number, map?: boolean }[];
+	zones?: { position: number[], hitbox: number[] | number, map?: boolean, [key: string]: any}[];
 	floors?: TerrainData[];
 	roofs?: ObstacleData[];
 	mapColor?: number;

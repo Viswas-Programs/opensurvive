@@ -4,7 +4,7 @@ import { readFileSync } from "fs";
 import * as ws from "ws";
 import { ID, send, wait, sendBitstream, spawnGun, getArrayLength} from "./utils";
 import { MousePressPacket, MouseReleasePacket, MouseMovePacket, MovementPressPacket, MovementReleasePacket, GamePacket, ParticlesPacket, MapPacket, AckPacket, SwitchWeaponPacket, SoundPacket, UseHealingPacket, ResponsePacket, MobileMovementPacket, AnnouncePacket, PlayerRotationDelta, IPacket, ServerSideScopeUpdate, PlayerTickPkt, GameOverPkt, TDMInfoPacket } from "./types/packet";
-import { DIRECTION_VEC, EntityTypes, numTeamMapping, NumToDeathImg, RecvPacketTypes, SkinsDecoding, TICKS_PER_SECOND, RED_TEAM, BLUE_TEAM, TeamPlayerInfo, TEAMS, getTotalKillsFromTeam, TeamUsernameInfo, removePlayerFromTeam, TeamRemovePlayerInfo } from "./constants";
+import { DIRECTION_VEC, EntityTypes, numTeamMapping, NumToDeathImg, RecvPacketTypes, SkinsDecoding, TICKS_PER_SECOND, RED_TEAM, BLUE_TEAM, TeamPlayerInfo, TEAMS, getTotalKillsFromTeam, TeamUsernameInfo, removePlayerFromTeam, TeamRemovePlayerInfo, FIRST_SPAWN_LOCATIONS, RESPAWN_LOCATIONS } from "./constants";
 import {  CommonAngles, RectHitbox, Vec2 } from "./types/math";
 import { Ammo, Bullet, Gun, Player } from "./store/entities";
 import { World } from "./types/world";
@@ -131,11 +131,13 @@ server.on("connection", async socket => {
 	let skin = "default";
 	let deathImg = "default";
 	let isMobile = false;
-	let playerTeam = ""
-	console.log(BLUE_TEAM, RED_TEAM)
+	let playerTeam = "RED"
+	let respawn = false;
 	if ((getArrayLength(BLUE_TEAM) >= getArrayLength(RED_TEAM)) && getArrayLength(RED_TEAM) < 10 ){ playerTeam = TEAMS.RED; RED_TEAM.push(id)}
 	else if ((getArrayLength(BLUE_TEAM) <= getArrayLength(RED_TEAM)) && getArrayLength(BLUE_TEAM) < 10) { playerTeam = TEAMS.BLUE; BLUE_TEAM.push(id)}
 	else {socket.close()}
+				
+	console.log(BLUE_TEAM, RED_TEAM)
 	// Communicate with the client by sending the ID and map size. The client should respond with ID and username, or else close the connection.
 	await Promise.race([wait(10000), new Promise<void>(resolve => {
 		sendBitstream(socket, new AckPacket(id, TICKS_PER_SECOND, world.size, world.defaultTerrain, numTeamMapping.get(playerTeam)!));
@@ -151,6 +153,10 @@ server.on("connection", async socket => {
 				skin = SkinsDecoding.get(decoded.skin!)!;
 				deathImg = NumToDeathImg.get(decoded.deathImg!)!;
 				isMobile = decoded.isMobile;
+				if (decoded.teamExists){playerTeam = decoded.team;
+					respawn = true 
+					if (playerTeam == "RED"){RED_TEAM.push(id)}
+					else{BLUE_TEAM.push(id)}}
 				TeamUsernameInfo.get(playerTeam)!.push(`${username}#${id}`)
 			} else try { socket.close(); } catch (err) { }
 			resolve();
@@ -162,9 +168,13 @@ server.on("connection", async socket => {
 	// Create the new player and add it to the entity list.
 	const player = new Player(id, username, skin, deathImg, playerTeam, accessToken, isMobile);
 	world.addPlayer(player);
-	player.scope = player.inventory.selectedScope = 2
-	player.inventory.scopes.push(2)
-	player.position = Vec2.fromArray([60, 60])
+	if (!respawn){
+		player.position = Vec2.fromArray(FIRST_SPAWN_LOCATIONS.get(player.team)!)
+	}
+	else{
+		const randomNumber = Math.floor(Math.random() * (RESPAWN_LOCATIONS.length-1));
+		player.position = Vec2.fromArray(RESPAWN_LOCATIONS[randomNumber])
+	}
 	let map = world.terrains.concat(...world.buildings.map(b => b.floors.map(fl => fl.terrain)))
 	world.buildings.forEach(building => {
 		if (building.subBuildings){
@@ -334,15 +344,16 @@ setInterval(() => {
 		const pkt = new GamePacket(world.dirtyEntities.filter(entity => entity.id != player.id), world.dirtyObstacles, player, world.playerCount, false, world.discardEntities, world.discardObstacles)
 		sendBitstream(socket, pkt);
 		sendBitstream(socket, new PlayerTickPkt(player));
-		if (world.particles.length) sendBitstream(socket, new ParticlesPacket(world.particles, player));
-		sendBitstream(socket, new TDMInfoPacket(getTotalKillsFromTeam(TEAMS.RED), getTotalKillsFromTeam(TEAMS.BLUE), TeamUsernameInfo.get(TEAMS.RED)!, TeamUsernameInfo.get(TEAMS.BLUE)!, TeamRemovePlayerInfo))
+		//if (world.particles.length) sendBitstream(socket, new ParticlesPacket(world.particles, player));
+		const pack = new TDMInfoPacket(getTotalKillsFromTeam(TEAMS.RED), getTotalKillsFromTeam(TEAMS.BLUE), TeamUsernameInfo.get(TEAMS.RED)!, TeamUsernameInfo.get(TEAMS.BLUE)!, TeamRemovePlayerInfo)
+		sendBitstream(socket, pack )
 		//for (const sound of world.onceSounds) sendBitstream(socket, new SoundPacket(sound.path, sound.position));
-		for (const killFeed of world.killFeeds) {
+		/*for (const killFeed of world.killFeeds) {
 			if (!killFeed.disconnection) sendBitstream(socket, new AnnouncePacket(killFeed.disconnection, killFeed.killed, killFeed.yourPos, (<any>killFeed).weaponUsed, (<any>killFeed).killer))
 			else sendBitstream(socket, new AnnouncePacket(killFeed.disconnection, killFeed.killed, killFeed.yourPos))
-		}
+		}*/
 		//if (player.changedScope) { sendBitstream(socket, new ScopeUpdatePacket(player.lastPickedUpScope)); player.changedScope = false; }
-		if ((player.despawn || player.shouldSendStuff) && !player.sentStuff) { 
+		if (((player.despawn || player.shouldSendStuff) && !player.sentStuff) || world.gameEnded) { 
 			sendBitstream(socket, new GameOverPkt(player.won, player.damageDone, player.damageTaken, player.killCount)); player.sentStuff = true;
 			removePlayerFromTeam(player.team, player.username, player.id)
 		 }

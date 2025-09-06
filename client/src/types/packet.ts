@@ -24,7 +24,7 @@ export class IPacketCLIENT {
 
 // Packet to respond the server Ack
 export class ResponsePacket extends IPacketCLIENT {
-	allocBytes = 25;
+	allocBytes = 26;
 	type = OutPacketTypes.RESPONSE;
 	id: string;
 	username: string;
@@ -32,8 +32,10 @@ export class ResponsePacket extends IPacketCLIENT {
 	deathImg: number | null;
 	accessToken?: string;
 	isMobile?: boolean;
+	teamExists = false;
+	team?: number
 
-	constructor(id: string, username: string, skin: number | null, deathImg: number | null, isMobile: boolean, accessToken="") {
+	constructor(id: string, username: string, skin: number | null, deathImg: number | null, isMobile: boolean, accessToken="", team=2) {
 		super()
 		this.id = id;
 		this.username = username;
@@ -42,6 +44,7 @@ export class ResponsePacket extends IPacketCLIENT {
 		this.accessToken = accessToken;
 		this.isMobile = isMobile
 		this.allocBytes += this.username.length + this.id.length + (this.accessToken?.length as number)
+		if (team != 2){this.team = team; this.teamExists = true; this.allocBytes ++}
 	}
 	serialise() {
 		super.serialise()
@@ -52,6 +55,8 @@ export class ResponsePacket extends IPacketCLIENT {
 		stream.writeInt8(this.deathImg!)
 		stream.writeAccessToken(this.accessToken as string)
 		stream.writeBoolean(this.isMobile as boolean)
+		stream.writeBoolean(this.teamExists)
+		if (this.teamExists) stream.writeInt8(this.team as number)
 	}
 
 }

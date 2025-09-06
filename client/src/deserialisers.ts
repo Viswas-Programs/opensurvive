@@ -145,6 +145,7 @@ export function deserialiseMinObstacles(stream: IslandrBitStream): MinObstacle[]
             roofless: new Set<string>(),
             special: "normal"
         }
+        if (obstacle.type == 36){console.log(obstacle)}
         if (obstacle.type == ObstacleTypes.ROOF) {
             const size = stream.readInt8()
             if (size == 0) obstacle.roofless.clear()

@@ -11,7 +11,7 @@ import { initMap } from "./rendering/map";
 import { setWindowKeyDown } from "./settings";
 import { addKeyPressed, addMousePressed, cleanUpMouseAndKeyPressed, getToken, isKeyPressed, isMenuHidden, isMouseDisabled, leaderBoardViewStatus, removeKeyPressed, removeMousePressed, toggleBigMap, toggleHud, toggleLeaderboard, toggleMap, toggleMenu, toggleMinimap, toggleMouseDisabled } from "./states";
 import { FullPlayer, Healing } from "./store/entities";
-import { Barrel, Box, Bush, castMinObstacle, castObstacle, Crate, Desk, Log, Stone, Table, Toilet, ToiletMore, Tree } from "./store/obstacles";
+import { Armoury_Cage, Barrel, Box, Bush, castMinObstacle, castObstacle, Crate, Desk, Log, Stone, Table, Toilet, ToiletMore, Tree } from "./store/obstacles";
 import { castTerrain } from "./store/terrains";
 import Building from "./types/building";
 import { Vec2 } from "./types/math";
@@ -36,7 +36,7 @@ let skin: string | null = localStorage.getItem("playerSkin");
 let gameEnded = true;
 if (!localStorage.getItem("playerDeathImg")) localStorage.setItem("playerDeathImg", "default")
 let deathImg: string | null = localStorage.getItem("playerDeathImg");
-
+let resetTeam = false
 const isMobile = /Android/.test(navigator.userAgent) || /iPhone/.test(navigator.userAgent) || /iPad/.test(navigator.userAgent) || /Tablet/.test(navigator.userAgent)
 let player: FullPlayer | null;
 
@@ -72,6 +72,7 @@ let _scopes = [1];
 let data: any;
 let __finishedDeathCleanup = false;
 let ping = 0;
+let oldTeam = ""
 const usableGunAmmoNames = ["9mm", "12 gauge", "7.62mm", "5.56mm", ".308 subsonic"];
 const ammosElements = document.getElementsByClassName("ammos");
 const ammoImgElements = document.getElementsByClassName("ammoImgs")
@@ -135,11 +136,12 @@ async function init(address: string) {
 				size: [stream.readInt16(), stream.readInt16()],
 				terrain: <MinTerrain>{ id: stream.readId() },
 				team: teamNumMapping.get(stream.readInt8()!)
+
 			}
 			id = dataA.id;
 			tps = dataA.tps;
 			world = new World(new Vec2(dataA.size[0], dataA.size[1]), castTerrain(dataA.terrain).setColour((modeMapColours[getMode() as modeMapColourType])));
-			const gameObjects = [Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table, Box, Log]
+			const gameObjects = [Bush, Tree, Barrel, Crate, Desk, Stone, Toilet, ToiletMore, Table, Box, Log, Armoury_Cage]
 			gameObjects.forEach(OBJ => { OBJ.updateAssets() })
 
 			// Call renderer start to setup
@@ -150,7 +152,16 @@ async function init(address: string) {
 			var currentCursor = localStorage.getItem("selectedCursor")
 			if (!currentCursor) { localStorage.setItem("selectedCursor", "default"); currentCursor = localStorage.getItem("selectedCursor") }
 			if (currentCursor) { document.documentElement.style.cursor = currentCursor }
-			const responsePacket = new ResponsePacket(id, username!, SkinsEncoding.get(skin!)!, DeathImgToNum.get(deathImg!)!, isMobile!, String(cookieExists("gave_me_cookies") ? getCookieValue("access_token") : getToken()))
+			let responsePacket: ResponsePacket;
+			if (oldTeam != ""){dataA.team = oldTeam}
+			if (oldTeam != ""){
+				if (oldTeam == "RED") {responsePacket = new ResponsePacket(id, username!, SkinsEncoding.get(skin!)!, DeathImgToNum.get(deathImg!)!, isMobile!, String(cookieExists("gave_me_cookies") ? getCookieValue("access_token") : getToken()), 0)}
+				else{responsePacket = new ResponsePacket(id, username!, SkinsEncoding.get(skin!)!, DeathImgToNum.get(deathImg!)!, isMobile!, String(cookieExists("gave_me_cookies") ? getCookieValue("access_token") : getToken()), 1)}
+			}
+			else{
+				responsePacket = new ResponsePacket(id, username!, SkinsEncoding.get(skin!)!, DeathImgToNum.get(deathImg!)!, isMobile!, String(cookieExists("gave_me_cookies") ? getCookieValue("access_token") : getToken()))
+			}
+			console.log(responsePacket)
 			connected = true;
 			send(ws, responsePacket);
 			setConnected(true)
@@ -430,7 +441,9 @@ async function init(address: string) {
 						}
 						const removedPlyersListLen = stream!.readInt8()
 						const removedPlayersIDS = []
-						for (let ii=0; ii<removedPlyersListLen; ii++){removedPlayersIDS.push(String(stream!.readInt16()))}
+						for (let ii=0; ii<removedPlyersListLen; ii++){
+							const id= stream!.readInt16()
+							removedPlayersIDS.push(String(id))}
 						if (!player?.team) return
 						let youTeamScore, youTeamPlayers: string[], themTeamScore, themTeamPlayers: string[];
 						let youGradient= "", themGradient = "", youNameGrad = "", themNameGrad = "";
@@ -465,11 +478,12 @@ async function init(address: string) {
 							newNameElement.textContent=member;
 							themElementsStuff[1]?.appendChild(newNameElement);}
 						})
-						removedPlayersIDS.forEach(ID => 
-							document.getElementById(ID)!.style.display = "none"
-						)
+						removedPlayersIDS.forEach(ID => {
+							try {document.getElementById(ID)!.style.display = "none"}
+							catch{}
+						
 
-						break;
+					})
 					}
 					// Packet switcher ends.
 				}
@@ -486,6 +500,8 @@ async function init(address: string) {
 			id = null;
 			tps = 1;
 			if (clearUsrStuffAfterDiscon) { username = null;}
+			oldTeam=player?.team!
+			if (resetTeam) oldTeam = ""
 			player = null;
 			setUsrnameIdDeathImg([null, null, null])
 			res(undefined);
@@ -687,7 +703,7 @@ function cleanupAfterDisconnect() {
 	cleanUpMouseAndKeyPressed()
 	toggleMenu();
 }
-document.getElementById("disconnect")?.addEventListener("click", cleanupAfterDisconnect);
+document.getElementById("disconnect")?.addEventListener("click", () => {resetTeam = true; cleanupAfterDisconnect()});
 document.getElementById("playAgain")?.addEventListener("click", () => {
 	clearUsrStuffAfterDiscon = false;
 	cleanupAfterDisconnect()
@@ -695,6 +711,7 @@ document.getElementById("playAgain")?.addEventListener("click", () => {
 	wait(1000).then(connect)
 })
 document.getElementById("mainMenu")?.addEventListener("click", () => {
+	resetTeam= true
 	cleanupAfterDisconnect()
 	toggleMenu();
 })

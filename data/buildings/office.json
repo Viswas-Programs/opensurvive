@@ -5,52 +5,67 @@
             "position": [-9.5, 3],
             "hitbox": [0.5, 33.5],
             "color": 2592373247,
-            "surface": "metal"
+            "surface": "metal",
+            "COMMENT": "ZONE 1 Left side vertical main wall"
         },
         {
             "type": "wall",
             "position": [26, -8.75],
             "hitbox": [0.5, 58],
             "color":2592373247,
-            "surface":"metal"
+            "surface":"metal",
+            "COMMENT": "ZONE 1 Right side vertical main wall"
         },
         {
             "type": "wall",
             "position": [-5.625, 19.6],
             "hitbox": [8.25, 0.5],
             "color":2592373247,
-            "surface": "metal"
+            "surface": "metal",
+            "COMMENT": "ZONE 1 Left side horizontal - Left of Vent Opening. Forms Main 2/4"
+        },
+        {
+            "type":"wall",
+            "hitbox": [2.825, 0.5],
+            "position": [3.75, 19.6],
+            "color":2592373247,
+            "COMMENT": "ZONE 1 Left side horizontal - Right of vent Opening. Forms Main 1/4 (rest 1/4 is vent opening itself)"
         },
         {
             "type": "wall",
             "position": [19.25, 20],
             "hitbox": [13.5, 0.5],
             "color":2592373247,
-            "surface":"metal"
+            "surface":"metal",
+            "COMMENT": "ZONE 1 Right side horizontal main (Main Building Right Primary Wall)"
         },
         {
             "type": "wall",
             "position": [5, 12.25],
             "hitbox": [0.5, 13.5],
-            "color": 3468538111
+            "color": 3468538111,
+            "COMMENT": "ZONE 1 Inner - Pathway Left Bottom Wall"
         },
         {
             "type": "wall",
             "position": [5, -6.5],
             "hitbox": [0.5, 12.5],
-            "color": 3468538111
+            "color": 3468538111,
+            "COMMENT": "ZONE 1 Inner - Pathway Left Top Wall"
         },
         {
             "type": "wall",
             "position": [12.5, -2.75],
             "hitbox": [0.5, 20],
-            "color": 3468538111
+            "color": 3468538111,
+            "COMMENT": "ZONE 1 Inner - Pathway Right Wall"
         },
         {
             "type": "wall",
             "hitbox": [0.5, 10],
             "position": [-10, 32.75],
-            "color": 2592373247
+            "color": 2592373247,
+            "COMMENT": ""
         },
         {
             "type": "wall",
@@ -77,16 +92,11 @@
             "color":2592373247
         },
         {
-            "type":"wall",
-            "hitbox": [2.825, 0.5],
-            "position": [3.75, 19.6],
-            "color":2592373247
-        },
-        {
             "type": "wall",
             "position": [3, -37.5],
             "hitbox": [45.75, 0.5],
-            "color":2592373247
+            "color":2592373247,
+            "COMMENT": "ZONE 4 Top Horizontal Long Primary Wall (Main Building Top Primary Wall)"
         }
     ],
     "floors": [
@@ -116,22 +126,26 @@
         {
             "position": [8.25,2.625],
             "hitbox": [34, 32.25],
-            "map": true
+            "map": true,
+            "ZoneID": "ZONE 1"
         },
         {
             "position": [8.5, 23],
             "hitbox": [7, 9],
-            "map": true
+            "map": true,
+            "ZoneID":"ZONE 2"
         },
         {
             "position": [1.5, 33],
             "hitbox": [20.5, 8],
-            "map": true
+            "map": true,
+            "ZoneID":"ZONE 3"
         },
         {
             "position": [3.5, -26],
             "hitbox": [45, 22],
-            "map": true
+            "map": true,
+            "ZoneID":"ZONE 4"
         }
     ],
     "mapColor": 1566399999

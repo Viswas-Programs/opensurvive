@@ -5,7 +5,7 @@ import { Entity } from "./entity";
 import { CircleHitbox, Vec2 } from "./math";
 import { Obstacle } from "./obstacle";
 import { Particle } from "./particle";
-import { EntityTypes, PLAYER_THRESHOLD, TICKS_PER_SECOND } from "../constants";
+import { EntityTypes, getTotalKillsFromTeam, PLAYER_THRESHOLD, TICKS_PER_SECOND } from "../constants";
 import { Player } from "../store/entities";
 import { Terrain } from "./terrain";
 import { reset } from "..";
@@ -33,6 +33,7 @@ export class World {
 	zoneMoving = false;
 	private zoneTick: number;
 	zoneDamage: number;
+	gameEnded = false
 	nextSafeZone: { hitbox: CircleHitbox; position: Vec2; };
 	safeZone: { hitbox: CircleHitbox; oHitbox: CircleHitbox; position: Vec2; oPosition: Vec2; };
 
@@ -138,6 +139,7 @@ export class World {
 		}
 		// Remove all discardable obstacles
 		for (ii = removable.length - 1; ii >= 0; ii--) this.obstacles.splice(removable[ii], 1);
+		if (getTotalKillsFromTeam("blue") >= 100 || getTotalKillsFromTeam("red") >= 100){this.gameEnded = true}
 
 		// Tick red zone [DISABLED]
 		/*if (this.zoneActive) {

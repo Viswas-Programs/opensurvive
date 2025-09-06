@@ -20,7 +20,7 @@ export { default as Table } from "./table";
 export { default as Desk } from "./desk";
 export { default as Box } from "./box";
 export { default as Log } from "./log"
-
+export { default as Armoury_Cage} from "./armoury_cage";
 const f: Map<string, number> = new Map([
 	["barrel", ObstacleTypes.BARREL],
 	["box", ObstacleTypes.BOX],
@@ -36,7 +36,8 @@ const f: Map<string, number> = new Map([
 	["toilet_more", ObstacleTypes.TOILET_MORE],
 	["tree", ObstacleTypes.TREE],
 	["wall", ObstacleTypes.WALL],
-	["roof", ObstacleTypes.ROOF]
+	["roof", ObstacleTypes.ROOF],
+	["armoury_cage", ObstacleTypes.ARMOURY_CAGE]
 ])
 export function castObstacle(data: ObstacleData) {
 	return OBSTACLE_SUPPLIERS.get(f.get(data.type)!)?.create(data);

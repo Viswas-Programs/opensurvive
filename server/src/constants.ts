@@ -81,7 +81,8 @@ export enum ObstacleTypes {
 	TOILET_MORE = 32,
 	TREE = 33,
 	WALL = 34,
-	SPAWNER = 35
+	SPAWNER = 35,
+	ARMOURY_CAGE = 36
 }
 
 export const SkinsDecoding = new Map<number, string>([
@@ -157,5 +158,19 @@ export function removePlayerFromTeam(team: string, username: string, id: string)
 	delete teamUsrInfo[TeamUsernameInfo.get(team)?.indexOf(`${username}#${id}`)!]
 	TeamPlayerInfo.set(team, teamPlInfo);
 	TeamUsernameInfo.set(team, teamUsrInfo)
-	TeamRemovePlayerInfo.push(id)
+	if (!(id in TeamPlayerInfo))TeamRemovePlayerInfo.push(id)
 }
+
+export const FIRST_SPAWN_LOCATIONS = new Map<string, number[]>([
+	["RED", [90, 120]],
+	["BLUE", [312, 49.5]]
+])
+export const RESPAWN_LOCATIONS = [
+	[325, 120],
+	[305, 93],
+	[327, 90],
+	[94, 72],
+	[74.5, 87.5],
+	[145, 120],
+	[285, 135]
+]

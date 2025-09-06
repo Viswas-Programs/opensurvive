@@ -69,11 +69,12 @@ export class BuildingSupplier implements Supplier<Building> {
 		const building = new Building(this.id);
 		building.direction = direction;
 		building.subBuildings = this.data.subBuildings
+		if (this.data.obstacles){
 		for (const ob of this.data.obstacles) {
 			const obstacle = castObstacle(ob);
 			if (!obstacle) continue;
 			building.addObstacle(Vec2.fromArray(ob.position).addAngle(angle), obstacle);
-		}
+		}}
 		const zones = this.data.zones?.map(zone => ({ position: Vec2.fromArray(zone.position).addAngle(angle), hitbox: Hitbox.fromNumber(zone.hitbox), map: !!zone.map })) || [];
 		if (this.data.zones)
 			for (const zone of zones)

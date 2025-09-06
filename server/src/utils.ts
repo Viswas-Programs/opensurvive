@@ -86,7 +86,7 @@ export function spawnLoot(type: string, id: string, color: GunColor, position: V
 
 export function getArrayLength(array: Array<any>): number{
     let length = 0;
-    array.forEach(member => length++);
+    array.forEach(member => {if (member)length++});
     return length
 }
 

@@ -19,6 +19,7 @@ export { default as Table } from "./table";
 export { default as Desk } from "./desk";
 export { default as Box } from "./box";
 export { default as Log } from "./log";
+export { default as Armoury_Cage} from "./armoury_cage";
 export function castObstacle(minObstacle: MinObstacle & any) {
 	return OBSTACLE_SUPPLIERS.get(minObstacle.type)?.create(minObstacle);
 }

@@ -147,7 +147,8 @@ export enum ObstacleTypes {
 	TOILET_MORE = 32,
 	TREE = 33,
 	WALL = 34,
-	SPAWNER = 35
+	SPAWNER = 35,
+	ARMOURY_CAGE = 36
 }
 
 export const SkinsDecoding = new Map<number, string>([

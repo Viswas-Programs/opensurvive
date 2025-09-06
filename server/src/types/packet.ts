@@ -1,5 +1,5 @@
 import { disconnect } from "process";
-import { BASE_RADIUS, BLUE_TEAM, OutPacketTypes, RecvPacketTypes, RED_TEAM } from "../constants";
+import { BASE_RADIUS, BLUE_TEAM, OutPacketTypes, RecvPacketTypes, RED_TEAM, TEAMS } from "../constants";
 import { IslandrBitStream } from "../packets";
 import { calculateAllocBytesForObs, calculateAllocBytesForTickPkt, serialiseDiscardables, serialiseMinObstacles, serialiseMinParticles, serialisePlayer } from "../serialisers";
 import { Player } from "../store/entities";
@@ -50,6 +50,8 @@ export class ResponsePacket extends IPacketCLIENTSERVERCOM {
 	accessToken?: string;
 	mode!: string;
 	isMobile!: boolean;
+	teamExists!: boolean;
+	team!: string;
 
 	deserialise(stream: IslandrBitStream) {
 		this.id = stream.readId()
@@ -58,6 +60,12 @@ export class ResponsePacket extends IPacketCLIENTSERVERCOM {
 		this.deathImg = stream.readInt8()
 		this.accessToken = stream.readAccessToken()
 		this.isMobile = stream.readBoolean()
+		this.teamExists = stream.readBoolean();
+		if (this.teamExists){
+			const team = stream.readInt8()
+			if (team == 0){this.team = TEAMS.RED}
+			else{ this.team = TEAMS.BLUE}
+		}
 	}
 }
 
@@ -273,10 +281,10 @@ export class TDMInfoPacket extends IPacketSERVER{
 		super.serialise()
 		this.stream.writeInt8(this.redTeamScore)
 		this.stream.writeInt8(this.blueTeamScore)
-		this.stream.writeInt8(getArrayLength(RED_TEAM))
-		this.redTeamMembers.forEach(member => this.stream.writeASCIIString(member))
-		this.stream.writeInt8(getArrayLength(BLUE_TEAM))
-		this.blueTeamMembers.forEach(member => this.stream.writeASCIIString(member))
+		this.stream.writeInt8(getArrayLength(this.redTeamMembers))
+		this.redTeamMembers.forEach(member => {if (member) this.stream.writeASCIIString(member)})
+		this.stream.writeInt8(getArrayLength(this.blueTeamMembers))
+		this.blueTeamMembers.forEach(member => {if (member) this.stream.writeASCIIString(member)})
 		this.stream.writeInt8(getArrayLength(this.removedPlayers))
 		this.removedPlayers.forEach(member => this.stream.writeInt16(Number(member)))
 	}
@@ -301,7 +309,7 @@ export class GameOverPkt extends IPacketSERVER {
 	playerWonGame: boolean;
 	damageDone: number;
 	damageTaken: number;
-	allocBytes = 7;
+	allocBytes = 8;
 	kills: number;
 	constructor(playerWonGame: boolean, damageDone: number, damageTaken: number, kills: number) {
 		super()
